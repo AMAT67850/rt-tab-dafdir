@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocket Tower - Tableau de Bord Financier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .section-description {
+            color: #7f8c8d;
+            font-size: 1em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-success { background: linear-gradient(45deg, #27ae60, #2ecc71); }
+        .btn-danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        .btn-info { background: linear-gradient(45deg, #3498db, #2980b9); }
+        .btn-warning { background: linear-gradient(45deg, #f39c12, #e67e22); }
+        .btn-primary { background: linear-gradient(45deg, #8e44ad, #9b59b6); }
+        .btn-analytics { background: linear-gradient(45deg, #007bff, #0056b3); }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+
+        .status-operational {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+
+        .status-planned {
+            background: #fdf2e9;
+            color: #e67e22;
+        }
+
+        .footer {
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .sections-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 20px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <h1>🚀 ROCKET TOWER</h1>
+        <p>Tableau de Bord Financier Multi-Pages</p>
+    </div>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <div class="container">
+        <!-- BREADCRUMB -->
+        <div class="breadcrumb">
+            🏠 Dashboard • Accueil
+        </div>
+
+        <!-- ACCÈS GÉNÉRIQUES -->
+        <div class="section-card">
+            <h2 class="section-title">📁 Accès Génériques</h2>
+            <p class="section-description">Vos outils principaux pour documents et données.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <a href="https://drive.google.com/drive/u/0/starred" target="_blank" class="btn btn-info">📁 Documents Métier (Suivis)</a>
+                <a href="https://drive.google.com/drive/u/0/folders/0ACyy-ODOULk4Uk9PVA" target="_blank" class="btn btn-info">📁 Dossier Partagé (Équipe)</a>
+                <a href="https://cloud.seatable.io" target="_blank" class="btn btn-success">🗄️ Bases de Données (SeaTable)</a>
+            </div>
+        </div>
+
+        <!-- SECTIONS MODULES PRINCIPAUX -->
+        <div class="sections-grid">
+            <!-- RECETTES RÉCURRENTES -->
+            <div class="section-card">
+                <h2 class="section-title">💵 Interface Gestion des Recettes récurrentes</h2>
+                <p class="section-description">Système complet avec 71 contrats clients réels intégrés, lissage automatique des périodicités et persistance localStorage.</p>
+                <a href="rt_module2_recettes_crud_final.html" class="btn btn-success">💵 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+            </div>
+
+            <!-- CHARGES RÉCURRENTES -->
+            <div class="section-card">
+                <h2 class="section-title">💰 Interface Gestion des Charges récurrentes</h2>
+                <p class="section-description">Système complet avec 119 charges réelles intégrées, lissage automatique des périodicités et persistance localStorage.</p>
+                <a href="rt_module3_charges_crud.html" class="btn btn-danger">💰 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+            </div>
+
+            <!-- CHARGES PÉRIODIQUES -->
+            <div class="section-card">
+                <h2 class="section-title">📅 Interface Charges Périodiques</h2>
+                <p class="section-description">Gestion complète des charges 1-2 fois par an avec CRUD localStorage, calculs automatiques et persistance.</p>
+                <a href="rt_Module4_charges-periodiques_crud.html" class="btn btn-warning">📅 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+            </div>
+
+            <!-- ANALYTICS DASHBOARD -->
+            <div class="section-card">
+                <h2 class="section-title">📊 Interface Analytics Dashboard</h2>
+                <p class="section-description">Analyse financière temps réel avec indicateurs clés, ratios de performance et équilibre financier. Lecture automatique modules recettes + charges récurrentes.</p>
+                <a href="rt_module5_analytics.html" class="btn btn-analytics">📊 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+            </div>
+
+            <!-- PRÉVISIONNEL 12 MOIS - NOUVEAU MODULE OPÉRATIONNEL -->
+            <div class="section-card">
+                <h2 class="section-title">🔮 Prévisionnel 12 Mois</h2>
+                <p class="section-description">Projection financière automatique sur 12 mois avec données récurrentes, graphique d'évolution et opérations spécifiques ajustables.</p>
+                <a href="rt_module6_previsionnel.html" class="btn btn-primary">🔮 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+            </div>
+
+            <!-- LOCATIONS PONCTUELLES -->
+            <div class="section-card">
+                <h2 class="section-title">🏢 Locations Ponctuelles</h2>
+                <p class="section-description">Interface de gestion des locations événementielles avec structure matricielle et calculs automatiques.</p>
+                <button onclick="alertModule('Locations')" class="btn btn-warning">🏢 Module en Préparation</button>
+                <span class="status-badge status-planned">📋 Phase 4</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>&copy; 2025 Rocket Tower - Tableau de Bord Financier | Architecture Multi-Pages • 6 Modules Opérationnels</p>
+    </div>
+
+    <script>
+        function alertModule(moduleName) {
+            alert(`Module ${moduleName} en cours de développement.\n\nArchitecture multi-pages :\n- 6 modules opérationnels (Dashboard + Recettes + Charges + Charges Périodiques + Analytics + Prévisionnel)\n- Développement interface par interface\n- Aucun impact sur modules existants\n- Évolutivité native garantie\n\nProchaine étape : Modules métier avancés`);
+        }
+    </script>
+</body>
+</html>

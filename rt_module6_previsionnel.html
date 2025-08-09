@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔮 Rocket Tower - Prévisionnel 12 Mois</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- PRINT CSS : Styles optimisés pour export PDF -->
+    <style>
+        @media print {
+            /* MASQUER ÉLÉMENTS NAVIGATION */
+            .header-controls, .nav-links, .controls, .actions, .btn, button, .modal {
+                display: none !important;
+            }
+            
+            /* OPTIMISER LAYOUT IMPRESSION */
+            body {
+                background: white !important;
+                padding: 0 !important;
+                font-size: 12px;
+            }
+            
+            .container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+            }
+            
+            /* HEADER IMPRESSION */
+            .header {
+                background: white !important;
+                color: #333 !important;
+                border-bottom: 2px solid #333;
+                page-break-after: avoid;
+            }
+            
+            /* ACCORDÉONS IMPRESSION */
+            .accordion-content {
+                display: block !important;
+                max-height: none !important;
+            }
+            
+            .accordion-header {
+                background: #f0f0f0 !important;
+                color: #333 !important;
+            }
+            
+            /* GRAPHIQUE IMPRESSION */
+            .chart-container {
+                page-break-inside: avoid;
+            }
+            
+            /* TABLEAUX IMPRESSION */
+            .month-table {
+                page-break-inside: avoid;
+                font-size: 10px !important;
+            }
+            
+            .month-table th, .month-table td {
+                border: 1px solid #333 !important;
+                padding: 4px !important;
+            }
+            
+            /* INFOS IMPRESSION */
+            .print-info {
+                display: block !important;
+                text-align: center;
+                font-size: 10px;
+                color: #666;
+                border-top: 1px solid #ccc;
+                padding-top: 10px;
+                margin-top: 20px;
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* MASQUER INFO IMPRESSION EN MODE NORMAL */
+        .print-info {
+            display: none;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(142, 68, 173, 0.3);
+        }
+
+        .param-grid {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            gap: 20px;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .param-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .param-item label {
+            font-weight: 600;
+            color: #495057;
+            white-space: nowrap;
+        }
+
+        .param-item input[type="number"] {
+            width: 120px;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .periode-display {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 10px 16px;
+            border-radius: 6px;
+            border: 2px solid #8e44ad;
+            font-weight: 600;
+            color: #8e44ad;
+            min-width: 220px;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* PDF Button */
+        .pdf-btn {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .pdf-btn:hover {
+            background: #5a32a3;
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #8e44ad;
+        }
+
+        .stat-card h3 {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #8e44ad;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+
+        .chart-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .accordion {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        }
+
+        .accordion-header.active {
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+            color: white;
+        }
+
+        .accordion-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accordion-summary {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .accordion-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-content.active {
+            max-height: none;
+            overflow: visible;
+        }
+
+        .accordion-body {
+            padding: 25px;
+        }
+
+        .month-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: visible;
+            max-height: none;
+        }
+
+        .month-table th,
+        .month-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .month-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .month-table td {
+            font-size: 0.85em;
+        }
+
+        .montant {
+            text-align: right;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .montant.positif {
+            color: #28a745;
+        }
+
+        .montant.negatif {
+            color: #dc3545;
+        }
+
+        .month-summary {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #8e44ad;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-item .label {
+            font-size: 0.8em;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .summary-item .value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .add-operation {
+            background: #e3f2fd;
+            border: 2px dashed #2196f3;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-operation:hover {
+            background: #bbdefb;
+            border-color: #1976d2;
+        }
+
+        .add-operation .icon {
+            font-size: 2em;
+            color: #2196f3;
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 0;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+        }
+
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: -5px;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #8e44ad;
+            box-shadow: 0 0 0 2px rgba(142, 68, 173, 0.2);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .btn-modal {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .param-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .accordion-header {
+                padding: 15px;
+            }
+
+            .accordion-body {
+                padding: 15px;
+            }
+
+            .month-table {
+                font-size: 0.8em;
+            }
+
+            .month-table th,
+            .month-table td {
+                padding: 8px 6px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔮 Prévisionnel 12 Mois</h1>
+            <p>Projection financière automatique avec données récurrentes + suivi réalisé</p>
+        </div>
+
+        <!-- Paramètres -->
+        <div class="param-grid">
+            <div class="param-item">
+                <label for="soldeInitial">💰 Solde au 31/07/2025 :</label>
+                <input type="number" id="soldeInitial" value="18881.28" step="0.01">
+            </div>
+            <div class="param-item">
+                <label>📅 Période :</label>
+                <div class="periode-display" id="periodeAffichage">Août 2025 - Juillet 2026</div>
+            </div>
+            <div class="param-item">
+                <button onclick="calculerPrevisionnel()" class="btn btn-primary">🔮 Calculer Prévisionnel</button>
+                <button onclick="exporterPDF()" class="btn pdf-btn">🖨️ Export PDF</button>
+                <a href="rt_Module1_index_dashboard_navigation.html" class="btn btn-secondary">🏠 Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Stats Résumé -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalRecettes">0€</h3>
+                <p>Total Recettes Annuel</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalCharges">0€</h3>
+                <p>Total Charges Annuel</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="resultatAnnuel">0€</h3>
+                <p>Résultat Prévisionnel</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="soldeFinal">0€</h3>
+                <p>Solde Final Prévu</p>
+            </div>
+        </div>
+
+        <!-- Graphique -->
+        <div class="chart-section">
+            <h2>📈 Évolution Solde Cumulé</h2>
+            <div class="chart-container">
+                <canvas id="prevChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Accordéons Mensuels -->
+        <div id="accordeonContainer">
+            <!-- Généré dynamiquement -->
+        </div>
+
+        <!-- INFORMATIONS POUR IMPRESSION - MASQUÉES À L'ÉCRAN -->
+        <div class="print-info">
+            <p><strong>🚀 ROCKET TOWER - PRÉVISIONNEL 12 MOIS</strong></p>
+            <p>Rapport généré le <span id="dateImpression"></span> à <span id="heureImpression"></span></p>
+            <p>Période : <span id="periodeImpression">Août 2025 - Juillet 2026</span></p>
+            <p>Données sources : Recettes + Charges récurrentes • Généré automatiquement</p>
+        </div>
+    </div>
+
+    <!-- Modal Ajout Opération -->
+    <div id="modalOperation" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nouvelle Opération</h2>
+                <span class="close" onclick="fermerModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="formOperation">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="operationType" required>
+                            <option value="recette">💰 Recette</option>
+                            <option value="charge">💸 Charge</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Libellé</label>
+                        <input type="text" id="operationLibelle" required placeholder="Description de l'opération">
+                    </div>
+                    <div class="form-group">
+                        <label>Montant (€)</label>
+                        <input type="number" id="operationMontant" step="0.01" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Commentaire</label>
+                        <textarea id="operationCommentaire" rows="3" placeholder="Informations complémentaires (optionnel)"></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="btn-modal btn-secondary" onclick="fermerModal()">Annuler</button>
+                        <button type="submit" class="btn-modal btn-primary">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let recettesData = [];
+        let chargesData = [];
+        let projectionMensuelle = [];
+        let operationsSpecifiques = {};
+        let chart = null;
+        let currentMonth = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            chargerDonnees();
+            initialiserGraphique();
+            calculerPrevisionnel();
+        });
+
+        function chargerDonnees() {
+            try {
+                // Chargement recettes
+                const recettesJSON = localStorage.getItem('recettesRT');
+                if (recettesJSON) {
+                    const toutesRecettes = JSON.parse(recettesJSON);
+                    recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF');
+                } else {
+                    recettesData = [];
+                }
+
+                // Chargement charges
+                const chargesJSON = localStorage.getItem('chargesRecurrentesRT');
+                if (chargesJSON) {
+                    const toutesCharges = JSON.parse(chargesJSON);
+                    chargesData = toutesCharges.filter(c => c.statut === 'ACTIF');
+                } else {
+                    chargesData = [];
+                }
+
+                // Chargement prévisionnel existant
+                const prevJSON = localStorage.getItem('previsionnel12moisRT');
+                if (prevJSON) {
+                    const prevData = JSON.parse(prevJSON);
+                    operationsSpecifiques = prevData.operationsSpecifiques || {};
+                }
+
+                console.log('📊 Données chargées:', {
+                    recettes: recettesData.length,
+                    charges: chargesData.length,
+                    operations: Object.keys(operationsSpecifiques).length
+                });
+
+            } catch (error) {
+                console.error('❌ Erreur chargement:', error);
+            }
+        }
+
+        function sauvegarderPrevisionnel() {
+            try {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    soldeInitial: parseFloat(document.getElementById('soldeInitial').value),
+                    projectionMensuelle: projectionMensuelle,
+                    operationsSpecifiques: operationsSpecifiques
+                };
+                localStorage.setItem('previsionnel12moisRT', JSON.stringify(data));
+                console.log('💾 Prévisionnel sauvegardé');
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde:', error);
+            }
+        }
+
+        // FONCTION CORRIGÉE POUR GÉRER LE FORMAT NUMÉRIQUE "1,4,7,10"
+        function doitApparaitreCeMois(item, dateMois) {
+            const moisActuel = dateMois.getMonth() + 1; // 1-12
+            
+            // Gestion mois spécifiques (format numérique : "1,4,7,10")
+            if (item.moisIntervention && 
+                item.moisIntervention.trim() && 
+                item.moisIntervention.trim().toLowerCase() !== 'tous') {
+                
+                const moisListe = item.moisIntervention.split(',').map(m => parseInt(m.trim()));
+                return moisListe.includes(moisActuel);
+            }
+            
+            // Gestion périodicités standards
+            if (!item.periodicite || item.periodicite === 'MENSUEL') {
+                return true;
+            }
+            
+            switch (item.periodicite) {
+                case 'BIMESTRIEL':
+                    return moisActuel % 2 === 0; // Mois pairs
+                case 'TRIMESTRIEL':
+                    return [1, 4, 7, 10].includes(moisActuel);
+                case 'SEMESTRIEL':
+                    return moisActuel === 1 || moisActuel === 7;
+                case 'ANNUEL':
+                    return moisActuel === 1;
+                default:
+                    return true;
+            }
+        }
+
+        function calculerPrevisionnel() {
+            const dateDebut = new Date('2025-08-01');
+            projectionMensuelle = [];
+            
+            const soldeInitial = parseFloat(document.getElementById('soldeInitial').value);
+            
+            for (let i = 0; i < 12; i++) {
+                const moisCourant = new Date(dateDebut);
+                moisCourant.setMonth(moisCourant.getMonth() + i);
+                
+                const moisNom = moisCourant.toLocaleDateString('fr-FR', { 
+                    month: 'long', 
+                    year: 'numeric' 
+                }).replace(/^\w/, c => c.toUpperCase());
+                
+                const moisCle = `${moisCourant.getFullYear()}-${String(moisCourant.getMonth() + 1).padStart(2, '0')}`;
+                
+                let totalRecettes = 0;
+                let totalCharges = 0;
+                let detailRecettes = [];
+                let detailCharges = [];
+                
+                // Calcul recettes récurrentes
+                recettesData.forEach(item => {
+                    if (doitApparaitreCeMois(item, moisCourant)) {
+                        totalRecettes += item.montantTTC;
+                        detailRecettes.push({
+                            libelle: `${item.element} - ${item.client}`,
+                            montant: item.montantTTC,
+                            type: 'recurrente'
+                        });
+                    }
+                });
+                
+                // Calcul charges récurrentes
+                chargesData.forEach(item => {
+                    if (doitApparaitreCeMois(item, moisCourant)) {
+                        const montant = Math.abs(item.montantTTC);
+                        totalCharges += montant;
+                        detailCharges.push({
+                            libelle: `${item.element} - ${item.fournisseur}`,
+                            montant: montant,
+                            type: 'recurrente'
+                        });
+                    }
+                });
+                
+                // Ajout opérations spécifiques
+                if (operationsSpecifiques[moisCle]) {
+                    operationsSpecifiques[moisCle].forEach(op => {
+                        if (op.type === 'recette') {
+                            totalRecettes += op.montant;
+                            detailRecettes.push({
+                                libelle: op.libelle,
+                                montant: op.montant,
+                                type: 'specifique',
+                                commentaire: op.commentaire
+                            });
+                        } else {
+                            totalCharges += op.montant;
+                            detailCharges.push({
+                                libelle: op.libelle,
+                                montant: op.montant,
+                                type: 'specifique',
+                                commentaire: op.commentaire
+                            });
+                        }
+                    });
+                }
+                
+                const solde = totalRecettes - totalCharges;
+                const soldeCumule = i === 0 ? soldeInitial + solde : projectionMensuelle[i-1].soldeCumule + solde;
+                
+                projectionMensuelle.push({
+                    mois: moisNom,
+                    moisCle: moisCle,
+                    totalRecettes,
+                    totalCharges,
+                    solde,
+                    soldeCumule,
+                    detailRecettes,
+                    detailCharges
+                });
+            }
+            
+            afficherStats();
+            afficherAccordeons();
+            mettreAJourGraphique();
+            sauvegarderPrevisionnel();
+            
+            console.log('✅ Prévisionnel calculé:', projectionMensuelle);
+        }
+
+        function afficherStats() {
+            const totalRecettes = projectionMensuelle.reduce((sum, m) => sum + m.totalRecettes, 0);
+            const totalCharges = projectionMensuelle.reduce((sum, m) => sum + m.totalCharges, 0);
+            const resultatAnnuel = totalRecettes - totalCharges;
+            const soldeFinal = projectionMensuelle[projectionMensuelle.length - 1]?.soldeCumule || 0;
+            
+            document.getElementById('totalRecettes').textContent = Math.round(totalRecettes).toLocaleString('fr-FR') + '€';
+            document.getElementById('totalCharges').textContent = Math.round(totalCharges).toLocaleString('fr-FR') + '€';
+            document.getElementById('resultatAnnuel').textContent = Math.round(resultatAnnuel).toLocaleString('fr-FR') + '€';
+            document.getElementById('soldeFinal').textContent = Math.round(soldeFinal).toLocaleString('fr-FR') + '€';
+        }
+
+        function afficherAccordeons() {
+            const container = document.getElementById('accordeonContainer');
+            container.innerHTML = '';
+            
+            projectionMensuelle.forEach((mois, index) => {
+                const accordion = document.createElement('div');
+                accordion.className = 'accordion';
+                
+                const soldeClass = mois.soldeCumule >= 0 ? 'positif' : 'negatif';
+                const soldeIcon = mois.soldeCumule >= 0 ? '📈' : '📉';
+                
+                accordion.innerHTML = `
+                    <div class="accordion-header" onclick="toggleAccordeon(${index})">
+                        <div class="accordion-title">
+                            ${index + 1}. ${mois.mois}
+                            <span style="color: ${mois.soldeCumule >= 0 ? '#28a745' : '#dc3545'}">
+                                ${soldeIcon} ${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€
+                            </span>
+                        </div>
+                        <div class="accordion-summary">
+                            💰 ${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€ • 
+                            💸 ${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€ • 
+                            📊 ${Math.round(mois.solde).toLocaleString('fr-FR')}€
+                        </div>
+                        <div class="accordion-icon">▼</div>
+                    </div>
+                    <div class="accordion-content" id="accordeon${index}">
+                        <div class="accordion-body">
+                            <div class="month-summary">
+                                <div class="summary-grid">
+                                    <div class="summary-item">
+                                        <div class="label">Recettes</div>
+                                        <div class="value" style="color: #28a745">${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€</div>
+                                    </div>
+                                    <div class="summary-item">
+                                        <div class="label">Charges</div>
+                                        <div class="value" style="color: #dc3545">${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€</div>
+                                    </div>
+                                    <div class="summary-item">
+                                        <div class="label">Solde Mensuel</div>
+                                        <div class="value" style="color: ${mois.solde >= 0 ? '#28a745' : '#dc3545'}">${Math.round(mois.solde).toLocaleString('fr-FR')}€</div>
+                                    </div>
+                                    <div class="summary-item">
+                                        <div class="label">Solde Cumulé</div>
+                                        <div class="value" style="color: ${mois.soldeCumule >= 0 ? '#28a745' : '#dc3545'}">${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div>
+                                    <h4 style="color: #28a745; margin-bottom: 15px;">
+                                        💰 Recettes (${mois.detailRecettes.length} écritures trouvées)
+                                        <small style="font-size: 0.8em; color: #666; display: block;">
+                                            Total calculé: ${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€
+                                        </small>
+                                    </h4>
+                                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 5px;">
+                                        <table class="month-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Libellé</th>
+                                                    <th>Montant</th>
+                                                    <th>Type</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${mois.detailRecettes.map((r, idx) => `
+                                                    <tr>
+                                                        <td>${r.libelle}</td>
+                                                        <td class="montant positif">${Math.round(r.montant).toLocaleString('fr-FR')}€</td>
+                                                        <td><span style="font-size: 0.8em; color: #666;">${r.type === 'recurrente' ? 'Récurrente' : 'Spécifique'}</span></td>
+                                                    </tr>
+                                                `).join('')}
+                                                ${mois.detailRecettes.length === 0 ? '<tr><td colspan="3" style="text-align: center; color: #999;">Aucune recette ce mois</td></tr>' : ''}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 style="color: #dc3545; margin-bottom: 15px;">
+                                        💸 Charges (${mois.detailCharges.length} écritures trouvées)
+                                        <small style="font-size: 0.8em; color: #666; display: block;">
+                                            Total calculé: ${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€
+                                        </small>
+                                    </h4>
+                                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 5px;">
+                                        <table class="month-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Libellé</th>
+                                                    <th>Montant</th>
+                                                    <th>Type</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${mois.detailCharges.map((c, idx) => `
+                                                    <tr>
+                                                        <td>${c.libelle}</td>
+                                                        <td class="montant negatif">${Math.round(c.montant).toLocaleString('fr-FR')}€</td>
+                                                        <td><span style="font-size: 0.8em; color: #666;">${c.type === 'recurrente' ? 'Récurrente' : 'Spécifique'}</span></td>
+                                                    </tr>
+                                                `).join('')}
+                                                ${mois.detailCharges.length === 0 ? '<tr><td colspan="3" style="text-align: center; color: #999;">Aucune charge ce mois</td></tr>' : ''}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="add-operation" onclick="ajouterOperation('${mois.moisCle}', '${mois.mois}')">
+                                <div class="icon">➕</div>
+                                <div>Ajouter une opération spécifique à ${mois.mois}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(accordion);
+            });
+        }
+
+        function toggleAccordeon(index) {
+            const header = document.querySelector(`#accordeonContainer .accordion:nth-child(${index + 1}) .accordion-header`);
+            const content = document.getElementById(`accordeon${index}`);
+            
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        function ajouterOperation(moisCle, moisNom) {
+            currentMonth = { cle: moisCle, nom: moisNom };
+            document.getElementById('modalTitle').textContent = `Nouvelle Opération - ${moisNom}`;
+            document.getElementById('formOperation').reset();
+            document.getElementById('modalOperation').style.display = 'block';
+        }
+
+        function fermerModal() {
+            document.getElementById('modalOperation').style.display = 'none';
+            currentMonth = null;
+        }
+
+        // Soumission formulaire
+        document.getElementById('formOperation').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!currentMonth) return;
+            
+            const operation = {
+                type: document.getElementById('operationType').value,
+                libelle: document.getElementById('operationLibelle').value,
+                montant: parseFloat(document.getElementById('operationMontant').value),
+                commentaire: document.getElementById('operationCommentaire').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (!operationsSpecifiques[currentMonth.cle]) {
+                operationsSpecifiques[currentMonth.cle] = [];
+            }
+            
+            operationsSpecifiques[currentMonth.cle].push(operation);
+            
+            // Recalculer prévisionnel
+            calculerPrevisionnel();
+            
+            // Fermer modal
+            fermerModal();
+            
+            console.log('➕ Opération ajoutée:', operation);
+        });
+
+        function initialiserGraphique() {
+            const ctx = document.getElementById('prevChart').getContext('2d');
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Solde Cumulé',
+                        data: [],
+                        borderColor: '#8e44ad',
+                        backgroundColor: 'rgba(142, 68, 173, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Évolution Solde Cumulé sur 12 Mois',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    return Math.round(value).toLocaleString('fr-FR') + '€';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function mettreAJourGraphique() {
+            if (!chart || projectionMensuelle.length === 0) return;
+            
+            const labels = projectionMensuelle.map(m => m.mois.split(' ')[0]);
+            const soldes = projectionMensuelle.map(m => m.soldeCumule);
+            
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = soldes;
+            chart.update();
+        }
+
+        // ==========================================
+        // EXPORT PDF VIA PRINT CSS - SOLUTION NATIVE
+        // ==========================================
+        function exporterPDF() {
+            // Mettre à jour les informations d'impression
+            const maintenant = new Date();
+            document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
+            document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
+            document.getElementById('periodeImpression').textContent = document.getElementById('periodeAffichage').textContent;
+
+            // Ouvrir tous les accordéons pour l'impression
+            const accordeons = document.querySelectorAll('.accordion-content');
+            const headers = document.querySelectorAll('.accordion-header');
+            
+            accordeons.forEach(acc => acc.classList.add('active'));
+            headers.forEach(header => header.classList.add('active'));
+
+            // Message informatif avant impression
+            const confirmation = confirm(
+                '📄 Export PDF via Impression\n\n' +
+                `• Période : ${document.getElementById('periodeAffichage').textContent}\n` +
+                `• Éléments : ${projectionMensuelle.length} mois détaillés\n\n` +
+                'Dans la boîte d\'impression :\n' +
+                '1. Choisir "Enregistrer au format PDF"\n' +
+                '2. Sélectionner "Plus de paramètres"\n' +
+                '3. Cocher "Graphiques d\'arrière-plan"\n\n' +
+                'Continuer ?'
+            );
+
+            if (confirmation) {
+                // Déclencher l'impression
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+            }
+        }
+
+        // Fermer modal en cliquant à l'extérieur
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalOperation');
+            if (event.target === modal) {
+                fermerModal();
+            }
+        }
+    </script>
+</body>
+</html>

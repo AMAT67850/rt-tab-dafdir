@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Analytics - Rocket Tower</title>
+    <!-- PRINT CSS : Styles optimisés pour export PDF -->
+    <style>
+        @media print {
+            /* MASQUER ÉLÉMENTS NAVIGATION */
+            .header-controls, .nav-links, .controls, .actions, .btn, button, .modal {
+                display: none !important;
+            }
+            
+            /* OPTIMISER LAYOUT IMPRESSION */
+            body {
+                background: white !important;
+                padding: 0 !important;
+                font-size: 12px;
+            }
+            
+            .container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+            }
+            
+            /* HEADER IMPRESSION */
+            .header {
+                background: white !important;
+                color: #333 !important;
+                border-bottom: 2px solid #333;
+                page-break-after: avoid;
+            }
+            
+            /* STATS CARDS IMPRESSION */
+            .stats-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 10px !important;
+                margin: 20px 0 !important;
+                page-break-inside: avoid;
+            }
+            
+            .stat-card {
+                background: white !important;
+                border: 1px solid #333 !important;
+                color: #333 !important;
+                padding: 10px !important;
+                page-break-inside: avoid;
+            }
+            
+            .stat-card.highlight {
+                background: #f0f0f0 !important;
+                color: #333 !important;
+            }
+            
+            .stat-card h3, .stat-card.highlight h3,
+            .stat-card p, .stat-card.highlight p {
+                color: #333 !important;
+            }
+            
+            /* SECTIONS IMPRESSION */
+            .analysis-section {
+                page-break-inside: avoid;
+                margin: 15px 0 !important;
+            }
+            
+            .top-items table {
+                font-size: 9px !important;
+                border-collapse: collapse !important;
+            }
+            
+            .top-items th, .top-items td {
+                border: 1px solid #333 !important;
+                padding: 4px !important;
+            }
+            
+            /* EXPLICATIONS IMPRESSION */
+            .explanations {
+                background: white !important;
+                border: 1px solid #333 !important;
+                font-size: 10px !important;
+            }
+            
+            /* INFOS IMPRESSION */
+            .print-info {
+                display: block !important;
+                text-align: center;
+                font-size: 10px;
+                color: #666;
+                border-top: 1px solid #ccc;
+                padding-top: 10px;
+                margin-top: 20px;
+                page-break-inside: avoid;
+            }
+            
+            /* SAUT DE PAGE */
+            .page-break {
+                page-break-before: always;
+            }
+        }
+        
+        /* MASQUER INFO IMPRESSION EN MODE NORMAL */
+        .print-info {
+            display: none;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* HEADER BLEU COHÉRENT */
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .header-controls {
+            background: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #dee2e6;
+            position: relative;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .refresh-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* PDF Button */
+        .pdf-btn {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .pdf-btn:hover {
+            background: #5a32a3;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        /* SECTION 1 : SITUATION FINANCIÈRE INSTANT T */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0;
+            font-size: 0.9em;
+        }
+
+        .stat-card.highlight {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border-left: 4px solid #004085;
+        }
+
+        .stat-card.highlight h3, .stat-card.highlight p {
+            color: white;
+        }
+
+        .stat-card.positive {
+            border-left: 4px solid #28a745;
+        }
+
+        .stat-card.positive h3 {
+            color: #28a745;
+        }
+
+        .stat-card.negative {
+            border-left: 4px solid #dc3545;
+        }
+
+        .stat-card.negative h3 {
+            color: #dc3545;
+        }
+
+        /* SECTIONS ANALYSES */
+        .analysis-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .analysis-section h2 {
+            color: #007bff;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .top-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .top-item-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .top-items table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .top-items th,
+        .top-items td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 0.9em;
+        }
+
+        .top-items th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .top-items .montant {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .montant.positif {
+            color: #28a745;
+        }
+
+        .montant.negatif {
+            color: #dc3545;
+        }
+
+        /* EXPLICATIONS INTÉGRÉES */
+        .explanations {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #007bff;
+        }
+
+        .explanations h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .explanation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .explanation-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #007bff;
+        }
+
+        .explanation-item h4 {
+            color: #007bff;
+            margin-bottom: 8px;
+        }
+
+        .explanation-item p {
+            color: #6c757d;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* STATUT BADGES */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-atteint {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-non-atteint {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top-items {
+                grid-template-columns: 1fr;
+            }
+
+            .explanation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* INDICATEURS DE CHARGEMENT */
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #dc3545;
+            font-weight: 600;
+            padding: 20px;
+            background: #f8d7da;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Bleu Cohérent -->
+        <div class="header">
+            <h1>📊 Analytics Dashboard</h1>
+            <p class="subtitle">Analyse financière temps réel HT • Recettes vs Charges récurrentes</p>
+        </div>
+
+        <div class="header-controls">
+            <div class="nav-links">
+                <a href="rt_Module1_index_dashboard_navigation.html" class="btn btn-secondary">🏠 Dashboard</a>
+                <button onclick="actualiserDonnees()" class="btn refresh-btn">🔄 Actualiser</button>
+                <button onclick="exporterPDF()" class="btn pdf-btn">🖨️ Export PDF</button>
+            </div>
+            
+            <div class="info-donnees">
+                <span id="infoSources" style="color: #6c757d; font-size: 0.9em;">Sources : Chargement...</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- SECTION 1 : SITUATION FINANCIÈRE INSTANT T -->
+            <div class="stats-grid">
+                <div class="stat-card positive">
+                    <h3 id="totalRecettesLissees">0€</h3>
+                    <p>Recettes Récurrentes HT Lissées</p>
+                </div>
+                <div class="stat-card negative">
+                    <h3 id="totalChargesLissees">0€</h3>
+                    <p>Charges Récurrentes HT Lissées</p>
+                </div>
+                <div class="stat-card highlight">
+                    <h3 id="resultatMensuel">0€</h3>
+                    <p>Résultat Mensuel HT</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="ratioChargesRecettes">0%</h3>
+                    <p>Ratio Charges/Recettes</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="margeOperationnelle">0%</h3>
+                    <p>Marge Opérationnelle</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="equilibreFinancier">
+                        <span class="status-badge status-atteint">CALCUL...</span>
+                    </h3>
+                    <p>Équilibre Financier</p>
+                </div>
+            </div>
+
+            <!-- SECTION 2 : RÉPARTITIONS PAR CATÉGORIE -->
+            <div class="analysis-section">
+                <h2>📊 Répartitions par Catégorie</h2>
+                <div class="top-items">
+                    <div class="top-item-section">
+                        <h3>💰 Répartition Recettes par Type</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Catégorie</th>
+                                    <th>Nb éléments</th>
+                                    <th>Total Lissé</th>
+                                    <th>% du total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repartitionRecettes">
+                                <tr><td colspan="4" class="loading">Calcul en cours...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="top-item-section">
+                        <h3>💸 Répartition Charges par Type</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Catégorie</th>
+                                    <th>Nb éléments</th>
+                                    <th>Total Lissé</th>
+                                    <th>% du total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repartitionCharges">
+                                <tr><td colspan="4" class="loading">Calcul en cours...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3 : EXPLICATIONS INTÉGRÉES -->
+            <div class="explanations">
+                <h2>💡 Définitions et Explications</h2>
+                <div class="explanation-grid">
+                    <div class="explanation-item">
+                        <h4>📊 Ratio Charges/Recettes</h4>
+                        <p>Quel pourcentage des recettes est absorbé par les charges. Plus ce ratio est faible, meilleure est la rentabilité.</p>
+                    </div>
+                    <div class="explanation-item">
+                        <h4>📈 Marge Opérationnelle</h4>
+                        <p>Pourcentage de recettes restant après déduction des charges : (Recettes - Charges) / Recettes × 100</p>
+                    </div>
+                    <div class="explanation-item">
+                        <h4>⚖️ Équilibre Financier</h4>
+                        <p>Atteint si Recettes ≥ Charges absolues (résultat ≥ 0). Indique la viabilité financière.</p>
+                    </div>
+                    <div class="explanation-item">
+                        <h4>📅 Totaux Lissés HT</h4>
+                        <p>Montants HT ajustés selon la périodicité : trimestriel ÷3, semestriel ÷6, annuel ÷12 pour obtenir l'équivalent mensuel hors taxes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFORMATIONS POUR IMPRESSION - MASQUÉES À L'ÉCRAN -->
+            <div class="print-info">
+                <p><strong>🚀 ROCKET TOWER - ANALYTICS DASHBOARD</strong></p>
+                <p>Rapport généré le <span id="dateImpression"></span> à <span id="heureImpression"></span></p>
+                <p>Sources : <span id="sourcesImpression">Modules Recettes + Charges récurrentes</span></p>
+                <p>Totaux calculés automatiquement avec lissage périodicité • Généré automatiquement</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let recettesData = [];
+        let chargesData = [];
+        let analytics = {
+            totalRecettesLissees: 0,
+            totalChargesLissees: 0,
+            resultatMensuel: 0,
+            ratioChargesRecettes: 0,
+            margeOperationnelle: 0,
+            equilibreFinancier: "NON ATTEINT"
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            actualiserDonnees();
+        });
+
+        function actualiserDonnees() {
+            console.log('🔄 Actualisation des données Analytics...');
+            
+            chargerDonneesLocalStorage();
+            calculerAnalytics();
+            afficherResultats();
+            afficherRepartitions();
+            
+            console.log('✅ Analytics mis à jour');
+        }
+
+        function chargerDonneesLocalStorage() {
+            try {
+                // Lecture Module 2 (Recettes)
+                const recettesJSON = localStorage.getItem('recettesRT');
+                if (recettesJSON) {
+                    const toutesRecettes = JSON.parse(recettesJSON);
+                    recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF');
+                    console.log(`📊 Recettes - Total dans localStorage: ${toutesRecettes.length}, Actives: ${recettesData.length}`);
+                    
+                    // DEBUG: Calculer les totaux comme dans l'interface recettes
+                    let totalRecettesHT = 0;
+                    let totalRecettesLisseHT = 0;
+                    recettesData.forEach(r => {
+                        totalRecettesHT += r.montantHT;
+                        let facteur = 1;
+                        switch (r.periodicite) {
+                            case 'BIMESTRIEL': facteur = 2; break;
+                            case 'TRIMESTRIEL': facteur = 3; break;
+                            case 'SEMESTRIEL': facteur = 6; break;
+                            case 'ANNUEL': facteur = 12; break;
+                        }
+                        totalRecettesLisseHT += r.montantHT / facteur;
+                    });
+                    console.log(`📊 Recettes DEBUG - Total HT: ${Math.round(totalRecettesHT)}€, Lissé HT: ${Math.round(totalRecettesLisseHT)}€`);
+                } else {
+                    recettesData = [];
+                    console.warn('⚠️ Aucune donnée recettes trouvée');
+                }
+
+                // Lecture Module 3 (Charges récurrentes) - REPRODUIRE EXACTEMENT L'INTERFACE
+                const chargesJSON = localStorage.getItem('chargesRecurrentesRT');
+                if (chargesJSON) {
+                    const toutesCharges = JSON.parse(chargesJSON);
+                    
+                    // REPRODUIRE EXACTEMENT LE FILTRAGE DE L'INTERFACE CHARGES
+                    // L'interface charges ne filtre peut-être PAS que les actifs...
+                    console.log('🔍 TOUTES LES CHARGES (avec statuts):');
+                    toutesCharges.forEach((c, index) => {
+                        if (index < 10) { // Afficher les 10 premiers pour debug
+                            console.log(`  ${index}: ${c.fournisseur} - ${c.montantHT}€ - Statut: ${c.statut}`);
+                        }
+                    });
+                    
+                    // Test 1: TOUTES les charges (comme peut-être dans l'interface)
+                    let totalChargesHT_Toutes = 0;
+                    let totalChargesLisseHT_Toutes = 0;
+                    toutesCharges.forEach(c => {
+                        totalChargesHT_Toutes += Math.abs(c.montantHT);
+                        let facteur = 1;
+                        switch (c.periodicite) {
+                            case 'BIMESTRIEL': facteur = 2; break;
+                            case 'TRIMESTRIEL': facteur = 3; break;
+                            case 'SEMESTRIEL': facteur = 6; break;
+                            case 'ANNUEL': facteur = 12; break;
+                        }
+                        totalChargesLisseHT_Toutes += Math.abs(c.montantHT) / facteur;
+                    });
+                    console.log(`🔍 TOUTES CHARGES - Total HT: ${Math.round(totalChargesHT_Toutes)}€, Lissé HT: ${Math.round(totalChargesLisseHT_Toutes)}€`);
+                    
+                    // Test 2: Seulement les actives (notre calcul actuel)
+                    chargesData = toutesCharges.filter(c => c.statut === 'ACTIF');
+                    let totalChargesHT_Actives = 0;
+                    let totalChargesLisseHT_Actives = 0;
+                    chargesData.forEach(c => {
+                        totalChargesHT_Actives += Math.abs(c.montantHT);
+                        let facteur = 1;
+                        switch (c.periodicite) {
+                            case 'BIMESTRIEL': facteur = 2; break;
+                            case 'TRIMESTRIEL': facteur = 3; break;
+                            case 'SEMESTRIEL': facteur = 6; break;
+                            case 'ANNUEL': facteur = 12; break;
+                        }
+                        totalChargesLisseHT_Actives += Math.abs(c.montantHT) / facteur;
+                    });
+                    console.log(`🔍 CHARGES ACTIVES - Total HT: ${Math.round(totalChargesHT_Actives)}€, Lissé HT: ${Math.round(totalChargesLisseHT_Actives)}€`);
+                    
+                    console.log(`🎯 LEQUEL CORRESPOND À 28441€ dans votre interface charges ?`);
+                    
+                } else {
+                    chargesData = [];
+                    console.warn('⚠️ Aucune donnée charges trouvée');
+                }
+
+                // Mise à jour info sources
+                document.getElementById('infoSources').textContent = 
+                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges actives`;
+
+            } catch (error) {
+                console.error('❌ Erreur chargement localStorage:', error);
+                recettesData = [];
+                chargesData = [];
+                
+                document.getElementById('infoSources').textContent = 
+                    'Erreur chargement données';
+            }
+        }
+
+        function calculerMontantLisse(item) {
+            let facteurLissage = 1;
+            switch (item.periodicite) {
+                case 'BIMESTRIEL': facteurLissage = 2; break;
+                case 'TRIMESTRIEL': facteurLissage = 3; break;
+                case 'SEMESTRIEL': facteurLissage = 6; break;
+                case 'ANNUEL': facteurLissage = 12; break;
+                default: facteurLissage = 1; // MENSUEL
+            }
+            // CORRECTION : Utiliser montantHT au lieu de montantTTC
+            return item.montantHT / facteurLissage;
+        }
+
+        function calculerAnalytics() {
+            // Calculs de base avec montants lissés
+            analytics.totalRecettesLissees = recettesData.reduce((sum, item) => {
+                return sum + calculerMontantLisse(item);
+            }, 0);
+
+            // CORRECTION : S'assurer qu'on travaille avec les montants lissés ET en valeur absolue
+            analytics.totalChargesLissees = chargesData.reduce((sum, item) => {
+                return sum + Math.abs(calculerMontantLisse(item)); // Toujours positif pour les charges
+            }, 0);
+
+            // CORRECTION : Résultat = Recettes lissées - Charges lissées (en valeur absolue)
+            analytics.resultatMensuel = analytics.totalRecettesLissees - analytics.totalChargesLissees;
+
+            // Ratios et indicateurs
+            if (analytics.totalRecettesLissees > 0) {
+                analytics.ratioChargesRecettes = (analytics.totalChargesLissees / analytics.totalRecettesLissees) * 100;
+                analytics.margeOperationnelle = (analytics.resultatMensuel / analytics.totalRecettesLissees) * 100;
+            } else {
+                analytics.ratioChargesRecettes = 0;
+                analytics.margeOperationnelle = 0;
+            }
+
+            analytics.equilibreFinancier = analytics.resultatMensuel >= 0 ? "ATTEINT" : "NON ATTEINT";
+
+            console.log('📊 Analytics calculés:', {
+                nbRecettes: recettesData.length,
+                nbCharges: chargesData.length,
+                recettesLissees: Math.round(analytics.totalRecettesLissees),
+                chargesLissees: Math.round(analytics.totalChargesLissees),
+                resultat: Math.round(analytics.resultatMensuel),
+                ratio: Math.round(analytics.ratioChargesRecettes) + '%',
+                marge: Math.round(analytics.margeOperationnelle) + '%',
+                equilibre: analytics.equilibreFinancier
+            });
+        }
+
+        function afficherResultats() {
+            // Mise à jour des cartes principales
+            document.getElementById('totalRecettesLissees').textContent = 
+                Math.round(analytics.totalRecettesLissees).toLocaleString('fr-FR') + '€';
+            
+            document.getElementById('totalChargesLissees').textContent = 
+                Math.round(analytics.totalChargesLissees).toLocaleString('fr-FR') + '€';
+            
+            document.getElementById('resultatMensuel').textContent = 
+                Math.round(analytics.resultatMensuel).toLocaleString('fr-FR') + '€';
+            
+            document.getElementById('ratioChargesRecettes').textContent = 
+                Math.round(analytics.ratioChargesRecettes) + '%';
+            
+            document.getElementById('margeOperationnelle').textContent = 
+                Math.round(analytics.margeOperationnelle) + '%';
+
+            // Équilibre financier avec badge coloré
+            const equilibreElement = document.getElementById('equilibreFinancier');
+            const badgeClass = analytics.equilibreFinancier === "ATTEINT" ? "status-atteint" : "status-non-atteint";
+            equilibreElement.innerHTML = `<span class="status-badge ${badgeClass}">${analytics.equilibreFinancier}</span>`;
+        }
+
+        function afficherRepartitions() {
+            // Répartition Recettes par catégorie
+            const repartitionRecettes = {};
+            recettesData.forEach(r => {
+                const montantLisse = calculerMontantLisse(r); // Utilise maintenant montantHT
+                if (!repartitionRecettes[r.categorie]) {
+                    repartitionRecettes[r.categorie] = { count: 0, total: 0 };
+                }
+                repartitionRecettes[r.categorie].count++;
+                repartitionRecettes[r.categorie].total += montantLisse;
+            });
+
+            const tbodyRepartitionRecettes = document.getElementById('repartitionRecettes');
+            const entriesRecettes = Object.entries(repartitionRecettes)
+                .sort((a, b) => b[1].total - a[1].total);
+
+            if (entriesRecettes.length > 0) {
+                tbodyRepartitionRecettes.innerHTML = entriesRecettes.map(([cat, data]) => {
+                    const pourcentage = analytics.totalRecettesLissees > 0 ? 
+                        (data.total / analytics.totalRecettesLissees * 100) : 0;
+                    return `
+                        <tr>
+                            <td>${cat}</td>
+                            <td>${data.count}</td>
+                            <td class="montant positif">${Math.round(data.total).toLocaleString('fr-FR')}€</td>
+                            <td>${Math.round(pourcentage)}%</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                tbodyRepartitionRecettes.innerHTML = '<tr><td colspan="4" class="no-data">Aucune donnée</td></tr>';
+            }
+
+            // Répartition Charges par catégorie
+            const repartitionCharges = {};
+            chargesData.forEach(c => {
+                const montantLisse = Math.abs(calculerMontantLisse(c)); // Utilise maintenant montantHT
+                if (!repartitionCharges[c.categorie]) {
+                    repartitionCharges[c.categorie] = { count: 0, total: 0 };
+                }
+                repartitionCharges[c.categorie].count++;
+                repartitionCharges[c.categorie].total += montantLisse;
+            });
+
+            const tbodyRepartitionCharges = document.getElementById('repartitionCharges');
+            const entriesCharges = Object.entries(repartitionCharges)
+                .sort((a, b) => b[1].total - a[1].total);
+
+            if (entriesCharges.length > 0) {
+                tbodyRepartitionCharges.innerHTML = entriesCharges.map(([cat, data]) => {
+                    const pourcentage = analytics.totalChargesLissees > 0 ? 
+                        (data.total / analytics.totalChargesLissees * 100) : 0;
+                    return `
+                        <tr>
+                            <td>${cat}</td>
+                            <td>${data.count}</td>
+                            <td class="montant negatif">${Math.round(data.total).toLocaleString('fr-FR')}€</td>
+                            <td>${Math.round(pourcentage)}%</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                tbodyRepartitionCharges.innerHTML = '<tr><td colspan="4" class="no-data">Aucune donnée</td></tr>';
+            }
+        }
+
+        // ==========================================
+        // EXPORT PDF VIA PRINT CSS - SOLUTION NATIVE
+        // ==========================================
+        function exporterPDF() {
+            // Mettre à jour les informations d'impression
+            const maintenant = new Date();
+            document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
+            document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
+            document.getElementById('sourcesImpression').textContent = `${recettesData.length} recettes + ${chargesData.length} charges récurrentes`;
+
+            // Message informatif avant impression
+            const confirmation = confirm(
+                '📄 Export PDF Analytics Dashboard\n\n' +
+                `• Recettes analysées : ${recettesData.length}\n` +
+                `• Charges analysées : ${chargesData.length}\n` +
+                `• Résultat mensuel : ${Math.round(analytics.resultatMensuel).toLocaleString('fr-FR')}€\n\n` +
+                'Dans la boîte d\'impression :\n' +
+                '1. Choisir "Enregistrer au format PDF"\n' +
+                '2. Sélectionner "Plus de paramètres"\n' +
+                '3. Cocher "Graphiques d\'arrière-plan"\n\n' +
+                'Continuer ?'
+            );
+
+            if (confirmation) {
+                // Attendre un peu que l'interface se mette à jour
+                setTimeout(() => {
+                    // Déclencher l'impression
+                    window.print();
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>

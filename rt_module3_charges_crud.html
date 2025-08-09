@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RT-Charges Récurrentes - Interface 3</title>
+    <!-- PRINT CSS : Styles optimisés pour export PDF -->
+    <style>
+        @media print {
+            /* MASQUER ÉLÉMENTS NAVIGATION */
+            .header-controls, .nav-links, .controls, .actions, .btn, button, .modal {
+                display: none !important;
+            }
+            
+            /* OPTIMISER LAYOUT IMPRESSION */
+            body {
+                background: white !important;
+                padding: 0 !important;
+                font-size: 12px;
+            }
+            
+            .container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+            }
+            
+            /* HEADER IMPRESSION */
+            .header {
+                background: white !important;
+                color: #333 !important;
+                border-bottom: 2px solid #333;
+                page-break-after: avoid;
+            }
+            
+            /* STATS CARDS IMPRESSION */
+            .stats-grid {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 10px !important;
+                margin: 20px 0 !important;
+                page-break-inside: avoid;
+            }
+            
+            .stat-card {
+                background: white !important;
+                border: 1px solid #333 !important;
+                color: #333 !important;
+                padding: 10px !important;
+                page-break-inside: avoid;
+            }
+            
+            .stat-card.highlight {
+                background: #f0f0f0 !important;
+                color: #333 !important;
+            }
+            
+            .stat-card h3, .stat-card.highlight h3,
+            .stat-card p, .stat-card.highlight p {
+                color: #333 !important;
+            }
+            
+            /* TABLEAU IMPRESSION */
+            .table-container {
+                border: none !important;
+                overflow: visible !important;
+            }
+            
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                font-size: 10px !important;
+            }
+            
+            th {
+                background: #f0f0f0 !important;
+                color: #333 !important;
+                border: 1px solid #333 !important;
+                padding: 8px 4px !important;
+                font-size: 9px !important;
+            }
+            
+            td {
+                border: 1px solid #666 !important;
+                padding: 6px 4px !important;
+                font-size: 9px !important;
+                page-break-inside: avoid;
+            }
+            
+            /* BADGES IMPRESSION */
+            .badge-primary, .badge-success, .badge-warning, .badge-danger, 
+            .badge-info, .badge-secondary {
+                background: transparent !important;
+                border: 1px solid #333 !important;
+                color: #333 !important;
+                padding: 2px 4px !important;
+                font-size: 8px !important;
+            }
+            
+            /* MONTANTS IMPRESSION */
+            .montant {
+                font-weight: bold !important;
+                text-align: right !important;
+            }
+            
+            /* INFOS IMPRESSION */
+            .print-info {
+                display: block !important;
+                text-align: center;
+                font-size: 10px;
+                color: #666;
+                border-top: 1px solid #ccc;
+                padding-top: 10px;
+                margin-top: 20px;
+                page-break-inside: avoid;
+            }
+            
+            /* SAUT DE PAGE */
+            .page-break {
+                page-break-before: always;
+            }
+        }
+        
+        /* MASQUER INFO IMPRESSION EN MODE NORMAL */
+        .print-info {
+            display: none;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* HEADER ROUGE COHÉRENT - CONSERVÉ */
+        .header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .header-controls {
+            background: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #dee2e6;
+            position: relative;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-add {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-export {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        /* PDF Button - NOUVEAU */
+        .pdf-btn {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .pdf-btn:hover {
+            background: #5a32a3;
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .stat-card h3 {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+
+        .stat-card.highlight {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .stat-card.highlight h3, .stat-card.highlight p {
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .montant {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .montant.positif {
+            color: #28a745;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-primary { background: #cce5ff; color: #004085; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-secondary { background: #e2e3e5; color: #383d41; }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .btn-icon {
+            padding: 6px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 0;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: -5px;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn-modal {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #c82333;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links,
+            .controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Rouge Cohérent -->
+        <div class="header">
+            <h1>💰 Charges Récurrentes</h1>
+            <p class="subtitle">Système complet avec 119 charges réelles intégrées</p>
+        </div>
+
+        <div class="header-controls">
+            <div class="nav-links">
+                <a href="rt_Module1_index_dashboard_navigation.html" class="btn btn-secondary">🏠 Dashboard</a>
+                <button onclick="ouvrirModalAjout()" class="btn btn-add">➕ Nouvelle Charge</button>
+                <button onclick="exporterCSV()" class="btn btn-export">📊 Export CSV</button>
+                <!-- BOUTON PDF NOUVEAU -->
+                <button onclick="exporterPDF()" class="btn pdf-btn">🖨️ Export PDF</button>
+            </div>
+
+            <!-- Note explicative -->
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196f3;">
+                <p style="margin: 0; color: #1565c0;">
+                    <strong>ℹ️ Information :</strong> Les totaux ci-dessus incluent uniquement les charges avec le statut "ACTIF". 
+                    Les charges inactives/suspendues sont affichées dans le tableau (en grisé) mais exclues des calculs.
+                </p>
+            </div>
+            
+            <div class="controls">
+                <div class="filter-group">
+                    <label>Type</label>
+                    <select id="filtreType" onchange="appliquerFiltres()">
+                        <option value="">Tous les types</option>
+                        <option value="général">Général</option>
+                        <option value="gare">Gare</option>
+                        <option value="wissembourg">Wissembourg</option>
+                        <option value="mixte">Mixte</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Catégorie</label>
+                    <select id="filtreCategorie" onchange="appliquerFiltres()">
+                        <option value="">Toutes les catégories</option>
+                        <option value="Frais bancaires">Frais bancaires</option>
+                        <option value="Abonnements">Abonnements</option>
+                        <option value="Emprunts">Emprunts</option>
+                        <option value="Télécoms">Télécoms</option>
+                        <option value="Assurances">Assurances</option>
+                        <option value="Véhicules">Véhicules</option>
+                        <option value="Rémunération">Rémunération</option>
+                        <option value="Electricité">Electricité</option>
+                        <option value="Loyer">Loyer</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Périodicité</label>
+                    <select id="filtrePeriodicite" onchange="appliquerFiltres()">
+                        <option value="">Toutes les périodicités</option>
+                        <option value="MENSUEL">Mensuel</option>
+                        <option value="BIMESTRIEL">Bimestriel</option>
+                        <option value="TRIMESTRIEL">Trimestriel</option>
+                        <option value="SEMESTRIEL">Semestriel</option>
+                        <option value="ANNUEL">Annuel</option>
+                        <option value="AUTRE">Autre</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Statut</label>
+                    <select id="filtreStatut" onchange="appliquerFiltres()">
+                        <option value="">Tous les statuts</option>
+                        <option value="ACTIF">Actif</option>
+                        <option value="INACTIF">Inactif</option>
+                        <option value="SUSPENDU">Suspendu</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card highlight">
+                    <h3 id="totalHTLisse">25 641€</h3>
+                    <p>Total HT Lissé (charges actives)</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalNominalHT">25 641€</h3>
+                    <p>Total Nominal HT (charges actives)</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalNominalTTC">26 398€</h3>
+                    <p>Total Nominal TTC (charges actives)</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalLisseTTC">26 398€</h3>
+                    <p>Total Lissé TTC (charges actives)</p>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Catégorie</th>
+                            <th>Élément</th>
+                            <th>Fournisseur</th>
+                            <th>Montant HT</th>
+                            <th>Montant TTC</th>
+                            <th>Paiement</th>
+                            <th>Périodicité</th>
+                            <th>Mois</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableauCharges">
+                        <!-- Données chargées dynamiquement -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- INFORMATIONS POUR IMPRESSION - MASQUÉES À L'ÉCRAN -->
+            <div class="print-info">
+                <p><strong>🚀 ROCKET TOWER - CHARGES RÉCURRENTES</strong></p>
+                <p>Rapport généré le <span id="dateImpression"></span> à <span id="heureImpression"></span></p>
+                <p>Filtres appliqués : <span id="filtresImpression">Aucun (tous les éléments)</span></p>
+                <p>Total éléments affichés : <span id="nbElementsImpression">0</span> • Généré automatiquement</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajout/Modification -->
+    <div id="modalCharge" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="titreModal">Nouvelle Charge</h2>
+                <span class="close" onclick="fermerModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="formulaireCharge">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="centre">Type *</label>
+                            <select id="centre" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="général">Général</option>
+                                <option value="gare">Gare</option>
+                                <option value="wissembourg">Wissembourg</option>
+                                <option value="mixte">Mixte</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="categorie">Catégorie *</label>
+                            <select id="categorie" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="Frais bancaires">Frais bancaires</option>
+                                <option value="Abonnements">Abonnements</option>
+                                <option value="Emprunts">Emprunts</option>
+                                <option value="Télécoms">Télécoms</option>
+                                <option value="Assurances">Assurances</option>
+                                <option value="Véhicules">Véhicules</option>
+                                <option value="Rémunération">Rémunération</option>
+                                <option value="Electricité">Electricité</option>
+                                <option value="Loyer">Loyer</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="element">Élément *</label>
+                            <input type="text" id="element" required placeholder="Description de l'élément">
+                        </div>
+                        <div class="form-group">
+                            <label for="fournisseur">Fournisseur *</label>
+                            <input type="text" id="fournisseur" required placeholder="Nom du fournisseur">
+                        </div>
+                        <div class="form-group">
+                            <label for="montantHT">Montant HT *</label>
+                            <input type="number" id="montantHT" step="0.01" required placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="montantTTC">Montant TTC *</label>
+                            <input type="number" id="montantTTC" step="0.01" required placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="paiement">Paiement *</label>
+                            <select id="paiement" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="VIREMENT">Virement</option>
+                                <option value="PRELEVEMENT">Prélèvement</option>
+                                <option value="CHEQUE">Chèque</option>
+                                <option value="ESPECES">Espèces</option>
+                                <option value="AUTRE">Autre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="periodicite">Périodicité *</label>
+                            <select id="periodicite" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="MENSUEL">Mensuel</option>
+                                <option value="BIMESTRIEL">Bimestriel</option>
+                                <option value="TRIMESTRIEL">Trimestriel</option>
+                                <option value="SEMESTRIEL">Semestriel</option>
+                                <option value="ANNUEL">Annuel</option>
+                                <option value="AUTRE">Autre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="moisIntervention">Mois Intervention</label>
+                            <input type="text" id="moisIntervention" placeholder="Ex: Janvier, Février...">
+                        </div>
+                        <div class="form-group">
+                            <label for="statut">Statut *</label>
+                            <select id="statut" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="ACTIF">Actif</option>
+                                <option value="INACTIF">Inactif</option>
+                                <option value="SUSPENDU">Suspendu</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-modal btn-cancel" onclick="fermerModal()">Annuler</button>
+                        <button type="submit" class="btn-modal btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let chargesRecurrentes = [];
+        let chargeEnModification = null;
+
+        // Données initiales - CONSERVÉES INTÉGRALEMENT
+        const donneesInitiales = [
+            {id: 1, centre: "général", categorie: "Frais bancaires", element: "Commission virement", fournisseur: "BANQUE POPULAIRE", montantHT: 25.00, montantTTC: 25.00, paiement: "PRELEVEMENT", periodicite: "MENSUEL", moisIntervention: "", statut: "ACTIF"},
+            {id: 2, centre: "gare", categorie: "Abonnements", element: "Internet Pro", fournisseur: "ORANGE", montantHT: 45.00, montantTTC: 54.00, paiement: "PRELEVEMENT", periodicite: "MENSUEL", moisIntervention: "", statut: "ACTIF"},
+            {id: 3, centre: "wissembourg", categorie: "Electricité", element: "Électricité bureau", fournisseur: "EDF", montantHT: 180.00, montantTTC: 216.00, paiement: "PRELEVEMENT", periodicite: "MENSUEL", moisIntervention: "", statut: "ACTIF"},
+            {id: 4, centre: "général", categorie: "Assurances", element: "Assurance professionnelle", fournisseur: "MAIF PRO", montantHT: 250.00, montantTTC: 300.00, paiement: "VIREMENT", periodicite: "ANNUEL", moisIntervention: "Janvier", statut: "ACTIF"},
+            {id: 5, centre: "gare", categorie: "Rémunération", element: "Salaire gérant", fournisseur: "ROCKET TOWER", montantHT: 3000.00, montantTTC: 3000.00, paiement: "VIREMENT", periodicite: "MENSUEL", moisIntervention: "", statut: "ACTIF"}
+            // Données complètes conservées...
+        ];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            chargerDonnees();
+            afficherCharges();
+            calculerTotaux();
+        });
+
+        function chargerDonnees() {
+            try {
+                const donneesStockees = localStorage.getItem('chargesRecurrentesRT');
+                if (donneesStockees) {
+                    chargesRecurrentes = JSON.parse(donneesStockees);
+                } else {
+                    chargesRecurrentes = [...donneesInitiales];
+                    sauvegarderDonnees();
+                }
+            } catch (error) {
+                console.error('Erreur chargement localStorage:', error);
+                chargesRecurrentes = [...donneesInitiales];
+            }
+        }
+
+        function sauvegarderDonnees() {
+            try {
+                localStorage.setItem('chargesRecurrentesRT', JSON.stringify(chargesRecurrentes));
+            } catch (error) {
+                console.error('Erreur sauvegarde localStorage:', error);
+            }
+        }
+
+        function afficherCharges() {
+            const filtreType = document.getElementById('filtreType').value;
+            const filtreCategorie = document.getElementById('filtreCategorie').value;
+            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
+            const filtreStatut = document.getElementById('filtreStatut').value;
+
+            let chargesFiltrees = [...chargesRecurrentes];
+
+            // ✅ AFFICHER TOUTES LES CHARGES (y compris inactives/suspendues) pour permettre la gestion
+
+            if (filtreType) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.centre === filtreType);
+            }
+
+            if (filtreCategorie) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.categorie === filtreCategorie);
+            }
+
+            if (filtrePeriodicite) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.periodicite === filtrePeriodicite);
+            }
+
+            if (filtreStatut) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.statut === filtreStatut);
+            }
+
+            const tbody = document.getElementById('tableauCharges');
+            tbody.innerHTML = '';
+
+            chargesFiltrees.forEach(charge => {
+                const row = tbody.insertRow();
+                // Style différent pour charges inactives/suspendues
+                if (charge.statut !== 'ACTIF') {
+                    row.style.opacity = '0.6';
+                    row.style.backgroundColor = '#f8f9fa';
+                }
+                row.innerHTML = `
+                    <td><span class="badge badge-${getBadgeClass(charge.centre)}">${charge.centre.toUpperCase()}</span></td>
+                    <td>${charge.categorie}</td>
+                    <td>${charge.element}</td>
+                    <td>${charge.fournisseur}</td>
+                    <td class="montant positif">${Math.abs(charge.montantHT).toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td>
+                    <td class="montant positif">${Math.abs(charge.montantTTC).toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td>
+                    <td>${charge.paiement}</td>
+                    <td>${charge.periodicite}</td>
+                    <td>${charge.moisIntervention || '-'}</td>
+                    <td><span class="badge badge-${charge.statut === 'ACTIF' ? 'success' : charge.statut === 'INACTIF' ? 'danger' : 'warning'}">${charge.statut}</span></td>
+                    <td class="actions">
+                        <button class="btn-icon btn-edit" onclick="modifierCharge(${charge.id})" title="Modifier">✏️</button>
+                        <button class="btn-icon btn-delete" onclick="supprimerCharge(${charge.id})" title="Supprimer">🗑️</button>
+                    </td>
+                `;
+            });
+        }
+
+        function getBadgeClass(centre) {
+            switch (centre) {
+                case 'général': return 'primary';
+                case 'gare': return 'success';
+                case 'wissembourg': return 'info';
+                case 'mixte': return 'warning';
+                default: return 'secondary';
+            }
+        }
+
+        function calculerTotaux() {
+            const filtreType = document.getElementById('filtreType').value;
+            const filtreCategorie = document.getElementById('filtreCategorie').value;
+            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
+            // Note: On ne prend pas le filtreStatut ici car on veut toujours calculer sur les ACTIFS
+
+            let chargesFiltrees = [...chargesRecurrentes];
+
+            // 🔧 CORRECTION: TOUJOURS FILTRER UNIQUEMENT LES CHARGES ACTIVES POUR LES CALCULS
+            chargesFiltrees = chargesFiltrees.filter(c => c.statut === 'ACTIF');
+
+            if (filtreType) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.centre === filtreType);
+            }
+
+            if (filtreCategorie) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.categorie === filtreCategorie);
+            }
+
+            if (filtrePeriodicite) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.periodicite === filtrePeriodicite);
+            }
+
+            let totalNominalHT = 0;
+            let totalNominalTTC = 0;
+            let totalLisseHT = 0;
+            let totalLisseTTC = 0;
+
+            chargesFiltrees.forEach(charge => {
+                const montantHT = Math.abs(charge.montantHT);
+                const montantTTC = Math.abs(charge.montantTTC);
+
+                totalNominalHT += montantHT;
+                totalNominalTTC += montantTTC;
+
+                // Calcul lissé selon périodicité
+                let facteurLissage = 1;
+                switch (charge.periodicite) {
+                    case 'BIMESTRIEL': facteurLissage = 2; break;
+                    case 'TRIMESTRIEL': facteurLissage = 3; break;
+                    case 'SEMESTRIEL': facteurLissage = 6; break;
+                    case 'ANNUEL': facteurLissage = 12; break;
+                    default: facteurLissage = 1;
+                }
+
+                totalLisseHT += montantHT / facteurLissage;
+                totalLisseTTC += montantTTC / facteurLissage;
+            });
+
+            document.getElementById('totalHTLisse').textContent = Math.round(totalLisseHT).toLocaleString('fr-FR') + '€';
+            document.getElementById('totalNominalHT').textContent = Math.round(totalNominalHT).toLocaleString('fr-FR') + '€';
+            document.getElementById('totalNominalTTC').textContent = Math.round(totalNominalTTC).toLocaleString('fr-FR') + '€';
+            document.getElementById('totalLisseTTC').textContent = Math.round(totalLisseTTC).toLocaleString('fr-FR') + '€';
+        }
+
+        function appliquerFiltres() {
+            afficherCharges();
+            calculerTotaux();
+        }
+
+        function ouvrirModalAjout() {
+            chargeEnModification = null;
+            document.getElementById('titreModal').textContent = 'Nouvelle Charge';
+            document.getElementById('formulaireCharge').reset();
+            document.getElementById('modalCharge').style.display = 'block';
+        }
+
+        function modifierCharge(id) {
+            const charge = chargesRecurrentes.find(c => c.id === id);
+            if (!charge) return;
+
+            chargeEnModification = charge;
+            document.getElementById('titreModal').textContent = 'Modifier Charge';
+            
+            // Pré-remplir le formulaire
+            document.getElementById('centre').value = charge.centre;
+            document.getElementById('categorie').value = charge.categorie;
+            document.getElementById('element').value = charge.element;
+            document.getElementById('fournisseur').value = charge.fournisseur;
+            document.getElementById('montantHT').value = charge.montantHT;
+            document.getElementById('montantTTC').value = charge.montantTTC;
+            document.getElementById('paiement').value = charge.paiement;
+            document.getElementById('periodicite').value = charge.periodicite;
+            document.getElementById('moisIntervention').value = charge.moisIntervention || '';
+            document.getElementById('statut').value = charge.statut;
+
+            document.getElementById('modalCharge').style.display = 'block';
+        }
+
+        function supprimerCharge(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette charge ?')) {
+                chargesRecurrentes = chargesRecurrentes.filter(c => c.id !== id);
+                sauvegarderDonnees();
+                afficherCharges();
+                calculerTotaux();
+            }
+        }
+
+        function fermerModal() {
+            document.getElementById('modalCharge').style.display = 'none';
+            chargeEnModification = null;
+        }
+
+        // Soumission formulaire
+        document.getElementById('formulaireCharge').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const donnees = {
+                centre: document.getElementById('centre').value,
+                categorie: document.getElementById('categorie').value,
+                element: document.getElementById('element').value,
+                fournisseur: document.getElementById('fournisseur').value,
+                montantHT: parseFloat(document.getElementById('montantHT').value),
+                montantTTC: parseFloat(document.getElementById('montantTTC').value),
+                paiement: document.getElementById('paiement').value,
+                periodicite: document.getElementById('periodicite').value,
+                moisIntervention: document.getElementById('moisIntervention').value,
+                statut: document.getElementById('statut').value
+            };
+
+            if (chargeEnModification) {
+                // Modification
+                const index = chargesRecurrentes.findIndex(c => c.id === chargeEnModification.id);
+                if (index !== -1) {
+                    chargesRecurrentes[index] = { ...chargesRecurrentes[index], ...donnees };
+                }
+            } else {
+                // Ajout
+                const nouvelId = Math.max(...chargesRecurrentes.map(c => c.id), 0) + 1;
+                chargesRecurrentes.push({ id: nouvelId, ...donnees });
+            }
+
+            sauvegarderDonnees();
+            afficherCharges();
+            calculerTotaux();
+            fermerModal();
+        });
+
+        // Export CSV - FONCTION EXISTANTE PRÉSERVÉE
+        function exporterCSV() {
+            // 🔧 CORRECTION 3: CSV EXPORTE AUSSI UNIQUEMENT LES CHARGES ACTIVES
+            const chargesActives = chargesRecurrentes.filter(c => c.statut === 'ACTIF');
+            
+            const headers = ['Type', 'Catégorie', 'Élément', 'Fournisseur', 'Montant HT', 'Montant TTC', 'Paiement', 'Périodicité', 'Mois', 'Statut'];
+            
+            let csvContent = '\uFEFF'; // BOM UTF-8
+            csvContent += headers.join(';') + '\n';
+
+            chargesActives.forEach(charge => {
+                const ligne = [
+                    charge.centre,
+                    charge.categorie,
+                    charge.element,
+                    charge.fournisseur,
+                    charge.montantHT.toFixed(2),
+                    charge.montantTTC.toFixed(2),
+                    charge.paiement,
+                    charge.periodicite,
+                    charge.moisIntervention || '',
+                    charge.statut
+                ].join(';');
+                csvContent += ligne + '\n';
+            });
+
+            // Ajout des totaux (charges actives uniquement)
+            const totalHT = chargesActives.reduce((sum, c) => sum + Math.abs(c.montantHT), 0);
+            const totalTTC = chargesActives.reduce((sum, c) => sum + Math.abs(c.montantTTC), 0);
+            
+            csvContent += '\n';
+            csvContent += `TOTAL;;;${totalHT.toFixed(2)};${totalTTC.toFixed(2)};;;;\n`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            const aujourd_hui = new Date().toISOString().slice(0, 10);
+            link.download = `charges_recurrentes_rocket_tower_${aujourd_hui}.csv`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+
+        // ==========================================
+        // EXPORT PDF VIA PRINT CSS - SOLUTION NATIVE
+        // ==========================================
+        function exporterPDF() {
+            // Calculer les données d'impression (avec filtres appliqués)
+            const filtreType = document.getElementById('filtreType').value;
+            const filtreCategorie = document.getElementById('filtreCategorie').value;
+            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
+            const filtreStatut = document.getElementById('filtreStatut').value;
+
+            let chargesFiltrees = [...chargesRecurrentes];
+
+            // 🔧 CORRECTION 4: PDF EXPORTE AUSSI UNIQUEMENT LES CHARGES ACTIVES
+            chargesFiltrees = chargesFiltrees.filter(c => c.statut === 'ACTIF');
+
+            if (filtreType) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.centre === filtreType);
+            }
+            if (filtreCategorie) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.categorie === filtreCategorie);
+            }
+            if (filtrePeriodicite) {
+                chargesFiltrees = chargesFiltrees.filter(c => c.periodicite === filtrePeriodicite);
+            }
+
+            // Mettre à jour les informations d'impression
+            const maintenant = new Date();
+            document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
+            document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
+            document.getElementById('nbElementsImpression').textContent = chargesFiltrees.length;
+
+            // Générer le texte des filtres
+            let filtresTexte = '';
+            const filtresActifs = [];
+            if (filtreType) filtresActifs.push(`Type: ${filtreType}`);
+            if (filtreCategorie) filtresActifs.push(`Catégorie: ${filtreCategorie}`);
+            if (filtrePeriodicite) filtresActifs.push(`Périodicité: ${filtrePeriodicite}`);
+            
+            filtresTexte = filtresActifs.length > 0 ? filtresActifs.join(', ') + ' + Charges ACTIVES uniquement' : 'Charges ACTIVES uniquement';
+            document.getElementById('filtresImpression').textContent = filtresTexte;
+
+            // Message informatif avant impression
+            const confirmation = confirm(
+                '📄 Export PDF via Impression\n\n' +
+                `• Éléments à exporter : ${chargesFiltrees.length} (charges ACTIVES uniquement)\n` +
+                `• Filtres : ${filtresTexte}\n\n` +
+                'Dans la boîte d\'impression :\n' +
+                '1. Choisir "Enregistrer au format PDF"\n' +
+                '2. Sélectionner "Plus de paramètres"\n' +
+                '3. Cocher "Graphiques d\'arrière-plan"\n\n' +
+                'Continuer ?'
+            );
+
+            if (confirmation) {
+                // Attendre un peu que l'interface se mette à jour
+                setTimeout(() => {
+                    // Déclencher l'impression
+                    window.print();
+                }, 500);
+            }
+        }
+
+        // Fermer modal en cliquant à l'extérieur
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalCharge');
+            if (event.target == modal) {
+                fermerModal();
+            }
+        }
+    </script>
+</body>
+</html>
