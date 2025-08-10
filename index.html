@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Rocket Tower - Tableau de Bord Financier</title>
+    <style>
+        /* RESET ET BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* HEADER */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* INDICATEUR SYNCHRONISATION */
+        .sync-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sync-indicator:hover {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .sync-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .sync-green { background: #27ae60; }
+        .sync-orange { 
+            background: #f39c12; 
+            animation: pulse 2s infinite;
+        }
+        .sync-red { background: #e74c3c; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* CONTAINER PRINCIPAL */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* GRILLE MODULES */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        /* CARTES MODULES */
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-description {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* BOUTONS */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .btn-danger { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .btn-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .btn-analytics { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .btn-primary { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+
+        /* BADGES STATUS */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-operational {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.2);
+        }
+
+        .status-sync {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        /* LIENS EXTERNES */
+        .external-links {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .external-links h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .external-link {
+            display: inline-block;
+            margin: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #ecf0f1;
+            color: #2c3e50;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .external-link:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        /* FOOTER */
+        .footer {
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .sync-indicator {
+                position: static;
+                justify-content: center;
+                margin-top: 1rem;
+            }
+            
+            .modules-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .section-card {
+                padding: 1.5rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="sync-indicator" onclick="ouvrirSynchronisation()">
+            <div class="sync-dot" id="syncDot"></div>
+            <span id="syncText">Vérification...</span>
+        </div>
+        <h1>🚀 Rocket Tower</h1>
+        <p>Tableau de Bord Financier Multi-Modules • Solution Hybride Performance Locale + Synchronisation Cloud</p>
+    </div>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <div class="container">
+        <!-- MODULES GRID -->
+        <div class="modules-grid">
+            <!-- RECETTES RÉCURRENTES -->
+            <div class="section-card">
+                <h2 class="section-title">💵 Interface Gestion des Recettes récurrentes</h2>
+                <p class="section-description">Système complet avec 76+ contrats clients réels intégrés, lissage automatique des périodicités et persistance localStorage.</p>
+                <a href="rt_module2_recettes_crud_final.html" class="btn btn-success">💵 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+                <span class="status-badge status-sync">🔄 Sync Hybride</span>
+            </div>
+
+            <!-- CHARGES RÉCURRENTES -->
+            <div class="section-card">
+                <h2 class="section-title">💰 Interface Gestion des Charges récurrentes</h2>
+                <p class="section-description">Système complet avec 119 charges réelles intégrées, lissage automatique des périodicités et persistance localStorage.</p>
+                <a href="rt_module3_charges_crud.html" class="btn btn-danger">💰 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+                <span class="status-badge status-sync">🔄 Sync Hybride</span>
+            </div>
+
+            <!-- CHARGES PÉRIODIQUES -->
+            <div class="section-card">
+                <h2 class="section-title">📅 Interface Charges Périodiques</h2>
+                <p class="section-description">Gestion complète des charges 1-2 fois par an avec CRUD localStorage, calculs automatiques et persistance.</p>
+                <a href="rt_Module4_charges-periodiques_crud.html" class="btn btn-warning">📅 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+                <span class="status-badge status-sync">🔄 Sync Hybride</span>
+            </div>
+
+            <!-- ANALYTICS DASHBOARD -->
+            <div class="section-card">
+                <h2 class="section-title">📊 Interface Analytics Dashboard</h2>
+                <p class="section-description">Analyse financière temps réel avec indicateurs clés, ratios de performance et équilibre financier. Lecture automatique modules recettes + charges récurrentes.</p>
+                <a href="rt_module5_analytics.html" class="btn btn-analytics">📊 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+            </div>
+
+            <!-- PRÉVISIONNEL 12 MOIS -->
+            <div class="section-card">
+                <h2 class="section-title">🔮 Prévisionnel 12 Mois</h2>
+                <p class="section-description">Projection financière automatique sur 12 mois avec données récurrentes, graphique d'évolution et opérations spécifiques ajustables.</p>
+                <a href="rt_module6_previsionnel.html" class="btn btn-primary">🔮 Accéder à l'Interface</a>
+                <span class="status-badge status-operational">✅ Opérationnel</span>
+            </div>
+
+            <!-- SYNCHRONISATION MULTI-UTILISATEURS -->
+            <div class="section-card">
+                <h2 class="section-title">🔄 Synchronisation Multi-Utilisateurs</h2>
+                <p class="section-description">Système hybride localStorage + SeaTable pour partage multi-utilisateurs avec performance locale optimale et synchronisation intelligente.</p>
+                <a href="rocket_tower_sync_system.html" class="btn btn-success">🔄 Interface Synchronisation</a>
+                <span class="status-badge status-operational">✅ Hybride Actif</span>
+            </div>
+        </div>
+
+        <!-- LIENS EXTERNES -->
+        <div class="external-links">
+            <h3>🔗 Accès Externes</h3>
+            <a href="https://drive.google.com" target="_blank" class="external-link">📁 Google Drive</a>
+            <a href="https://cloud.seatable.io/workspace/83314/" target="_blank" class="external-link">🔄 SeaTable Workspace</a>
+            <a href="https://github.com/AMAT67850/rt-tab-dafdir" target="_blank" class="external-link">💻 GitHub Repository</a>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>&copy; 2025 Rocket Tower - Tableau de Bord Financier | Architecture Hybride • Synchronisation Multi-Utilisateurs • 6 Modules Opérationnels</p>
+    </div>
+
+    <!-- SCRIPT DE SYNCHRONISATION -->
+    <script>
+        // État de synchronisation simplifié pour l'indicator
+        let syncStatus = {
+            status: 'checking',
+            lastCheck: null,
+            pendingCount: 0
+        };
+
+        // Vérification rapide des données locales
+        function verifierDonneesLocales() {
+            try {
+                const recettes = localStorage.getItem('recettesRT');
+                const charges = localStorage.getItem('chargesRecurrentesRT');
+                const chargesPeriodiques = localStorage.getItem('chargesPeriodiquesRT');
+                
+                let totalElements = 0;
+                let hasData = false;
+                
+                if (recettes) {
+                    const recData = JSON.parse(recettes);
+                    totalElements += Array.isArray(recData) ? recData.length : 0;
+                    hasData = true;
+                }
+                
+                if (charges) {
+                    const charData = JSON.parse(charges);
+                    totalElements += Array.isArray(charData) ? charData.length : 0;
+                    hasData = true;
+                }
+                
+                if (chargesPeriodiques) {
+                    const charPerData = JSON.parse(chargesPeriodiques);
+                    totalElements += Array.isArray(charPerData) ? charPerData.length : 0;
+                    hasData = true;
+                }
+                
+                if (hasData && totalElements > 0) {
+                    syncStatus.status = 'synced';
+                    syncStatus.pendingCount = 0;
+                } else if (hasData) {
+                    syncStatus.status = 'warning';
+                    syncStatus.pendingCount = 0;
+                } else {
+                    syncStatus.status = 'pending';
+                    syncStatus.pendingCount = 0;
+                }
+                
+                syncStatus.lastCheck = new Date();
+                return true;
+                
+            } catch (error) {
+                console.error('Erreur vérification données:', error);
+                syncStatus.status = 'error';
+                return false;
+            }
+        }
+
+        // Mettre à jour l'indicateur visuel
+        function mettreAJourIndicateur() {
+            const dot = document.getElementById('syncDot');
+            const text = document.getElementById('syncText');
+            
+            if (!dot || !text) return;
+            
+            // Reset classes
+            dot.className = 'sync-dot';
+            
+            switch (syncStatus.status) {
+                case 'synced':
+                    dot.classList.add('sync-green');
+                    text.textContent = 'Synchronisé';
+                    break;
+                case 'pending':
+                    dot.classList.add('sync-orange');
+                    text.textContent = `${syncStatus.pendingCount} à sync`;
+                    break;
+                case 'warning':
+                    dot.classList.add('sync-orange');
+                    text.textContent = 'Sync recommandée';
+                    break;
+                case 'error':
+                    dot.classList.add('sync-red');
+                    text.textContent = 'Erreur sync';
+                    break;
+                default:
+                    dot.classList.add('sync-orange');
+                    text.textContent = 'Vérification...';
+            }
+        }
+
+        // Initialisation
+        function initialiserIndicateur() {
+            if (verifierDonneesLocales()) {
+                mettreAJourIndicateur();
+            }
+        }
+
+        // Démarrage automatique
+        document.addEventListener('DOMContentLoaded', initialiserIndicateur);
+        
+        // Vérification périodique (toutes les 2 minutes)
+        setInterval(() => {
+            verifierDonneesLocales();
+            mettreAJourIndicateur();
+        }, 120000);
+
+        function ouvrirSynchronisation() {
+            window.open('rocket_tower_sync_system.html', '_blank');
+        }
+
+        function alertModule(moduleName) {
+            alert(`Module ${moduleName} en cours de développement.\n\nArchitecture hybride :\n- 6 modules opérationnels avec synchronisation\n- Performance locale optimale (localStorage)\n- Partage multi-utilisateurs (SeaTable)\n- Développement interface par interface\n- Aucun impact sur modules existants\n- Évolutivité native garantie\n\nProchaine étape : Modules métier avancés`);
+        }
+    </script>
+</body>
+</html>
