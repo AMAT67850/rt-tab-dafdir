@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔮 Prévisionnel 12 Mois • ROCKET TOWER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* Header Cohérent */
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        /* Configuration */
+        .config-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .config-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        /* Boutons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8em;
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #007bff;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .stat-card p {
+            color: #6c757d;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+        
+        /* Chart Section */
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+        
+        /* Accordéon */
+        .accordion {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .accordion-header {
+            background: #f8f9fa;
+            padding: 20px 25px;
+            cursor: pointer;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .accordion-header:hover {
+            background: #e9ecef;
+        }
+        
+        .accordion-header.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .accordion-title {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .accordion-summary {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .accordion-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        .accordion-content {
+            display: none;
+            padding: 25px;
+        }
+        
+        .accordion-content.active {
+            display: block;
+        }
+        
+        /* Détails mensuels */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-section h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .detail-list {
+            list-style: none;
+        }
+        
+        .detail-list li {
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .detail-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+        }
+        
+        .detail-amount {
+            font-weight: 600;
+            color: #007bff;
+        }
+        
+        .total-row {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            opacity: 0.7;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+        
+        /* Impression */
+        @media print {
+            body {
+                background: white;
+                font-size: 12px;
+            }
+            
+            .container {
+                box-shadow: none;
+                background: white;
+            }
+            
+            .header {
+                background: #2c3e50 !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .config-section {
+                display: none;
+            }
+            
+            .accordion-content {
+                display: block !important;
+            }
+            
+            .accordion-header {
+                background: #f8f9fa !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .btn {
+                display: none;
+            }
+            
+            .print-info {
+                display: block !important;
+            }
+        }
+        
+        .print-info {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        /* Indicateur de synchronisation */
+        .sync-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sync-indicator:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔮 Prévisionnel 12 Mois</h1>
+            <p class="subtitle">Projection financière automatique • Recettes et Charges récurrentes HT</p>
+        </div>
+
+        <div class="content">
+            <!-- Configuration -->
+            <div class="config-section">
+                <h2>⚙️ Configuration</h2>
+                <div class="config-grid">
+                    <div>
+                        <div class="form-group">
+                            <label for="soldeInitial">Solde Initial (€)</label>
+                            <input type="number" id="soldeInitial" value="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button onclick="calculerPrevisionnel()" class="btn btn-primary">🔄 Calculer Prévisionnel</button>
+                        <button onclick="ouvrirModalOperation()" class="btn btn-success">➕ Ajouter Opérations</button>
+                        <button onclick="exporterPDF()" class="btn btn-danger">🖨️ Export PDF</button>
+                        <a href="index.html" class="btn btn-secondary">🏠 Dashboard</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Résumé -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalRecettes">0€</h3>
+                    <p>Total Recettes HT Annuel</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalCharges">0€</h3>
+                    <p>Total Charges HT Annuel</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="resultatAnnuel">0€</h3>
+                    <p>Résultat Prévisionnel HT</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="soldeFinal">0€</h3>
+                    <p>Solde Final Prévu</p>
+                </div>
+            </div>
+
+            <!-- Graphique -->
+            <div class="chart-section">
+                <h2>📈 Évolution Solde Cumulé</h2>
+                <div class="chart-container">
+                    <canvas id="prevChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Accordéons Mensuels -->
+            <div id="accordeonContainer">
+                <!-- Généré dynamiquement -->
+            </div>
+
+            <!-- INFORMATIONS POUR IMPRESSION - MASQUÉES À L'ÉCRAN -->
+            <div class="print-info">
+                <p><strong>🚀 ROCKET TOWER - PRÉVISIONNEL 12 MOIS</strong></p>
+                <p>Rapport généré le <span id="dateImpression"></span> à <span id="heureImpression"></span></p>
+                <p>Période : <span id="periodeImpression">Août 2025 - Juillet 2026</span></p>
+                <p>Données sources : Recettes + Charges récurrentes • Généré automatiquement</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajout Opération -->
+    <div id="modalOperation" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nouvelle Opération</h2>
+                <span class="close" onclick="fermerModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="formOperation">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="operationType" required>
+                            <option value="recette">💰 Recette</option>
+                            <option value="charge">💸 Charge</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mois</label>
+                        <select id="operationMois" required>
+                            <!-- Généré dynamiquement -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Libellé</label>
+                        <input type="text" id="operationLibelle" required placeholder="Description de l'opération">
+                    </div>
+                    <div class="form-group">
+                        <label>Montant HT (€)</label>
+                        <input type="number" id="operationMontant" required step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Commentaire (optionnel)</label>
+                        <input type="text" id="operationCommentaire" placeholder="Informations complémentaires">
+                    </div>
+                    <div style="text-align: right; margin-top: 25px;">
+                        <button type="button" onclick="fermerModal()" class="btn btn-secondary">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let recettesData = [];
+        let chargesData = [];
+        let projectionMensuelle = [];
+        let operationsSpecifiques = {}; // { "2025-08": [operations], ... }
+        let prevChart = null;
+
+        // ===================================
+        // INITIALISATION
+        // ===================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Prévisionnel 12 Mois - Initialisation');
+            chargerDonnees();
+            initialiserModalMois();
+            
+            // Calculer automatiquement au démarrage
+            setTimeout(() => {
+                calculerPrevisionnel();
+            }, 500);
+        });
+
+        function chargerDonnees() {
+            try {
+                console.log('📊 Chargement des données prévisionnel...');
+                
+                // Charger les données des modules
+                const recettesStorage = localStorage.getItem('recettesRT');
+                const chargesStorage = localStorage.getItem('chargesRecurrentesRT');
+                const prevStorage = localStorage.getItem('previsionnel12moisRT');
+                
+                recettesData = recettesStorage ? JSON.parse(recettesStorage) : [];
+                chargesData = chargesStorage ? JSON.parse(chargesStorage) : [];
+                
+                console.log(`📥 Données chargées: ${recettesData.length} recettes, ${chargesData.length} charges`);
+                
+                // Charger les données spécifiques du prévisionnel
+                if (prevStorage) {
+                    const prevData = JSON.parse(prevStorage);
+                    document.getElementById('soldeInitial').value = prevData.soldeInitial || 0;
+                    operationsSpecifiques = prevData.operationsSpecifiques || {};
+                    console.log('💾 Configuration prévisionnel restaurée');
+                }
+
+            } catch (error) {
+                console.error('❌ Erreur chargement:', error);
+                alert('Erreur lors du chargement des données: ' + error.message);
+            }
+        }
+
+        function sauvegarderPrevisionnel() {
+            try {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    soldeInitial: parseFloat(document.getElementById('soldeInitial').value),
+                    projectionMensuelle: projectionMensuelle,
+                    operationsSpecifiques: operationsSpecifiques
+                };
+                localStorage.setItem('previsionnel12moisRT', JSON.stringify(data));
+                
+                // HOOK SYNCHRONISATION : Marquer changement pour sync
+                localStorage.setItem('previsionnel12moisRT_lastModified', new Date().toISOString());
+                
+                console.log('💾 Prévisionnel sauvegardé');
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde:', error);
+            }
+        }
+
+        // FONCTION CORRIGÉE POUR GÉRER LE FORMAT NUMÉRIQUE "1,4,7,10"
+        function doitApparaitreCeMois(item, dateMois) {
+            const moisActuel = dateMois.getMonth() + 1; // 1-12
+            
+            // Gestion mois spécifiques (format numérique : "1,4,7,10")
+            if (item.moisIntervention && 
+                item.moisIntervention.trim() && 
+                item.moisIntervention.trim().toLowerCase() !== 'tous') {
+                
+                const moisListe = item.moisIntervention.split(',').map(m => parseInt(m.trim())).filter(m => !isNaN(m));
+                return moisListe.includes(moisActuel);
+            }
+            
+            // Gestion des périodicités standards
+            const periodicite = item.periodicite?.toUpperCase();
+            
+            switch (periodicite) {
+                case 'MENSUEL':
+                    return true;
+                    
+                case 'TRIMESTRIEL':
+                    // Trimestres : janvier=1, avril=4, juillet=7, octobre=10
+                    return [1, 4, 7, 10].includes(moisActuel);
+                    
+                case 'SEMESTRIEL':
+                    // Semestres : janvier=1, juillet=7
+                    return [1, 7].includes(moisActuel);
+                    
+                case 'ANNUEL':
+                    // Une fois par an, par défaut en janvier
+                    return moisActuel === 1;
+                    
+                default:
+                    // Par défaut, considérer comme mensuel
+                    return true;
+            }
+        }
+
+        function calculerPrevisionnel() {
+            console.log('🔮 === DÉBUT CALCUL PRÉVISIONNEL ===');
+            
+            const soldeInitial = parseFloat(document.getElementById('soldeInitial').value) || 0;
+            const dateDebut = new Date(); // Mois actuel
+            dateDebut.setDate(1); // Premier du mois
+            
+            projectionMensuelle = [];
+            
+            console.log(`📅 Période: ${dateDebut.toLocaleDateString()} + 12 mois`);
+            console.log(`💰 Solde initial: ${soldeInitial}€`);
+            console.log(`📊 Sources: ${recettesData.length} recettes, ${chargesData.length} charges`);
+            
+            for (let i = 0; i < 12; i++) {
+                const dateMois = new Date(dateDebut);
+                dateMois.setMonth(dateMois.getMonth() + i);
+                
+                const moisNom = dateMois.toLocaleDateString('fr-FR', { 
+                    year: 'numeric', 
+                    month: 'long' 
+                }).replace(' ', ' ');
+                
+                const moisCle = `${dateMois.getFullYear()}-${String(dateMois.getMonth() + 1).padStart(2, '0')}`;
+                
+                console.log(`\n📅 === ${moisNom.toUpperCase()} (${moisCle}) ===`);
+                
+                let totalRecettes = 0;
+                let totalCharges = 0;
+                let detailRecettes = [];
+                let detailCharges = [];
+                
+                // Recettes récurrentes
+                recettesData.forEach(recette => {
+                    if (doitApparaitreCeMois(recette, dateMois)) {
+                        const montant = Math.abs(recette.montantHT || 0);
+                        totalRecettes += montant;
+                        detailRecettes.push({
+                            libelle: `${recette.client} - ${recette.libelle}`,
+                            montant: montant,
+                            type: 'recurrente',
+                            periodicite: recette.periodicite
+                        });
+                        console.log(`💰 Recette: ${recette.client} = ${montant}€ (${recette.periodicite})`);
+                    }
+                });
+                
+                // Charges récurrentes
+                chargesData.forEach(charge => {
+                    if (doitApparaitreCeMois(charge, dateMois)) {
+                        const montant = Math.abs(charge.montantHT || 0);
+                        totalCharges += montant;
+                        detailCharges.push({
+                            libelle: `${charge.element}`,
+                            montant: montant,
+                            type: 'recurrente',
+                            periodicite: charge.periodicite
+                        });
+                        console.log(`💸 Charge: ${charge.element} = ${montant}€ (${charge.periodicite})`);
+                    }
+                });
+                
+                // Ajout opérations spécifiques
+                if (operationsSpecifiques[moisCle]) {
+                    console.log(`📅 ${moisNom} - Opérations spécifiques trouvées:`, operationsSpecifiques[moisCle]);
+                    operationsSpecifiques[moisCle].forEach(op => {
+                        if (op.type === 'recette') {
+                            totalRecettes += op.montant;
+                            detailRecettes.push({
+                                libelle: op.libelle,
+                                montant: op.montant,
+                                type: 'specifique',
+                                commentaire: op.commentaire
+                            });
+                            console.log(`💰 Ajout recette spécifique: ${op.libelle} = ${op.montant}€`);
+                        } else {
+                            totalCharges += op.montant;
+                            detailCharges.push({
+                                libelle: op.libelle,
+                                montant: op.montant,
+                                type: 'specifique',
+                                commentaire: op.commentaire
+                            });
+                            console.log(`💸 Ajout charge spécifique: ${op.libelle} = ${op.montant}€`);
+                        }
+                    });
+                } else {
+                    console.log(`📅 ${moisNom} - Aucune opération spécifique`);
+                }
+                
+                const solde = totalRecettes - totalCharges;
+                const soldeCumule = i === 0 ? soldeInitial + solde : projectionMensuelle[i-1].soldeCumule + solde;
+                
+                projectionMensuelle.push({
+                    mois: moisNom,
+                    moisCle: moisCle,
+                    totalRecettes,
+                    totalCharges,
+                    solde,
+                    soldeCumule,
+                    detailRecettes,
+                    detailCharges
+                });
+            }
+            
+            afficherStats();
+            afficherAccordeons();
+            mettreAJourGraphique();
+            sauvegarderPrevisionnel();
+            
+            console.log('✅ === FIN CALCUL PRÉVISIONNEL ===');
+            console.log('📊 Totaux finaux:', {
+                totalRecettesAnnuel: projectionMensuelle.reduce((sum, m) => sum + m.totalRecettes, 0),
+                totalChargesAnnuel: projectionMensuelle.reduce((sum, m) => sum + m.totalCharges, 0),
+                soldeFinal: projectionMensuelle[projectionMensuelle.length - 1]?.soldeCumule
+            });
+            console.log('📊 Projection complète:', projectionMensuelle);
+            
+            console.log('✅ Prévisionnel calculé:', projectionMensuelle);
+        }
+
+        function afficherStats() {
+            const totalRecettes = projectionMensuelle.reduce((sum, m) => sum + m.totalRecettes, 0);
+            const totalCharges = projectionMensuelle.reduce((sum, m) => sum + m.totalCharges, 0);
+            const resultatAnnuel = totalRecettes - totalCharges;
+            const soldeFinal = projectionMensuelle.length > 0 ? projectionMensuelle[projectionMensuelle.length - 1].soldeCumule : 0;
+
+            document.getElementById('totalRecettes').textContent = Math.round(totalRecettes).toLocaleString('fr-FR') + '€';
+            document.getElementById('totalCharges').textContent = Math.round(totalCharges).toLocaleString('fr-FR') + '€';
+            document.getElementById('resultatAnnuel').textContent = Math.round(resultatAnnuel).toLocaleString('fr-FR') + '€';
+            document.getElementById('soldeFinal').textContent = Math.round(soldeFinal).toLocaleString('fr-FR') + '€';
+        }
+
+        function afficherAccordeons() {
+            const container = document.getElementById('accordeonContainer');
+            container.innerHTML = '';
+
+            projectionMensuelle.forEach((mois, index) => {
+                const soldeCouleur = mois.soldeCumule >= 0 ? '#28a745' : '#dc3545';
+                
+                const accordeon = document.createElement('div');
+                accordeon.className = 'accordion';
+                accordeon.innerHTML = `
+                    <div class="accordion-header" onclick="toggleAccordeon(${index})">
+                        <div>
+                            <div class="accordion-title">${mois.mois}</div>
+                            <div class="accordion-summary">
+                                Recettes: ${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€ • 
+                                Charges: ${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€ • 
+                                <span style="color: ${soldeCouleur}">Solde: ${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€</span>
+                            </div>
+                        </div>
+                        <div class="accordion-icon">▼</div>
+                    </div>
+                    <div class="accordion-content" id="accordeon-${index}">
+                        <div class="detail-grid">
+                            <div class="detail-section">
+                                <h4>💰 Recettes (${mois.detailRecettes.length})</h4>
+                                <ul class="detail-list">
+                                    ${mois.detailRecettes.map(r => `
+                                        <li>
+                                            <span class="detail-label">
+                                                ${r.libelle}
+                                                ${r.type === 'specifique' ? ' 🎯' : ''}
+                                                ${r.periodicite ? ` (${r.periodicite})` : ''}
+                                            </span>
+                                            <span class="detail-amount">${Math.round(r.montant).toLocaleString('fr-FR')}€</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                                <div class="total-row">
+                                    <span>Total Recettes</span>
+                                    <span>${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€</span>
+                                </div>
+                            </div>
+                            <div class="detail-section">
+                                <h4>💸 Charges (${mois.detailCharges.length})</h4>
+                                <ul class="detail-list">
+                                    ${mois.detailCharges.map(c => `
+                                        <li>
+                                            <span class="detail-label">
+                                                ${c.libelle}
+                                                ${c.type === 'specifique' ? ' 🎯' : ''}
+                                                ${c.periodicite ? ` (${c.periodicite})` : ''}
+                                            </span>
+                                            <span class="detail-amount">${Math.round(c.montant).toLocaleString('fr-FR')}€</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                                <div class="total-row">
+                                    <span>Total Charges</span>
+                                    <span>${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="total-row" style="background: ${soldeCouleur}; color: white; margin-top: 20px;">
+                            <span>Solde Cumulé ${mois.mois}</span>
+                            <span>${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(accordeon);
+            });
+        }
+
+        function toggleAccordeon(index) {
+            const header = document.querySelector(`#accordeonContainer .accordion:nth-child(${index + 1}) .accordion-header`);
+            const content = document.getElementById(`accordeon-${index}`);
+            
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        function mettreAJourGraphique() {
+            const ctx = document.getElementById('prevChart').getContext('2d');
+            
+            if (prevChart) {
+                prevChart.destroy();
+            }
+            
+            const labels = projectionMensuelle.map(m => m.mois.split(' ')[0]); // Juste le mois
+            const data = projectionMensuelle.map(m => Math.round(m.soldeCumule));
+            
+            prevChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Solde Cumulé (€)',
+                        data: data,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#007bff',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('fr-FR') + '€';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        // ===================================
+        // MODAL OPÉRATIONS SPÉCIFIQUES
+        // ===================================
+
+        function initialiserModalMois() {
+            const select = document.getElementById('operationMois');
+            const dateDebut = new Date();
+            dateDebut.setDate(1);
+            
+            for (let i = 0; i < 12; i++) {
+                const dateMois = new Date(dateDebut);
+                dateMois.setMonth(dateMois.getMonth() + i);
+                
+                const moisNom = dateMois.toLocaleDateString('fr-FR', { 
+                    year: 'numeric', 
+                    month: 'long' 
+                });
+                
+                const moisCle = `${dateMois.getFullYear()}-${String(dateMois.getMonth() + 1).padStart(2, '0')}`;
+                
+                const option = document.createElement('option');
+                option.value = moisCle;
+                option.textContent = moisNom;
+                select.appendChild(option);
+            }
+        }
+
+        function ouvrirModalOperation() {
+            document.getElementById('modalOperation').style.display = 'block';
+            document.getElementById('formOperation').reset();
+        }
+
+        function fermerModal() {
+            document.getElementById('modalOperation').style.display = 'none';
+        }
+
+        // Gestionnaire de soumission du formulaire
+        document.getElementById('formOperation').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('operationType').value;
+            const moisCle = document.getElementById('operationMois').value;
+            const libelle = document.getElementById('operationLibelle').value;
+            const montant = parseFloat(document.getElementById('operationMontant').value);
+            const commentaire = document.getElementById('operationCommentaire').value;
+            
+            if (!operationsSpecifiques[moisCle]) {
+                operationsSpecifiques[moisCle] = [];
+            }
+            
+            operationsSpecifiques[moisCle].push({
+                id: Date.now(),
+                type,
+                libelle,
+                montant,
+                commentaire
+            });
+            
+            fermerModal();
+            calculerPrevisionnel(); // Recalculer avec les nouvelles opérations
+            
+            console.log('✅ Opération spécifique ajoutée:', { type, moisCle, libelle, montant });
+        });
+
+        // ===================================
+        // EXPORT PDF
+        // ===================================
+
+        function exporterPDF() {
+            // Mise à jour des informations d'impression
+            const maintenant = new Date();
+            document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
+            document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
+            
+            // Ouvrir tous les accordéons pour l'impression
+            const accordeonHeaders = document.querySelectorAll('.accordion-header');
+            const accordeonContents = document.querySelectorAll('.accordion-content');
+            
+            accordeonHeaders.forEach(header => header.classList.add('active'));
+            accordeonContents.forEach(content => content.classList.add('active'));
+            
+            // Instructions pour l'utilisateur
+            const confirmation = confirm(
+                '🖨️ Export PDF - Instructions :\n\n' +
+                '1. Cliquez OK puis CTRL+P (Cmd+P sur Mac)\n' +
+                '2. Choisir "Enregistrer au format PDF"\n' +
+                '3. Sélectionner "Plus de paramètres"\n' +
+                '4. Cocher "Graphiques d\'arrière-plan"\n\n' +
+                'Continuer ?'
+            );
+
+            if (confirmation) {
+                // Déclencher l'impression
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+            }
+        }
+
+        // Fermer modal en cliquant à l'extérieur
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalOperation');
+            if (event.target === modal) {
+                fermerModal();
+            }
+        }
+    </script>
+
+    <!-- =============================================== -->
+    <!-- SCRIPT SYNCHRONISATION HYBRIDE - MODULE 6 PRÉVISIONNEL -->
+    <!-- =============================================== -->
+    <script>
+        // =================================
+        // CONFIGURATION GLOBALE
+        // =================================
+
+        const RT_SYNC_CONFIG = {
+            enabled: true,
+            autoSync: false, // Mode manuel par défaut pour sécurité
+            syncInterval: 300000, // 5 minutes
+            retryAttempts: 3,
+            
+            // Configuration SeaTable (identifiants Phase 2)
+            seatable: {
+                baseUrl: 'https://cloud.seatable.io',
+                workspaceId: '83314',
+                dtableUuid: 'ef333f2a-8a98-4935-87f3-7ffed2c8e298',
+                apiToken: 'af7d26a67a7e68ff3fa1243bc3d3baeb5d06eb07'
+            },
+            
+            // Mapping des clés localStorage vers tables SeaTable
+            tableMapping: {
+                'recettesRT': 'RECETTES',
+                'chargesRecurrentesRT': 'CHARGES RÉCURRENTES', 
+                'chargesPeriodiquesRT': 'CHARGES PÉRIODIQUES',
+                'previsionnel12moisRT': 'PRÉVISIONNEL'
+            }
+        };
+
+        // =================================
+        // DÉTECTION AUTOMATIQUE MODULE
+        // =================================
+
+        class RTSyncDetector {
+            static detectModule() {
+                const url = window.location.pathname;
+                const title = document.title;
+                
+                if (url.includes('recettes') || title.includes('Recettes')) {
+                    return { type: 'recettes', storageKey: 'recettesRT', table: 'RECETTES' };
+                }
+                if (url.includes('charges') && !url.includes('periodiques')) {
+                    return { type: 'charges_rec', storageKey: 'chargesRecurrentesRT', table: 'CHARGES RÉCURRENTES' };
+                }
+                if (url.includes('periodiques')) {
+                    return { type: 'charges_per', storageKey: 'chargesPeriodiquesRT', table: 'CHARGES PÉRIODIQUES' };
+                }
+                if (url.includes('analytics')) {
+                    return { type: 'analytics', storageKey: null, table: null };
+                }
+                if (url.includes('previsionnel')) {
+                    return { type: 'previsionnel', storageKey: 'previsionnel12moisRT', table: 'PRÉVISIONNEL' };
+                }
+                
+                return { type: 'unknown', storageKey: null, table: null };
+            }
+        }
+
+        // =================================
+        // CLASSE SYNCHRONISATION HYBRIDE
+        // =================================
+
+        class RTHybridSync {
+            constructor() {
+                this.module = RTSyncDetector.detectModule();
+                this.isOnline = navigator.onLine;
+                this.syncStatus = 'idle';
+                this.lastSync = this.getLastSyncTime();
+                this.pendingChanges = 0;
+                this.indicator = null;
+                
+                console.log(`[RT-Sync] Initialisation module : ${this.module.type}`);
+                
+                this.init();
+            }
+            
+            init() {
+                this.createSyncIndicator();
+                this.setupNetworkListeners();
+                
+                if (this.module.storageKey) {
+                    this.setupChangeListener();
+                    this.detectPendingChanges();
+                }
+            }
+            
+            // =================================
+            // INDICATEUR VISUEL
+            // =================================
+            
+            createSyncIndicator() {
+                this.indicator = document.createElement('div');
+                this.indicator.className = 'sync-indicator';
+                this.indicator.title = 'Synchronisation Multi-Utilisateurs';
+                this.indicator.addEventListener('click', () => this.showSyncDetails());
+                document.body.appendChild(this.indicator);
+                
+                this.updateSyncStatus(this.syncStatus);
+            }
+            
+            updateSyncStatus(status) {
+                this.syncStatus = status;
+                
+                const colors = {
+                    'idle': '#6c757d',      // Gris - en veille
+                    'synced': '#28a745',    // Vert - synchronisé
+                    'pending': '#ffc107',   // Jaune - changements en attente
+                    'syncing': '#007bff',   // Bleu - synchronisation en cours
+                    'offline': '#dc3545',   // Rouge - hors ligne
+                    'error': '#dc3545',     // Rouge - erreur
+                    'online': '#28a745'     // Vert - connexion rétablie
+                };
+                
+                this.indicator.style.background = colors[status] || '#6c757d';
+                
+                // Animation pour les états actifs
+                if (status === 'syncing') {
+                    this.indicator.style.animation = 'pulse 1s infinite';
+                } else {
+                    this.indicator.style.animation = '';
+                }
+                
+                // Mettre à jour le tooltip
+                const messages = {
+                    'idle': 'Synchronisation en veille',
+                    'synced': `Prévisionnel synchronisé (${this.formatLastSync()})`,
+                    'pending': `${this.pendingChanges} changements à synchroniser`,
+                    'syncing': 'Synchronisation en cours...',
+                    'offline': 'Mode local (hors ligne)',
+                    'error': 'Erreur de synchronisation',
+                    'online': 'Connexion rétablie'
+                };
+                
+                this.indicator.title = messages[status] || 'Synchronisation Multi-Utilisateurs';
+            }
+            
+            // =================================
+            // INTERFACE DÉTAILS SYNCHRONISATION
+            // =================================
+            
+            showSyncDetails() {
+                const data = this.getLocalData();
+                const lastModified = localStorage.getItem(`${this.module.storageKey}_lastModified`);
+                
+                let dataInfo = 'Aucune donnée';
+                if (this.module.type === 'previsionnel' && data) {
+                    const opCount = Object.keys(data.operationsSpecifiques || {}).length;
+                    dataInfo = `${data.projectionMensuelle?.length || 0} mois projetés + ${opCount} opérations spécifiques`;
+                }
+                
+                const details = `
+SYNCHRONISATION MULTI-UTILISATEURS
+Module : ${this.module.type.toUpperCase()} (Hybride)
+
+📊 DONNÉES LOCALES :
+• ${dataInfo}
+• Dernière modification : ${lastModified ? new Date(lastModified).toLocaleString() : 'Inconnue'}
+• Sources : Recettes + Charges récurrentes
+
+🔄 ÉTAT SYNCHRONISATION :
+• Statut : ${this.syncStatus.toUpperCase()}
+• Dernière sync : ${this.formatLastSync()}
+• Changements en attente : ${this.pendingChanges}
+• Connexion : ${this.isOnline ? 'En ligne' : 'Hors ligne'}
+
+💡 MODE HYBRIDE :
+✅ Projections calculées automatiquement
+✅ Opérations spécifiques synchronisables
+✅ Performance optimale garantie
+✅ Sauvegarde continue des ajouts
+
+Le module Prévisionnel lit automatiquement les données 
+synchronisées des modules Recettes et Charges, et 
+synchronise ses propres opérations spécifiques.
+                `;
+                
+                if (confirm(details + '\n\nVoulez-vous ouvrir l\'interface de synchronisation complète ?')) {
+                    window.open('rocket_tower_sync_system.html', '_blank');
+                }
+            }
+            
+            // =================================
+            // GESTION RÉSEAU
+            // =================================
+            
+            setupNetworkListeners() {
+                window.addEventListener('online', () => {
+                    this.isOnline = true;
+                    this.updateSyncStatus('online');
+                    console.log('[RT-Sync] Connexion rétablie');
+                });
+                
+                window.addEventListener('offline', () => {
+                    this.isOnline = false;
+                    this.updateSyncStatus('offline');
+                    console.log('[RT-Sync] Mode hors ligne activé');
+                });
+            }
+            
+            setupChangeListener() {
+                if (!this.module.storageKey) return;
+                
+                // Surveillance des modifications localStorage
+                const originalSetItem = localStorage.setItem;
+                const self = this;
+                
+                localStorage.setItem = function(key, value) {
+                    if (key === self.module.storageKey) {
+                        self.pendingChanges++;
+                        self.updateSyncStatus('pending');
+                        console.log(`[RT-Sync] Modification détectée: ${key}`);
+                    }
+                    return originalSetItem.apply(this, arguments);
+                };
+            }
+            
+            detectPendingChanges() {
+                if (!this.module.storageKey) return;
+                
+                const lastModified = localStorage.getItem(`${this.module.storageKey}_lastModified`);
+                if (lastModified && (!this.lastSync || new Date(lastModified) > new Date(this.lastSync))) {
+                    this.pendingChanges++;
+                    this.updateSyncStatus('pending');
+                }
+            }
+            
+            // =================================
+            // UTILITAIRES
+            // =================================
+            
+            getLocalData() {
+                if (!this.module.storageKey) return null;
+                
+                try {
+                    const data = localStorage.getItem(this.module.storageKey);
+                    return data ? JSON.parse(data) : null;
+                } catch (error) {
+                    console.error(`[RT-Sync] Erreur lecture données locales:`, error);
+                    return null;
+                }
+            }
+            
+            getLastSyncTime() {
+                return localStorage.getItem(`${this.module.type}_lastSync`);
+            }
+            
+            formatLastSync() {
+                if (!this.lastSync) return 'Jamais';
+                
+                const syncDate = new Date(this.lastSync);
+                const now = new Date();
+                const diffMinutes = Math.floor((now - syncDate) / 60000);
+                
+                if (diffMinutes < 1) return 'À l\'instant';
+                if (diffMinutes < 60) return `Il y a ${diffMinutes} min`;
+                if (diffMinutes < 1440) return `Il y a ${Math.floor(diffMinutes / 60)}h`;
+                return syncDate.toLocaleDateString();
+            }
+        }
+
+        // =================================
+        // INITIALISATION SYNCHRONISATION
+        // =================================
+
+        // Initialiser la synchronisation automatiquement
+        let rtSync;
+        document.addEventListener('DOMContentLoaded', function() {
+            if (RT_SYNC_CONFIG.enabled) {
+                rtSync = new RTHybridSync();
+                console.log('[RT-Sync] Système hybride initialisé');
+            }
+        });
+
+        // Exposer l'objet sync pour débogage
+        window.rtSync = rtSync;
+    </script>
+</body>
+</html>
