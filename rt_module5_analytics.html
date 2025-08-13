@@ -522,14 +522,28 @@
                 const recettesStorage = localStorage.getItem('recettesRT');
                 const chargesStorage = localStorage.getItem('chargesRecurrentesRT');
                 
-                recettesData = recettesStorage ? JSON.parse(recettesStorage) : [];
-                chargesData = chargesStorage ? JSON.parse(chargesStorage) : [];
+                // CORRECTION 1: Charger toutes les recettes actives
+                if (recettesStorage) {
+                    const toutesRecettes = JSON.parse(recettesStorage);
+                    recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF' || !r.statut);
+                } else {
+                    recettesData = [];
+                }
+                
+                // CORRECTION 2: Exclure les charges SUSPENDUES
+                if (chargesStorage) {
+                    const toutesCharges = JSON.parse(chargesStorage);
+                    chargesData = toutesCharges.filter(c => c.statut !== 'SUSPENDU');
+                    console.log(`🔍 Charges filtrées: ${toutesCharges.length} total → ${chargesData.length} actives (${toutesCharges.length - chargesData.length} suspendues exclues)`);
+                } else {
+                    chargesData = [];
+                }
                 
                 console.log(`📥 Données chargées: ${recettesData.length} recettes, ${chargesData.length} charges`);
                 
                 // Mise à jour info sources
                 document.getElementById('infoSources').textContent = 
-                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges récurrentes`;
+                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges récurrentes actives`;
                 
                 if (recettesData.length === 0 && chargesData.length === 0) {
                     afficherAlerteAucuneDonnee();
@@ -574,12 +588,14 @@
         // ===================================
 
         function calculerMontantLisse(item) {
-            // Utilise maintenant montantHT au lieu de montantTTC
+            // CORRECTION 3: Calcul lissage correct avec montantHT
             const montantBase = Math.abs(item.montantHT || 0);
             
             switch (item.periodicite?.toUpperCase()) {
                 case 'MENSUEL':
                     return montantBase;
+                case 'BIMESTRIEL':
+                    return montantBase / 2;
                 case 'TRIMESTRIEL':
                     return montantBase / 3;
                 case 'SEMESTRIEL':
@@ -650,7 +666,7 @@
             // Répartition Recettes par catégorie
             const repartitionRecettes = {};
             recettesData.forEach(r => {
-                const montantLisse = calculerMontantLisse(r); // Utilise maintenant montantHT
+                const montantLisse = calculerMontantLisse(r);
                 if (!repartitionRecettes[r.categorie]) {
                     repartitionRecettes[r.categorie] = { count: 0, total: 0 };
                 }
@@ -685,7 +701,7 @@
             // Répartition Charges par catégorie
             const repartitionCharges = {};
             chargesData.forEach(c => {
-                const montantLisse = calculerMontantLisse(c); // Utilise maintenant montantHT
+                const montantLisse = calculerMontantLisse(c);
                 if (!repartitionCharges[c.categorie]) {
                     repartitionCharges[c.categorie] = { count: 0, total: 0 };
                 }
@@ -812,275 +828,6 @@
                 controls.style.display = originalDisplay;
             }
         }
-    </script>
-
-    <!-- =============================================== -->
-    <!-- SCRIPT SYNCHRONISATION HYBRIDE - MODULE 5 ANALYTICS -->
-    <!-- =============================================== -->
-    <script>
-        // =================================
-        // CONFIGURATION GLOBALE
-        // =================================
-
-        const RT_SYNC_CONFIG = {
-            enabled: true,
-            autoSync: false, // Mode manuel par défaut pour sécurité
-            syncInterval: 300000, // 5 minutes
-            retryAttempts: 3,
-            
-            // Configuration SeaTable (identifiants Phase 2)
-            seatable: {
-                baseUrl: 'https://cloud.seatable.io',
-                workspaceId: '83314',
-                dtableUuid: 'ef333f2a-8a98-4935-87f3-7ffed2c8e298',
-                apiToken: 'af7d26a67a7e68ff3fa1243bc3d3baeb5d06eb07'
-            },
-            
-            // Mapping des clés localStorage vers tables SeaTable
-            tableMapping: {
-                'recettesRT': 'RECETTES',
-                'chargesRecurrentesRT': 'CHARGES RÉCURRENTES', 
-                'chargesPeriodiquesRT': 'CHARGES PÉRIODIQUES'
-            }
-        };
-
-        // =================================
-        // DÉTECTION AUTOMATIQUE MODULE
-        // =================================
-
-        class RTSyncDetector {
-            static detectModule() {
-                const url = window.location.pathname;
-                const title = document.title;
-                
-                if (url.includes('recettes') || title.includes('Recettes')) {
-                    return { type: 'recettes', storageKey: 'recettesRT', table: 'RECETTES' };
-                }
-                if (url.includes('charges') && !url.includes('periodiques')) {
-                    return { type: 'charges_rec', storageKey: 'chargesRecurrentesRT', table: 'CHARGES RÉCURRENTES' };
-                }
-                if (url.includes('periodiques')) {
-                    return { type: 'charges_per', storageKey: 'chargesPeriodiquesRT', table: 'CHARGES PÉRIODIQUES' };
-                }
-                if (url.includes('analytics')) {
-                    return { type: 'analytics', storageKey: null, table: null };
-                }
-                if (url.includes('previsionnel')) {
-                    return { type: 'previsionnel', storageKey: null, table: null };
-                }
-                
-                return { type: 'unknown', storageKey: null, table: null };
-            }
-        }
-
-        // =================================
-        // CLASSE SYNCHRONISATION HYBRIDE
-        // =================================
-
-        class RTHybridSync {
-            constructor() {
-                this.module = RTSyncDetector.detectModule();
-                this.isOnline = navigator.onLine;
-                this.syncStatus = 'idle';
-                this.lastSync = this.getLastSyncTime();
-                this.pendingChanges = 0;
-                this.indicator = null;
-                
-                console.log(`[RT-Sync] Initialisation module : ${this.module.type}`);
-                
-                this.init();
-            }
-            
-            init() {
-                this.createSyncIndicator();
-                this.setupNetworkListeners();
-                
-                // Pour le module analytics (lecture seule), pas de surveillance des changements
-                if (this.module.type === 'analytics' || this.module.type === 'previsionnel') {
-                    console.log('[RT-Sync] Module lecture seule - surveillance des changements désactivée');
-                    this.updateSyncStatus('synced');
-                } else if (this.module.storageKey) {
-                    this.setupChangeListener();
-                    this.detectPendingChanges();
-                }
-            }
-            
-            // =================================
-            // INDICATEUR VISUEL
-            // =================================
-            
-            createSyncIndicator() {
-                this.indicator = document.createElement('div');
-                this.indicator.className = 'sync-indicator';
-                this.indicator.title = 'Synchronisation Multi-Utilisateurs';
-                this.indicator.addEventListener('click', () => this.showSyncDetails());
-                document.body.appendChild(this.indicator);
-                
-                this.updateSyncStatus(this.syncStatus);
-            }
-            
-            updateSyncStatus(status) {
-                this.syncStatus = status;
-                
-                const colors = {
-                    'idle': '#6c757d',      // Gris - en veille
-                    'synced': '#28a745',    // Vert - synchronisé
-                    'pending': '#ffc107',   // Jaune - changements en attente
-                    'syncing': '#007bff',   // Bleu - synchronisation en cours
-                    'offline': '#dc3545',   // Rouge - hors ligne
-                    'error': '#dc3545',     // Rouge - erreur
-                    'online': '#28a745'     // Vert - connexion rétablie
-                };
-                
-                this.indicator.style.background = colors[status] || '#6c757d';
-                
-                // Animation pour les états actifs
-                if (status === 'syncing') {
-                    this.indicator.style.animation = 'pulse 1s infinite';
-                } else {
-                    this.indicator.style.animation = '';
-                }
-                
-                // Mettre à jour le tooltip
-                const messages = {
-                    'idle': 'Synchronisation en veille',
-                    'synced': `Analytics à jour (${this.formatLastSync()})`,
-                    'pending': `${this.pendingChanges} changements à synchroniser`,
-                    'syncing': 'Synchronisation en cours...',
-                    'offline': 'Mode local (hors ligne)',
-                    'error': 'Erreur de synchronisation',
-                    'online': 'Connexion rétablie'
-                };
-                
-                this.indicator.title = messages[status] || 'Synchronisation Multi-Utilisateurs';
-            }
-            
-            // =================================
-            // INTERFACE DÉTAILS SYNCHRONISATION
-            // =================================
-            
-            showSyncDetails() {
-                // Pour le module analytics, afficher les informations des modules sources
-                let sourceInfo = 'Aucune source détectée';
-                if (this.module.type === 'analytics') {
-                    const recettes = JSON.parse(localStorage.getItem('recettesRT') || '[]');
-                    const charges = JSON.parse(localStorage.getItem('chargesRecurrentesRT') || '[]');
-                    sourceInfo = `${recettes.length} recettes + ${charges.length} charges récurrentes`;
-                }
-                
-                const details = `
-SYNCHRONISATION MULTI-UTILISATEURS
-Module : ${this.module.type.toUpperCase()} (Lecture seule)
-
-📊 DONNÉES SOURCES :
-• ${sourceInfo}
-• Calculs : Automatiques temps réel
-• Type : Dashboard analytics
-
-🔄 ÉTAT SYNCHRONISATION :
-• Statut : ${this.syncStatus.toUpperCase()}
-• Module : Lecture seule (pas de synchronisation nécessaire)
-• Données sources : Synchronisées via modules CRUD
-• Connexion : ${this.isOnline ? 'En ligne' : 'Hors ligne'}
-
-💡 MODE HYBRIDE :
-✅ Dashboard temps réel fonctionnel
-✅ Lecture directe localStorage optimisée
-✅ Synchronisation via modules sources
-✅ Performance maximale garantie
-
-Information : Les modules de lecture (Analytics, Prévisionnel) 
-n'ont pas besoin de synchronisation car ils lisent les données 
-déjà synchronisées par les modules CRUD.
-                `;
-                
-                if (confirm(details + '\n\nVoulez-vous ouvrir l\'interface de synchronisation complète ?')) {
-                    window.open('rocket_tower_sync_system.html', '_blank');
-                }
-            }
-            
-            // =================================
-            // GESTION RÉSEAU
-            // =================================
-            
-            setupNetworkListeners() {
-                window.addEventListener('online', () => {
-                    this.isOnline = true;
-                    this.updateSyncStatus('online');
-                    console.log('[RT-Sync] Connexion rétablie');
-                });
-                
-                window.addEventListener('offline', () => {
-                    this.isOnline = false;
-                    this.updateSyncStatus('offline');
-                    console.log('[RT-Sync] Mode hors ligne activé');
-                });
-            }
-            
-            setupChangeListener() {
-                if (!this.module.storageKey) return;
-                
-                // Surveillance des modifications localStorage
-                const originalSetItem = localStorage.setItem;
-                const self = this;
-                
-                localStorage.setItem = function(key, value) {
-                    if (key === self.module.storageKey) {
-                        self.pendingChanges++;
-                        self.updateSyncStatus('pending');
-                        console.log(`[RT-Sync] Modification détectée: ${key}`);
-                    }
-                    return originalSetItem.apply(this, arguments);
-                };
-            }
-            
-            detectPendingChanges() {
-                if (!this.module.storageKey) return;
-                
-                const lastModified = localStorage.getItem(`${this.module.storageKey}_lastModified`);
-                if (lastModified && (!this.lastSync || new Date(lastModified) > new Date(this.lastSync))) {
-                    this.pendingChanges++;
-                    this.updateSyncStatus('pending');
-                }
-            }
-            
-            // =================================
-            // UTILITAIRES
-            // =================================
-            
-            getLastSyncTime() {
-                return localStorage.getItem(`${this.module.type}_lastSync`);
-            }
-            
-            formatLastSync() {
-                if (!this.lastSync) return 'Jamais';
-                
-                const syncDate = new Date(this.lastSync);
-                const now = new Date();
-                const diffMinutes = Math.floor((now - syncDate) / 60000);
-                
-                if (diffMinutes < 1) return 'À l\'instant';
-                if (diffMinutes < 60) return `Il y a ${diffMinutes} min`;
-                if (diffMinutes < 1440) return `Il y a ${Math.floor(diffMinutes / 60)}h`;
-                return syncDate.toLocaleDateString();
-            }
-        }
-
-        // =================================
-        // INITIALISATION SYNCHRONISATION
-        // =================================
-
-        // Initialiser la synchronisation automatiquement
-        let rtSync;
-        document.addEventListener('DOMContentLoaded', function() {
-            if (RT_SYNC_CONFIG.enabled) {
-                rtSync = new RTHybridSync();
-                console.log('[RT-Sync] Système hybride initialisé');
-            }
-        });
-
-        // Exposer l'objet sync pour débogage
-        window.rtSync = rtSync;
     </script>
 </body>
 </html>
