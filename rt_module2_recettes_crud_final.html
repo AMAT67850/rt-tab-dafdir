@@ -127,7 +127,7 @@
             color: #6c757d;
         }
 
-        /* NOUVEAUX FILTRES PAR TYPE */
+        /* FILTRES PAR TYPE */
         .filters {
             display: flex;
             gap: 15px;
@@ -238,10 +238,6 @@
             color: #27ae60;
         }
 
-        .montant.negatif {
-            color: #dc3545;
-        }
-
         .badge {
             padding: 4px 8px;
             border-radius: 12px;
@@ -260,7 +256,7 @@
             color: #721c24;
         }
 
-        /* BADGES POUR LES TYPES - 9 TYPES AU TOTAL */
+        /* BADGES POUR LES 9 TYPES */
         .badge-type-bureau-privatif {
             background: #e3f2fd;
             color: #0d47a1;
@@ -281,7 +277,6 @@
             color: #b71c1c;
         }
 
-        /* NOUVEAUX BADGES POUR LES 5 TYPES AJOUTÉS */
         .badge-type-flex-plus {
             background: #e8f5e8;
             color: #2e7d32;
@@ -530,7 +525,7 @@
                 </a>
             </div>
 
-            <!-- NOUVEAUX FILTRES PAR TYPE - 6 TYPES -->
+            <!-- FILTRES PAR TYPE - 9 TYPES -->
             <div class="filters">
                 <div class="filter-group">
                     <label for="filtreType">Type :</label>
@@ -611,7 +606,7 @@
                 <thead>
                     <tr>
                         <th>Client</th>
-                        <th>Type</th> <!-- NOUVELLE COLONNE TYPE -->
+                        <th>Type</th>
                         <th>Élément</th>
                         <th>Montant HT</th>
                         <th>Montant TTC</th>
@@ -645,7 +640,7 @@
                             <input type="text" id="client" required>
                         </div>
                         <div class="form-group">
-                            <label for="type">Type *</label> <!-- NOUVEAU CHAMP TYPE - 9 OPTIONS -->
+                            <label for="type">Type *</label>
                             <select id="type" required>
                                 <option value="">Choisir un type</option>
                                 <option value="bureau privatif">Bureau Privatif</option>
@@ -728,7 +723,7 @@
             mettreAJourStats();
         });
 
-        // DONNÉES DE DÉMONSTRATION pour test des filtres par type - AVEC LES 9 TYPES
+        // DONNÉES DE DÉMONSTRATION avec les 9 types
         const donneesDemo = [
             { id: 1, client: "Entreprise Alpha", type: "bureau privatif", element: "Location bureau 20m²", montantHT: 800, montantTTC: 960, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Bureau individuel centre-ville" },
             { id: 2, client: "Startup Beta", type: "coworking", element: "Abonnement coworking", montantHT: 300, montantTTC: 360, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Open space partagé" },
@@ -740,14 +735,296 @@
             { id: 8, client: "Développeur Theta", type: "rocket pass", element: "Rocket Pass Standard", montantHT: 59, montantTTC: 70.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Accès services de base" },
             { id: 9, client: "Cabinet Iota", type: "bureau privatif", element: "Suite bureau 50m²", montantHT: 2000, montantTTC: 2400, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Bureau direction + salle réunion" },
             { id: 10, client: "Etudiant Kappa", type: "coworking", element: "Tarif étudiant", montantHT: 100, montantTTC: 120, periodicite: "MENSUEL", statut: "INACTIF", commentaire: "Suspendu temporairement" },
-            { id: 11, client: "Entreprise Lambda", type: "flex +", element: "Flex Premium 24h/7j", montantHT: 250, montantTTC: 300, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Accès illimité flex avec services" },
-            { id: 12, client: "Scale-up Mu", type: "rocket pass +", element: "Rocket Pass Enterprise", montantHT: 199, montantTTC: 238.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Rocket Pass avec options avancées" },
-            { id: 13, client: "Groupe Nu", type: "coworking +", element: "Coworking Premium", montantHT: 450, montantTTC: 540, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Coworking avec services additionnels" },
-            { id: 14, client: "Agence Xi", type: "mixte", element: "Solution mixte sur mesure", montantHT: 350, montantTTC: 420, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Combinaison bureau + coworking + flex" },
+            { id: 11, client: "Entreprise Lambda", type: "flex +", element: "Flex Premium 24h/7j", montantHT: 250, montantTTC: 300, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Accès illimité flex avec salles réunion" },
+            { id: 12, client: "Scale-up Mu", type: "rocket pass +", element: "Rocket Pass Enterprise", montantHT: 199, montantTTC: 238.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Rocket Pass avec salles réunion" },
+            { id: 13, client: "Groupe Nu", type: "coworking +", element: "Coworking Premium", montantHT: 450, montantTTC: 540, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Coworking avec salles réunion" },
+            { id: 14, client: "Agence Xi", type: "mixte", element: "Solution mixte Gare+Wiss", montantHT: 350, montantTTC: 420, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Accès sites Gare et Wissembourg" },
             { id: 15, client: "Client Omicron", type: "autres", element: "Service spécialisé", montantHT: 120, montantTTC: 144, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Prestation particulière non catégorisée" }
         ];
 
         // Gestion des données
         function chargerRecettes() {
             try {
-                const donneesLocales = localStorage.getItem('recettesRT
+                const donneesLocales = localStorage.getItem('recettesRT');
+                if (donneesLocales) {
+                    recettes = JSON.parse(donneesLocales);
+                    
+                    // MIGRATION : Ajouter le champ "type" aux anciens enregistrements
+                    let migrationNecessaire = false;
+                    recettes.forEach(recette => {
+                        if (!recette.type) {
+                            recette.type = 'bureau privatif'; // Valeur par défaut
+                            migrationNecessaire = true;
+                        }
+                    });
+                    
+                    if (migrationNecessaire) {
+                        sauvegarderRecettes();
+                        console.log('🔄 Migration automatique : champ "type" ajouté aux recettes existantes');
+                    }
+                    
+                    console.log('📥 Recettes chargées depuis localStorage:', recettes.length);
+                } else {
+                    // UTILISER DONNÉES DE DÉMONSTRATION si pas de localStorage
+                    recettes = [...donneesDemo];
+                    console.log('📥 Données de démonstration chargées pour test des 9 types:', recettes.length);
+                }
+            } catch (error) {
+                console.error('❌ Erreur chargement:', error);
+                recettes = [...donneesDemo];
+                console.log('📥 Données de démonstration chargées (fallback):', recettes.length);
+            }
+        }
+
+        function sauvegarderRecettes() {
+            try {
+                localStorage.setItem('recettesRT', JSON.stringify(recettes));
+                console.log('💾 Recettes sauvegardées');
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde:', error);
+                alert('Erreur lors de la sauvegarde des données');
+            }
+        }
+
+        // Affichage et filtrage
+        function afficherRecettes() {
+            const tbody = document.getElementById('recettesTableBody');
+            let recettesFiltrees = [...recettes];
+
+            // Application des filtres
+            const filtreType = document.getElementById('filtreType').value;
+            const filtreStatut = document.getElementById('filtreStatut').value;
+            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (filtreType !== 'tous') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
+            }
+            
+            if (filtreStatut !== 'tous') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+            }
+            
+            if (filtrePeriodicite !== 'toutes') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
+            }
+            
+            if (searchTerm) {
+                recettesFiltrees = recettesFiltrees.filter(r => 
+                    r.client.toLowerCase().includes(searchTerm) ||
+                    r.element.toLowerCase().includes(searchTerm) ||
+                    r.type.toLowerCase().includes(searchTerm) ||
+                    (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            if (recettesFiltrees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="no-data">Aucune recette trouvée</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = recettesFiltrees.map((recette, index) => {
+                const montantLisse = calculerMontantLisse(recette);
+                // Générer la classe CSS pour le badge type
+                let typeCssClass = recette.type.toLowerCase();
+                
+                // Mapping spécifique pour les types avec "+"
+                if (recette.type === "flex +") typeCssClass = "flex-plus";
+                else if (recette.type === "rocket pass +") typeCssClass = "rocket-pass-plus";
+                else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
+                else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
+                
+                return `
+                    <tr>
+                        <td><strong>${recette.client}</strong></td>
+                        <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
+                        <td>${recette.element}</td>
+                        <td class="montant positif">${recette.montantHT.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                        <td class="montant positif">${recette.montantTTC.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                        <td><span class="badge badge-periodicite-${recette.periodicite.toLowerCase()}">${recette.periodicite}</span></td>
+                        <td class="montant positif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                        <td><span class="badge badge-${recette.statut.toLowerCase()}">${recette.statut}</span></td>
+                        <td class="actions">
+                            <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id || index})">✏️</button>
+                            <button class="btn-action btn-delete" onclick="supprimerRecette(${recette.id || index})">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function appliquerFiltres() {
+            afficherRecettes();
+            mettreAJourStats();
+        }
+
+        function calculerMontantLisse(recette) {
+            const facteurs = {
+                'MENSUEL': 1,
+                'BIMESTRIEL': 2,
+                'TRIMESTRIEL': 3,
+                'SEMESTRIEL': 6,
+                'ANNUEL': 12
+            };
+            
+            return recette.montantHT / (facteurs[recette.periodicite] || 1);
+        }
+
+        function calculerTTC() {
+            const montantHT = parseFloat(document.getElementById('montantHT').value) || 0;
+            const montantTTC = montantHT * 1.2; // TVA 20%
+            document.getElementById('montantTTC').value = montantTTC.toFixed(2);
+        }
+
+        function calculerLisse() {
+            const montantHT = parseFloat(document.getElementById('montantHT').value) || 0;
+            const periodicite = document.getElementById('periodicite').value;
+            
+            const facteurs = {
+                'MENSUEL': 1,
+                'BIMESTRIEL': 2,
+                'TRIMESTRIEL': 3,
+                'SEMESTRIEL': 6,
+                'ANNUEL': 12
+            };
+            
+            const montantLisse = montantHT / (facteurs[periodicite] || 1);
+            document.getElementById('montantLisse').textContent = montantLisse.toFixed(2) + '€';
+        }
+
+        // Statistiques
+        function mettreAJourStats() {
+            // Application des mêmes filtres que l'affichage
+            const filtreType = document.getElementById('filtreType').value;
+            const filtreStatut = document.getElementById('filtreStatut').value;
+            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let recettesFiltrees = [...recettes];
+            
+            if (filtreType !== 'tous') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
+            }
+            
+            if (filtreStatut !== 'tous') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+            }
+            
+            if (filtrePeriodicite !== 'toutes') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
+            }
+            
+            if (searchTerm) {
+                recettesFiltrees = recettesFiltrees.filter(r => 
+                    r.client.toLowerCase().includes(searchTerm) ||
+                    r.element.toLowerCase().includes(searchTerm) ||
+                    r.type.toLowerCase().includes(searchTerm) ||
+                    (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            const totalRecettes = recettesFiltrees.length;
+            const totalMontantHT = recettesFiltrees.reduce((sum, r) => sum + r.montantHT, 0);
+            const totalMontantLisse = recettesFiltrees.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
+            const totalActifs = recettesFiltrees.filter(r => r.statut === 'ACTIF').length;
+
+            document.getElementById('totalRecettes').textContent = totalRecettes;
+            document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
+            document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
+            document.getElementById('totalActifs').textContent = totalActifs;
+        }
+
+        // Gestion Modal
+        function nouvelleRecette() {
+            recetteEnEdition = null;
+            document.getElementById('modalTitle').textContent = 'Nouvelle Recette';
+            document.getElementById('recetteForm').reset();
+            document.getElementById('montantLisse').textContent = '0.00€';
+            document.getElementById('recetteModal').style.display = 'block';
+        }
+
+        function modifierRecette(index) {
+            const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
+            if (!recette) return;
+
+            recetteEnEdition = index;
+            document.getElementById('modalTitle').textContent = 'Modifier Recette';
+            
+            document.getElementById('client').value = recette.client;
+            document.getElementById('type').value = recette.type || 'bureau privatif';
+            document.getElementById('element').value = recette.element;
+            document.getElementById('montantHT').value = recette.montantHT;
+            document.getElementById('montantTTC').value = recette.montantTTC;
+            document.getElementById('periodicite').value = recette.periodicite;
+            document.getElementById('statut').value = recette.statut;
+            document.getElementById('commentaire').value = recette.commentaire || '';
+            
+            calculerLisse();
+            document.getElementById('recetteModal').style.display = 'block';
+        }
+
+        function supprimerRecette(index) {
+            const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
+            if (!recette) return;
+
+            if (confirm(`Êtes-vous sûr de vouloir supprimer la recette "${recette.client} - ${recette.element}" ?`)) {
+                recettes = recettes.filter(r => (r.id || recettes.indexOf(r)) !== index);
+                sauvegarderRecettes();
+                afficherRecettes();
+                mettreAJourStats();
+            }
+        }
+
+        function fermerModal() {
+            document.getElementById('recetteModal').style.display = 'none';
+        }
+
+        // Soumission du formulaire
+        document.getElementById('recetteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nouvelleRecette = {
+                client: document.getElementById('client').value,
+                type: document.getElementById('type').value,
+                element: document.getElementById('element').value,
+                montantHT: parseFloat(document.getElementById('montantHT').value),
+                montantTTC: parseFloat(document.getElementById('montantTTC').value),
+                periodicite: document.getElementById('periodicite').value,
+                statut: document.getElementById('statut').value,
+                commentaire: document.getElementById('commentaire').value
+            };
+
+            if (recetteEnEdition !== null) {
+                // Modification
+                const index = recettes.findIndex(r => (r.id || recettes.indexOf(r)) === recetteEnEdition);
+                if (index !== -1) {
+                    recettes[index] = { ...recettes[index], ...nouvelleRecette };
+                }
+            } else {
+                // Nouvelle recette
+                nouvelleRecette.id = Date.now();
+                recettes.push(nouvelleRecette);
+            }
+
+            sauvegarderRecettes();
+            fermerModal();
+            afficherRecettes();
+            mettreAJourStats();
+        });
+
+        // Fermeture modal avec Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                fermerModal();
+            }
+        });
+
+        // Fermeture modal en cliquant à l'extérieur
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('recetteModal')) {
+                fermerModal();
+            }
+        });
+    </script>
+</body>
+</html>
