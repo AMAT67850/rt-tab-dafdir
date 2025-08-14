@@ -543,11 +543,11 @@
                         <option value="emprunts">Emprunts</option>
                         <option value="frais bancaires">Frais Bancaires</option>
                         <option value="loyers">Loyers</option>
-                        <option value="télÃ©comm.">TélÃ©comm.</option>
+                        <option value="télécomm.">Télécomm.</option>
                         <option value="assurances">Assurances</option>
-                        <option value="vÃ©hicules">VÃ©hicules</option>
+                        <option value="véhicules">Véhicules</option>
                         <option value="abonnements">Abonnements</option>
-                        <option value="rÃ©munÃ©rations">RÃ©munÃ©rations</option>
+                        <option value="rémunérations">Rémunérations</option>
                         <option value="ES">ES</option>
                         <option value="autres">Autres</option>
                     </select>
@@ -563,7 +563,7 @@
                 </div>
 
                 <div class="filter-group">
-                    <label for="filtrePeriodicite">PÃ©riodicitÃ© :</label>
+                    <label for="filtrePeriodicite">Périodicité :</label>
                     <select id="filtrePeriodicite" onchange="appliquerFiltres()">
                         <option value="toutes">Toutes</option>
                         <option value="MENSUEL">Mensuel</option>
@@ -596,7 +596,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalMontantLisse">0€</div>
-                    <div class="stat-label">Total LissÃ©/Mois</div>
+                    <div class="stat-label">Total Lissé/Mois</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalActifs">0</div>
@@ -612,18 +612,18 @@
                     <tr>
                         <th>Fournisseur</th>
                         <th>Type</th> <!-- NOUVELLE COLONNE TYPE -->
-                        <th>Ã‰lÃ©ment</th>
+                        <th>Élément</th>
                         <th>Montant HT</th>
                         <th>Montant TTC</th>
-                        <th>PÃ©riodicitÃ©</th>
-                        <th>LissÃ©/Mois</th>
+                        <th>Périodicité</th>
+                        <th>Lissé/Mois</th>
                         <th>Statut</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="chargesTableBody">
                     <tr>
-                        <td colspan="9" class="loading">Chargement des donnÃ©es...</td>
+                        <td colspan="9" class="loading">Chargement des données...</td>
                     </tr>
                 </tbody>
             </table>
@@ -651,11 +651,11 @@
                                 <option value="emprunts">Emprunts</option>
                                 <option value="frais bancaires">Frais Bancaires</option>
                                 <option value="loyers">Loyers</option>
-                                <option value="télÃ©comm.">TélÃ©comm.</option>
+                                <option value="télécomm.">Télécomm.</option>
                                 <option value="assurances">Assurances</option>
-                                <option value="vÃ©hicules">VÃ©hicules</option>
+                                <option value="véhicules">Véhicules</option>
                                 <option value="abonnements">Abonnements</option>
-                                <option value="rÃ©munÃ©rations">RÃ©munÃ©rations</option>
+                                <option value="rémunérations">Rémunérations</option>
                                 <option value="ES">ES</option>
                                 <option value="autres">Autres</option>
                             </select>
@@ -663,7 +663,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="element">Ã‰lÃ©ment/Service *</label>
+                        <label for="element">Élément/Service *</label>
                         <input type="text" id="element" required>
                     </div>
 
@@ -680,7 +680,7 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="periodicite">PÃ©riodicitÃ© *</label>
+                            <label for="periodicite">Périodicité *</label>
                             <select id="periodicite" required onchange="calculerLisse()">
                                 <option value="">Choisir</option>
                                 <option value="MENSUEL">Mensuel</option>
@@ -705,7 +705,7 @@
                     </div>
 
                     <div class="montant-lisse">
-                        Montant lissÃ© mensuel : <span id="montantLisse">0.00€</span>
+                        Montant lissé mensuel : <span id="montantLisse">0.00€</span>
                     </div>
 
                     <div class="form-buttons">
@@ -722,17 +722,17 @@
         let charges = [];
         let chargeEnEdition = null;
 
-        // DONNÃ‰ES DE DÃ‰MONSTRATION pour test des filtres par type charges
+        // DONNÉES DE DÉMONSTRATION pour test des filtres par type charges
         const donneesDemo = [
             { id: 1, fournisseur: "Banque Principale", type: "emprunts", element: "Emprunt immobilier local", montantHT: -2500, montantTTC: -3000, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Financement bureau principal" },
-            { id: 2, fournisseur: "CrÃ©dit Agricole", type: "frais bancaires", element: "Frais de tenue de compte", montantHT: -15, montantTTC: -18, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Compte professionnel principal" },
-            { id: 3, fournisseur: "SCI Immobilier", type: "loyers", element: "Loyer bureau centre-ville", montantHT: -1800, montantTTC: -2160, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Local commercial 150mÂ²" },
-            { id: 4, fournisseur: "Orange Business", type: "tÃ©lÃ©comm.", element: "Abonnement internet fibre", montantHT: -89, montantTTC: -106.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Fibre 1Gb symÃ©trique" },
-            { id: 5, fournisseur: "AXA Pro", type: "assurances", element: "Assurance responsabilitÃ© civile", montantHT: -250, montantTTC: -300, periodicite: "ANNUEL", statut: "ACTIF", commentaire: "Couverture activitÃ© coworking" },
-            { id: 6, fournisseur: "Peugeot Lease", type: "vÃ©hicules", element: "Leasing vÃ©hicule utilitaire", montantHT: -320, montantTTC: -384, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Partner Ã©lectrique" },
-            { id: 7, fournisseur: "Adobe", type: "abonnements", element: "Creative Cloud Ã‰quipe", montantHT: -59, montantTTC: -70.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "5 licences design" },
-            { id: 8, fournisseur: "Paie RH", type: "rÃ©munÃ©rations", element: "Salaire gestionnaire", montantHT: -2800, montantTTC: -2800, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Temps plein 35h" },
-            { id: 9, fournisseur: "Expert Comptable", type: "ES", element: "Expertise comptable", montantHT: -180, montantTTC: -216, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Tenue comptabilitÃ©" },
+            { id: 2, fournisseur: "Crédit Agricole", type: "frais bancaires", element: "Frais de tenue de compte", montantHT: -15, montantTTC: -18, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Compte professionnel principal" },
+            { id: 3, fournisseur: "SCI Immobilier", type: "loyers", element: "Loyer bureau centre-ville", montantHT: -1800, montantTTC: -2160, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Local commercial 150m²" },
+            { id: 4, fournisseur: "Orange Business", type: "télécomm.", element: "Abonnement internet fibre", montantHT: -89, montantTTC: -106.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Fibre 1Gb symétrique" },
+            { id: 5, fournisseur: "AXA Pro", type: "assurances", element: "Assurance responsabilité civile", montantHT: -250, montantTTC: -300, periodicite: "ANNUEL", statut: "ACTIF", commentaire: "Couverture activité coworking" },
+            { id: 6, fournisseur: "Peugeot Lease", type: "véhicules", element: "Leasing véhicule utilitaire", montantHT: -320, montantTTC: -384, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Partner électrique" },
+            { id: 7, fournisseur: "Adobe", type: "abonnements", element: "Creative Cloud Équipe", montantHT: -59, montantTTC: -70.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "5 licences design" },
+            { id: 8, fournisseur: "Paie RH", type: "rémunérations", element: "Salaire gestionnaire", montantHT: -2800, montantTTC: -2800, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Temps plein 35h" },
+            { id: 9, fournisseur: "Expert Comptable", type: "ES", element: "Expertise comptable", montantHT: -180, montantTTC: -216, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Tenue comptabilité" },
             { id: 10, fournisseur: "Formation Pro", type: "abonnements", element: "Plateforme e-learning", montantHT: -99, montantTTC: -118.8, periodicite: "ANNUEL", statut: "INACTIF", commentaire: "Suspendu temporairement" },
             { id: 11, fournisseur: "Divers", type: "autres", element: "Frais divers bureau", montantHT: -50, montantTTC: -60, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Petites fournitures" }
         ];
@@ -744,35 +744,35 @@
             mettreAJourStats();
         });
 
-        // Gestion des donnÃ©es
+        // Gestion des données
         function chargerCharges() {
             try {
                 const donneesLocales = localStorage.getItem('chargesRecurrentesRT');
                 if (donneesLocales) {
                     charges = JSON.parse(donneesLocales);
-                    console.log('🔥 Charges chargÃ©es depuis localStorage:', charges.length);
+                    console.log('🔥 Charges chargées depuis localStorage:', charges.length);
                     
                     // PAS DE MIGRATION AUTOMATIQUE - l'utilisateur ajoutera manuellement
-                    console.log('â„¹ï¸ Pas de migration automatique - types Ã  ajouter manuellement');
+                    console.log('ℹ️ Pas de migration automatique - types à ajouter manuellement');
                 } else {
-                    // UTILISER DONNÃ‰ES DE DÃ‰MONSTRATION si pas de localStorage
+                    // UTILISER DONNÉES DE DÉMONSTRATION si pas de localStorage
                     charges = [...donneesDemo];
-                    console.log('🔥 DonnÃ©es de dÃ©monstration chargÃ©es pour test des filtres:', charges.length);
+                    console.log('🔥 Données de démonstration chargées pour test des filtres:', charges.length);
                 }
             } catch (error) {
-                console.error('âŒ Erreur chargement:', error);
+                console.error('❌ Erreur chargement:', error);
                 charges = [...donneesDemo];
-                console.log('🔥 DonnÃ©es de dÃ©monstration chargÃ©es (fallback):', charges.length);
+                console.log('🔥 Données de démonstration chargées (fallback):', charges.length);
             }
         }
 
         function sauvegarderCharges() {
             try {
                 localStorage.setItem('chargesRecurrentesRT', JSON.stringify(charges));
-                console.log('💾 Charges sauvegardÃ©es');
+                console.log('💾 Charges sauvegardées');
             } catch (error) {
-                console.error('âŒ Erreur sauvegarde:', error);
-                alert('Erreur lors de la sauvegarde des donnÃ©es');
+                console.error('❌ Erreur sauvegarde:', error);
+                alert('Erreur lors de la sauvegarde des données');
             }
         }
 
@@ -809,14 +809,14 @@
             }
 
             if (chargesFiltrees.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="no-data">Aucune charge trouvÃ©e</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="no-data">Aucune charge trouvée</td></tr>';
                 return;
             }
 
             tbody.innerHTML = chargesFiltrees.map((charge, index) => {
                 const montantLisse = calculerMontantLisse(charge);
                 const typeFormatted = charge.type ? charge.type.replace(' ', '-').replace('.', '').toLowerCase() : 'non-defini';
-                const typeBadge = charge.type ? `<span class="badge badge-type-${typeFormatted}">${charge.type}</span>` : '<span class="badge" style="background:#f8f9fa;color:#6c757d;">Non dÃ©fini</span>';
+                const typeBadge = charge.type ? `<span class="badge badge-type-${typeFormatted}">${charge.type}</span>` : '<span class="badge" style="background:#f8f9fa;color:#6c757d;">Non défini</span>';
                 
                 return `
                     <tr>
@@ -829,7 +829,7 @@
                         <td class="montant negatif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
                         <td><span class="badge badge-${charge.statut.toLowerCase()}">${charge.statut}</span></td>
                         <td class="actions">
-                            <button class="btn-action btn-edit" onclick="modifierCharge(${charge.id || index})">âœï¸</button>
+                            <button class="btn-action btn-edit" onclick="modifierCharge(${charge.id || index})">✏️</button>
                             <button class="btn-action btn-delete" onclick="supprimerCharge(${charge.id || index})">🗑️</button>
                         </td>
                     </tr>
@@ -839,7 +839,7 @@
 
         function appliquerFiltres() {
             afficherCharges();
-            setTimeout(() => mettreAJourStats(), 10); // Force la synchronisation des filtres
+            mettreAJourStats();
         }
 
         function calculerMontantLisse(charge) {
@@ -878,7 +878,7 @@
 
         // Statistiques
         function mettreAJourStats() {
-            // Application des mÃªmes filtres que l'affichage
+            // Application des mêmes filtres que l'affichage
             const filtreType = document.getElementById('filtreType').value;
             const filtreStatut = document.getElementById('filtreStatut').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
@@ -935,7 +935,7 @@
             document.getElementById('modalTitle').textContent = 'Modifier Charge';
             
             document.getElementById('fournisseur').value = charge.fournisseur;
-            document.getElementById('type').value = charge.type || ''; // Peut Ãªtre vide si pas encore dÃ©fini
+            document.getElementById('type').value = charge.type || ''; // Peut être vide si pas encore défini
             document.getElementById('element').value = charge.element;
             document.getElementById('montantHT').value = charge.montantHT;
             document.getElementById('montantTTC').value = charge.montantTTC;
@@ -951,7 +951,7 @@
             const charge = charges.find(c => (c.id || charges.indexOf(c)) === index);
             if (!charge) return;
 
-            if (confirm(`ÃŠtes-vous sÃ»r de vouloir supprimer la charge "${charge.fournisseur} - ${charge.element}" ?`)) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer la charge "${charge.fournisseur} - ${charge.element}" ?`)) {
                 charges = charges.filter(c => (c.id || charges.indexOf(c)) !== index);
                 sauvegarderCharges();
                 afficherCharges();
@@ -1003,7 +1003,7 @@
             }
         });
 
-        // Fermeture modal en cliquant Ã  l'extÃ©rieur
+        // Fermeture modal en cliquant à l'extérieur
         window.addEventListener('click', function(e) {
             if (e.target === document.getElementById('chargeModal')) {
                 fermerModal();
