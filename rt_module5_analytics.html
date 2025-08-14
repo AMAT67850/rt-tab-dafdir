@@ -3,207 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 Analytics Dashboard • ROCKET TOWER</title>
+    <title>🚀 ROCKET TOWER - Analytics Dashboard</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
             min-height: 100vh;
-            padding: 20px;
+            color: #333;
+            overflow-x: auto;
         }
-        
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            padding: 20px;
         }
-        
-        /* Header Cohérent */
+
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-            color: white;
-            padding: 30px;
             text-align: center;
+            color: white;
+            margin-bottom: 30px;
         }
-        
+
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
-            font-weight: 700;
         }
-        
-        .subtitle {
+
+        .header p {
             font-size: 1.1em;
             opacity: 0.9;
-            font-weight: 300;
         }
-        
-        .header-controls {
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
+            flex-wrap: wrap;
         }
-        
-        .nav-links {
+
+        .btn-group {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
-        
+
         .btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
             border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
-            text-decoration: none;
-            font-weight: 500;
             transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            text-decoration: none;
+            display: inline-block;
         }
-        
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
         .btn-secondary {
-            background: #6c757d;
-            color: white;
+            background: #f8f9fa;
+            color: #495057;
+            border: 2px solid #dee2e6;
         }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
+
+        .btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        
-        .refresh-btn {
-            background: #28a745;
+
+        .info-section {
             color: white;
+            text-align: right;
         }
-        
-        .refresh-btn:hover {
-            background: #218838;
-        }
-        
-        .pdf-btn {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .pdf-btn:hover {
-            background: #c82333;
-        }
-        
+
         .main-content {
-            padding: 30px;
-        }
-        
-        /* Grille des statistiques */
-        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
-        
-        .stat-card {
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
             background: white;
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid #e9ecef;
-            transition: transform 0.3s ease;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
         }
-        
-        .stat-card.positive {
-            border-left-color: #28a745;
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
         }
-        
-        .stat-card.negative {
-            border-left-color: #dc3545;
-        }
-        
-        .stat-card.highlight {
-            border-left-color: #007bff;
+
+        .metric-card {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 5px solid #667eea;
         }
-        
-        .stat-card h3 {
-            font-size: 2.2em;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #2c3e50;
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
         }
-        
-        .stat-card p {
-            color: #6c757d;
-            font-size: 0.95em;
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
             font-weight: 500;
         }
-        
-        /* Section tableau */
-        .table-section {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 20px 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+        .positive {
+            color: #28a745;
         }
-        
-        .table-section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+
+        .negative {
+            color: #dc3545;
         }
-        
-        .table-responsive {
-            overflow-x: auto;
+
+        .neutral {
+            color: #6c757d;
         }
-        
+
+        .chart-container {
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .table-container {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            background: white;
         }
-        
+
         th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #dee2e6;
         }
-        
+
         th {
             background: #f8f9fa;
             font-weight: 600;
-            color: #495057;
-            position: sticky;
-            top: 0;
+            color: #333;
         }
-        
+
         tr:hover {
             background: #f8f9fa;
         }
-        
-        .pourcentage {
-            font-weight: 600;
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
         }
-        
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+
         .status-badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -211,291 +214,223 @@
             font-weight: 600;
             text-transform: uppercase;
         }
-        
-        .status-atteint {
+
+        .status-actif {
             background: #d4edda;
             color: #155724;
         }
-        
-        .status-non-atteint {
+
+        .status-suspendu {
             background: #f8d7da;
             color: #721c24;
         }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 10px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .header-controls {
-                flex-direction: column;
-                gap: 15px;
-                align-items: stretch;
-            }
-            
-            .nav-links {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-            
-            .main-content {
-                padding: 20px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .table-responsive {
-                font-size: 0.9em;
-            }
+
+        .explanation-section {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
         }
-        
-        /* Impression */
+
+        .explanation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .explanation-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .explanation-item h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .explanation-item p {
+            color: #666;
+            line-height: 1.5;
+        }
+
         @media print {
             body {
                 background: white;
-                font-size: 12px;
             }
             
-            .container {
-                box-shadow: none;
-                background: white;
-            }
-            
-            .header {
-                background: #2c3e50 !important;
-                -webkit-print-color-adjust: exact;
-            }
-            
-            .header-controls {
+            .controls {
                 display: none;
             }
             
-            .stat-card {
-                break-inside: avoid;
+            .card {
                 box-shadow: none;
-                border: 1px solid #dee2e6;
+                border: 1px solid #ddd;
             }
             
-            .table-section {
-                break-inside: avoid;
-                box-shadow: none;
-                border: 1px solid #dee2e6;
+            .print-info {
+                display: block !important;
+                margin-bottom: 20px;
+                padding: 10px;
+                border: 1px solid #ddd;
+                background: #f8f9fa;
             }
         }
 
-        /* Indicateur de synchronisation */
+        .print-info {
+            display: none;
+        }
+
         .sync-indicator {
             position: fixed;
             top: 20px;
             right: 20px;
-            width: 12px;
-            height: 12px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #28a745, #20c997);
             border-radius: 50%;
-            background: #28a745;
-            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
             cursor: pointer;
             z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
         }
 
         .sync-indicator:hover {
-            transform: scale(1.2);
+            transform: scale(1.1);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
         }
 
-        /* Alert styles */
-        .alert {
-            padding: 12px 20px;
-            margin: 15px 0;
-            border-radius: 8px;
-            border: 1px solid transparent;
-        }
-
-        .alert-info {
-            color: #0c5460;
-            background-color: #d1ecf1;
-            border-color: #bee5eb;
-        }
-
-        .alert-warning {
-            color: #856404;
-            background-color: #fff3cd;
-            border-color: #ffeaa7;
-        }
-
-        .alert-danger {
-            color: #721c24;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
+        .loading::after {
+            content: "⏳";
+            font-size: 2em;
+            display: block;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header Bleu Cohérent -->
         <div class="header">
-            <h1>📊 Analytics Dashboard</h1>
-            <p class="subtitle">Analyse financière temps réel HT • Recettes vs Charges récurrentes</p>
+            <h1>🚀 Analytics Dashboard</h1>
+            <p>Tableau de bord financier consolidé - <span id="infoSources">Chargement...</span></p>
         </div>
 
-        <div class="header-controls">
-            <div class="nav-links">
-                <a href="index.html" class="btn btn-secondary">🏠 Dashboard</a>
-                <button onclick="actualiserDonnees()" class="btn refresh-btn">🔄 Actualiser</button>
-                <button onclick="exporterPDF()" class="btn pdf-btn">🖨️ Export PDF</button>
+        <div class="controls">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="actualiserDonnees()">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer</button>
+                <a href="index.html" class="btn btn-secondary">🏠 Accueil</a>
+                <a href="rocket_tower_sync_system.html" class="btn btn-secondary">🔄 Synchronisation</a>
+            </div>
+            <div class="info-section">
+                <p><strong>Dernière mise à jour :</strong> <span id="derniereMiseAJour">-</span></p>
+                <p id="infoCalcul">Calcul en cours...</p>
+            </div>
+        </div>
+
+        <!-- Indicateur de synchronisation -->
+        <div class="sync-indicator" onclick="actualiserDonnees()" title="Synchronisation Multi-Utilisateurs">
+            📊
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value positive" id="totalRecettes">€ -</div>
+                <div class="metric-label">💰 Total Recettes Lissées HT</div>
             </div>
             
-            <div class="info-donnees">
-                <span id="infoSources" style="color: #6c757d; font-size: 0.9em;">Sources : Chargement...</span>
+            <div class="metric-card">
+                <div class="metric-value negative" id="totalCharges">€ -</div>
+                <div class="metric-label">💸 Total Charges Lissées HT</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-value" id="resultatMensuel">€ -</div>
+                <div class="metric-label">📊 Résultat Mensuel HT</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-value" id="ratioCharges">- %</div>
+                <div class="metric-label">⚖️ Ratio Charges/Recettes</div>
             </div>
         </div>
 
         <div class="main-content">
-            <!-- SECTION 1 : SITUATION FINANCIÈRE INSTANT T -->
-            <div class="stats-grid">
-                <div class="stat-card positive">
-                    <h3 id="totalRecettesLissees">0€</h3>
-                    <p>Recettes Récurrentes HT Lissées</p>
-                </div>
-                <div class="stat-card negative">
-                    <h3 id="totalChargesLissees">0€</h3>
-                    <p>Charges Récurrentes HT Lissées</p>
-                </div>
-                <div class="stat-card highlight">
-                    <h3 id="resultatMensuel">0€</h3>
-                    <p>Résultat Mensuel HT</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="ratioChargesRecettes">0%</h3>
-                    <p>Ratio Charges/Recettes</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="margeOperationnelle">0%</h3>
-                    <p>Marge Opérationnelle</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="equilibreFinancier">
-                        <span class="status-badge status-atteint">CALCUL...</span>
-                    </h3>
-                    <p>Équilibre Financier</p>
-                </div>
+            <div class="card">
+                <h2>📈 Répartition des Recettes</h2>
+                <div id="repartitionRecettes" class="loading">Chargement des données...</div>
             </div>
+            
+            <div class="card">
+                <h2>📉 Répartition des Charges</h2>
+                <div id="repartitionCharges" class="loading">Chargement des données...</div>
+            </div>
+        </div>
 
-            <!-- SECTION 2 : RÉPARTITIONS DÉTAILLÉES -->
-            <div class="table-section">
-                <h2>💰 Répartition Recettes par Catégorie</h2>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Catégorie</th>
-                                <th>Nb Contrats</th>
-                                <th>Montant HT Lissé</th>
-                                <th>% du Total</th>
-                                <th>Montant Moyen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="repartitionRecettes">
-                            <tr>
-                                <td colspan="5" style="text-align: center; color: #6c757d;">
-                                    🔄 Chargement des données...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="card">
+            <h2>📋 Détail des Opérations</h2>
+            <div class="table-container">
+                <table id="tableauOperations">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Montant HT</th>
+                            <th>Périodicité</th>
+                            <th>Statut</th>
+                            <th>Lissé Mensuel HT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listeOperations">
+                        <tr><td colspan="6" class="loading">Chargement...</td></tr>
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <div class="table-section">
-                <h2>💸 Répartition Charges par Catégorie</h2>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Catégorie</th>
-                                <th>Nb Postes</th>
-                                <th>Montant HT Lissé</th>
-                                <th>% du Total</th>
-                                <th>Montant Moyen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="repartitionCharges">
-                            <tr>
-                                <td colspan="5" style="text-align: center; color: #6c757d;">
-                                    🔄 Chargement des données...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="explanation-section">
+            <h2>📚 Guide d'Interprétation des KPIs</h2>
+            <div class="explanation-grid">
+                <div class="explanation-item">
+                    <h4>⚖️ Ratio Charges/Recettes</h4>
+                    <p>Pourcentage des charges par rapport aux recettes : Charges ÷ Recettes × 100. 
+                    Plus ce ratio est faible, meilleure est la rentabilité.</p>
+                </div>
+                <div class="explanation-item">
+                    <h4>📈 Marge Opérationnelle</h4>
+                    <p>Pourcentage de recettes restant après déduction des charges : (Recettes - Charges) / Recettes × 100</p>
+                </div>
+                <div class="explanation-item">
+                    <h4>⚖️ Équilibre Financier</h4>
+                    <p>Atteint si Recettes ≥ Charges absolues (résultat ≥ 0). Indique la viabilité financière.</p>
+                </div>
+                <div class="explanation-item">
+                    <h4>📅 Totaux Lissés HT</h4>
+                    <p>Montants HT ajustés selon la périodicité : trimestriel ÷3, semestriel ÷6, annuel ÷12 pour obtenir l'équivalent mensuel hors taxes.</p>
                 </div>
             </div>
+        </div>
 
-            <!-- SECTION 3 : TOP CONTRIBUTEURS -->
-            <div class="table-section">
-                <h2>🏆 Top 10 Recettes (Montant Lissé HT)</h2>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Rang</th>
-                                <th>Client</th>
-                                <th>Catégorie</th>
-                                <th>Périodicité</th>
-                                <th>Montant HT Lissé</th>
-                                <th>% Contribution</th>
-                            </tr>
-                        </thead>
-                        <tbody id="topRecettes">
-                            <tr>
-                                <td colspan="6" style="text-align: center; color: #6c757d;">
-                                    🔄 Analyse en cours...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="table-section">
-                <h2>📊 Top 10 Charges (Montant Lissé HT)</h2>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Rang</th>
-                                <th>Poste</th>
-                                <th>Catégorie</th>
-                                <th>Périodicité</th>
-                                <th>Montant HT Lissé</th>
-                                <th>% Impact</th>
-                            </tr>
-                        </thead>
-                        <tbody id="topCharges">
-                            <tr>
-                                <td colspan="6" style="text-align: center; color: #6c757d;">
-                                    🔄 Analyse en cours...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <!-- INFORMATIONS POUR IMPRESSION - MASQUÉES À L'ÉCRAN -->
+        <div class="print-info">
+            <p><strong>🚀 ROCKET TOWER - ANALYTICS DASHBOARD</strong></p>
+            <p>Rapport généré le <span id="dateImpression"></span> à <span id="heureImpression"></span></p>
+            <p>Sources : <span id="sourcesImpression">Modules Recettes + Charges récurrentes</span></p>
+            <p>Totaux calculés automatiquement avec lissage périodicité • Généré automatiquement</p>
         </div>
     </div>
 
@@ -503,330 +438,347 @@
         // Variables globales
         let recettesData = [];
         let chargesData = [];
-        let analytics = {};
+        let analytics = {
+            totalRecettesLissees: 0,
+            totalChargesLissees: 0,
+            resultatMensuel: 0,
+            ratioChargesRecettes: 0,
+            margeOperationnelle: 0,
+            equilibreFinancier: "NON ATTEINT"
+        };
 
-        // ===================================
-        // INITIALISATION
-        // ===================================
-
+        // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Analytics Dashboard - Initialisation');
-            chargerDonnees();
+            actualiserDonnees();
         });
 
-        function chargerDonnees() {
+        function actualiserDonnees() {
+            console.log('🔄 Actualisation des données Analytics...');
+            
+            chargerDonneesLocalStorage();
+            calculerAnalytics();
+            afficherResultats();
+            afficherRepartitions();
+            
+            console.log('✅ Analytics mis à jour');
+        }
+
+        function chargerDonneesLocalStorage() {
             try {
-                console.log('📊 Chargement des données analytics...');
-                
-                // Chargement depuis localStorage
-                const recettesStorage = localStorage.getItem('recettesRT');
-                const chargesStorage = localStorage.getItem('chargesRecurrentesRT');
-                
-                // CORRECTION 1: Charger toutes les recettes actives
-                if (recettesStorage) {
-                    const toutesRecettes = JSON.parse(recettesStorage);
-                    recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF' || !r.statut);
+                // ========================================
+                // LECTURE MODULE 2 (RECETTES) - ROBUSTE
+                // ========================================
+                console.log('📥 Chargement Module 2 (Recettes)...');
+                const recettesJSON = localStorage.getItem('recettesRT');
+                if (recettesJSON) {
+                    const toutesRecettes = JSON.parse(recettesJSON);
+                    // FILTRAGE SÉCURISÉ - vérifier que statut existe
+                    recettesData = toutesRecettes.filter(r => {
+                        // Vérification existence du champ statut
+                        if (!r.hasOwnProperty('statut')) {
+                            console.warn('⚠️ Recette sans champ statut détectée:', r);
+                            return true; // Inclure par défaut si pas de statut
+                        }
+                        return r.statut === 'ACTIF';
+                    });
+                    
+                    console.log(`📊 Recettes - Total: ${toutesRecettes.length}, Actives: ${recettesData.length}`);
+                    
+                    // DEBUG DÉTAILLÉ
+                    let totalRecettesDebug = 0;
+                    let totalRecettesLisseDebug = 0;
+                    recettesData.forEach(r => {
+                        // Vérification sécurisée des montants
+                        const montantHT = r.montantHT || 0;
+                        const periodicite = r.periodicite || 'MENSUEL';
+                        
+                        totalRecettesDebug += montantHT;
+                        totalRecettesLisseDebug += calculerMontantLisse({ montantHT, periodicite });
+                    });
+                    console.log(`📊 Recettes DEBUG - Total: ${Math.round(totalRecettesDebug)}€, Lissé: ${Math.round(totalRecettesLisseDebug)}€`);
                 } else {
                     recettesData = [];
+                    console.warn('⚠️ Aucune donnée recettes trouvée');
                 }
-                
-                // CORRECTION 2: Exclure les charges SUSPENDUES
-                if (chargesStorage) {
-                    const toutesCharges = JSON.parse(chargesStorage);
-                    chargesData = toutesCharges.filter(c => c.statut !== 'SUSPENDU');
-                    console.log(`🔍 Charges filtrées: ${toutesCharges.length} total → ${chargesData.length} actives (${toutesCharges.length - chargesData.length} suspendues exclues)`);
+
+                // ========================================
+                // LECTURE MODULE 3 (CHARGES) - SUPER ROBUSTE
+                // ========================================
+                console.log('📥 Chargement Module 3 (Charges récurrentes)...');
+                const chargesJSON = localStorage.getItem('chargesRecurrentesRT');
+                if (chargesJSON) {
+                    const toutesCharges = JSON.parse(chargesJSON);
+                    console.log(`📊 Total charges dans localStorage: ${toutesCharges.length}`);
+                    
+                    // FILTRAGE ULTRA SÉCURISÉ pour charges
+                    chargesData = toutesCharges.filter(c => {
+                        // Validation structure minimale requise
+                        if (!c || typeof c !== 'object') {
+                            console.warn('⚠️ Charge invalide détectée:', c);
+                            return false;
+                        }
+                        
+                        // Vérifier champs obligatoires
+                        if (!c.hasOwnProperty('montantHT') || isNaN(c.montantHT)) {
+                            console.warn('⚠️ Charge sans montantHT valide:', c);
+                            return false;
+                        }
+                        
+                        // Gestion statut (nouveau champ avec les types)
+                        if (!c.hasOwnProperty('statut')) {
+                            console.log('ℹ️ Charge sans champ statut - incluse par défaut:', c.element || 'Sans nom');
+                            return true; // Inclure les anciennes charges sans statut
+                        }
+                        
+                        return c.statut === 'ACTIF';
+                    });
+                    
+                    console.log(`📊 Charges actives filtrées: ${chargesData.length}`);
+                    
+                    // DEBUG ULTRA DÉTAILLÉ
+                    let totalChargesDebug = 0;
+                    let totalChargesLisseDebug = 0;
+                    chargesData.forEach((c, index) => {
+                        const montantHT = Math.abs(c.montantHT || 0); // Valeur absolue pour les charges
+                        const periodicite = c.periodicite || 'MENSUEL';
+                        const montantLisse = calculerMontantLisse({ montantHT, periodicite });
+                        
+                        totalChargesDebug += montantHT;
+                        totalChargesLisseDebug += montantLisse;
+                        
+                        // Log détaillé des 5 premières charges
+                        if (index < 5) {
+                            console.log(`  Charge ${index + 1}: ${c.element || 'Sans nom'} - ${montantHT}€ HT (${periodicite}) = ${montantLisse.toFixed(2)}€ lissé`);
+                        }
+                    });
+                    
+                    console.log(`📊 Charges DEBUG - Total: ${Math.round(totalChargesDebug)}€, Lissé: ${Math.round(totalChargesLisseDebug)}€`);
+                    console.log(`🎯 TARGET: Doit correspondre à ~2800€ lissé pour obtenir 9094€ final`);
+                    
                 } else {
                     chargesData = [];
+                    console.warn('⚠️ Aucune donnée charges trouvée');
                 }
-                
-                console.log(`📥 Données chargées: ${recettesData.length} recettes, ${chargesData.length} charges`);
-                
-                // Mise à jour info sources
+
+                // Mise à jour interface
                 document.getElementById('infoSources').textContent = 
-                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges récurrentes actives`;
-                
-                if (recettesData.length === 0 && chargesData.length === 0) {
-                    afficherAlerteAucuneDonnee();
-                } else {
-                    calculerAnalytics();
-                    afficherResultats();
-                    afficherRepartitions();
-                    afficherTopContributeurs();
-                }
-                
+                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges actives`;
+
+                // LOG FINAL CONSOLIDÉ
+                console.log('✅ === CHARGEMENT TERMINÉ ===');
+                console.log(`📊 BILAN FINAL:`, {
+                    recettes: recettesData.length,
+                    charges: chargesData.length,
+                    total_operations: recettesData.length + chargesData.length
+                });
+
             } catch (error) {
-                console.error('❌ Erreur chargement données:', error);
-                afficherErreur('Erreur lors du chargement des données: ' + error.message);
+                console.error('❌ Erreur critique chargement localStorage:', error);
+                recettesData = [];
+                chargesData = [];
+                
+                document.getElementById('infoSources').textContent = 
+                    'Erreur chargement données';
             }
         }
-
-        function afficherAlerteAucuneDonnee() {
-            const alerteHTML = `
-                <div class="alert alert-warning">
-                    <strong>⚠️ Aucune donnée détectée</strong><br>
-                    Assurez-vous d'avoir saisi des recettes et charges dans les modules correspondants.
-                    <br><br>
-                    <a href="rt_module2_recettes_crud_final.html" class="btn btn-secondary" style="margin-right: 10px;">📝 Saisir Recettes</a>
-                    <a href="rt_module3_charges_crud.html" class="btn btn-secondary">💸 Saisir Charges</a>
-                </div>
-            `;
-            document.querySelector('.main-content').innerHTML = alerteHTML;
-        }
-
-        function afficherErreur(message) {
-            const alerteHTML = `
-                <div class="alert alert-danger">
-                    <strong>❌ Erreur</strong><br>
-                    ${message}
-                </div>
-            `;
-            document.querySelector('.main-content').innerHTML = alerteHTML;
-        }
-
-        // ===================================
-        // CALCULS ANALYTICS
-        // ===================================
 
         function calculerMontantLisse(item) {
-            // CORRECTION 3: Calcul lissage correct avec montantHT
-            const montantBase = Math.abs(item.montantHT || 0);
+            // Fonction ROBUSTE de calcul lissage périodicité
+            let facteurLissage = 1;
+            const periodicite = item.periodicite || 'MENSUEL';
+            const montantHT = Math.abs(item.montantHT || 0);
             
-            switch (item.periodicite?.toUpperCase()) {
-                case 'MENSUEL':
-                    return montantBase;
+            switch (periodicite.toUpperCase()) {
                 case 'BIMESTRIEL':
-                    return montantBase / 2;
+                    facteurLissage = 2;
+                    break;
                 case 'TRIMESTRIEL':
-                    return montantBase / 3;
+                    facteurLissage = 3;
+                    break;
                 case 'SEMESTRIEL':
-                    return montantBase / 6;
+                    facteurLissage = 6;
+                    break;
                 case 'ANNUEL':
-                    return montantBase / 12;
+                    facteurLissage = 12;
+                    break;
+                case 'MENSUEL':
                 default:
-                    return montantBase; // Par défaut mensuel
+                    facteurLissage = 1;
+                    break;
             }
+            
+            return montantHT / facteurLissage;
         }
 
         function calculerAnalytics() {
             console.log('🧮 Calcul des analytics...');
             
-            // Totaux lissés (montants mensuels)
-            analytics.totalRecettesLissees = recettesData.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
-            analytics.totalChargesLissees = chargesData.reduce((sum, c) => sum + calculerMontantLisse(c), 0);
+            // Reset des totaux
+            analytics.totalRecettesLissees = 0;
+            analytics.totalChargesLissees = 0;
             
-            // Résultat mensuel
+            // ========================================
+            // CALCUL RECETTES LISSÉES
+            // ========================================
+            recettesData.forEach(recette => {
+                const montantLisse = calculerMontantLisse(recette);
+                analytics.totalRecettesLissees += montantLisse;
+            });
+            
+            // ========================================
+            // CALCUL CHARGES LISSÉES
+            // ========================================
+            chargesData.forEach(charge => {
+                const montantLisse = calculerMontantLisse(charge);
+                analytics.totalChargesLissees += montantLisse;
+            });
+            
+            // ========================================
+            // CALCULS DÉRIVÉS
+            // ========================================
             analytics.resultatMensuel = analytics.totalRecettesLissees - analytics.totalChargesLissees;
             
-            // Ratios
-            analytics.ratioChargesRecettes = analytics.totalRecettesLissees > 0 ? 
-                (analytics.totalChargesLissees / analytics.totalRecettesLissees) * 100 : 0;
-                
-            analytics.margeOperationnelle = analytics.totalRecettesLissees > 0 ? 
-                (analytics.resultatMensuel / analytics.totalRecettesLissees) * 100 : 0;
+            analytics.ratioChargesRecettes = analytics.totalRecettesLissees > 0 
+                ? (analytics.totalChargesLissees / analytics.totalRecettesLissees) * 100 
+                : 0;
             
-            // Équilibre financier
+            analytics.margeOperationnelle = analytics.totalRecettesLissees > 0 
+                ? (analytics.resultatMensuel / analytics.totalRecettesLissees) * 100 
+                : 0;
+            
             analytics.equilibreFinancier = analytics.resultatMensuel >= 0 ? "ATTEINT" : "NON ATTEINT";
-
-            console.log('📊 Analytics calculés:', {
-                nbRecettes: recettesData.length,
-                nbCharges: chargesData.length,
-                recettesLissees: Math.round(analytics.totalRecettesLissees),
-                chargesLissees: Math.round(analytics.totalChargesLissees),
-                resultat: Math.round(analytics.resultatMensuel),
-                ratio: Math.round(analytics.ratioChargesRecettes) + '%',
-                marge: Math.round(analytics.margeOperationnelle) + '%',
-                equilibre: analytics.equilibreFinancier
-            });
+            
+            // LOG RÉSULTATS
+            console.log('📊 === RÉSULTATS ANALYTICS ===');
+            console.log(`💰 Recettes lissées: ${Math.round(analytics.totalRecettesLissees)}€`);
+            console.log(`💸 Charges lissées: ${Math.round(analytics.totalChargesLissees)}€`);
+            console.log(`📊 Résultat mensuel: ${Math.round(analytics.resultatMensuel)}€`);
+            console.log(`🎯 TARGET ATTEINT: ${Math.round(analytics.resultatMensuel) === 9094 ? '✅ OUI' : '❌ NON'}`);
         }
 
         function afficherResultats() {
-            // Mise à jour des cartes principales
-            document.getElementById('totalRecettesLissees').textContent = 
-                Math.round(analytics.totalRecettesLissees).toLocaleString('fr-FR') + '€';
+            // Mise à jour des métriques principales
+            document.getElementById('totalRecettes').textContent = 
+                `€ ${Math.round(analytics.totalRecettesLissees).toLocaleString()}`;
             
-            document.getElementById('totalChargesLissees').textContent = 
-                Math.round(analytics.totalChargesLissees).toLocaleString('fr-FR') + '€';
+            document.getElementById('totalCharges').textContent = 
+                `€ ${Math.round(analytics.totalChargesLissees).toLocaleString()}`;
             
-            document.getElementById('resultatMensuel').textContent = 
-                Math.round(analytics.resultatMensuel).toLocaleString('fr-FR') + '€';
+            const resultatElement = document.getElementById('resultatMensuel');
+            resultatElement.textContent = `€ ${Math.round(analytics.resultatMensuel).toLocaleString()}`;
+            resultatElement.className = `metric-value ${analytics.resultatMensuel >= 0 ? 'positive' : 'negative'}`;
             
-            document.getElementById('ratioChargesRecettes').textContent = 
-                Math.round(analytics.ratioChargesRecettes) + '%';
+            document.getElementById('ratioCharges').textContent = 
+                `${analytics.ratioChargesRecettes.toFixed(1)} %`;
             
-            document.getElementById('margeOperationnelle').textContent = 
-                Math.round(analytics.margeOperationnelle) + '%';
-
-            // Équilibre financier avec badge coloré
-            const equilibreElement = document.getElementById('equilibreFinancier');
-            const badgeClass = analytics.equilibreFinancier === "ATTEINT" ? "status-atteint" : "status-non-atteint";
-            equilibreElement.innerHTML = `<span class="status-badge ${badgeClass}">${analytics.equilibreFinancier}</span>`;
+            // Mise à jour timestamp
+            const maintenant = new Date();
+            document.getElementById('derniereMiseAJour').textContent = 
+                maintenant.toLocaleString('fr-FR');
+            
+            // Mise à jour info calcul
+            document.getElementById('infoCalcul').textContent = 
+                `Équilibre : ${analytics.equilibreFinancier} • Marge : ${analytics.margeOperationnelle.toFixed(1)}%`;
+            
+            // Préparer pour impression
+            document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
+            document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
         }
 
         function afficherRepartitions() {
-            // Répartition Recettes par catégorie
-            const repartitionRecettes = {};
-            recettesData.forEach(r => {
-                const montantLisse = calculerMontantLisse(r);
-                if (!repartitionRecettes[r.categorie]) {
-                    repartitionRecettes[r.categorie] = { count: 0, total: 0 };
-                }
-                repartitionRecettes[r.categorie].count++;
-                repartitionRecettes[r.categorie].total += montantLisse;
-            });
-
-            const tbodyRepartitionRecettes = document.getElementById('repartitionRecettes');
-            const entriesRecettes = Object.entries(repartitionRecettes)
-                .sort((a, b) => b[1].total - a[1].total);
-
-            if (entriesRecettes.length > 0) {
-                tbodyRepartitionRecettes.innerHTML = entriesRecettes.map(([cat, data]) => {
-                    const pourcentage = analytics.totalRecettesLissees > 0 ? 
-                        (data.total / analytics.totalRecettesLissees * 100) : 0;
-                    const montantMoyen = data.count > 0 ? data.total / data.count : 0;
+            // ========================================
+            // RÉPARTITION RECETTES
+            // ========================================
+            const repartitionRecettes = document.getElementById('repartitionRecettes');
+            if (recettesData.length === 0) {
+                repartitionRecettes.innerHTML = '<p class="text-muted">Aucune recette active trouvée</p>';
+            } else {
+                let htmlRecettes = '<div class="table-container"><table class="table table-sm">';
+                htmlRecettes += '<thead><tr><th>Client</th><th>Montant Lissé HT</th><th>%</th></tr></thead><tbody>';
+                
+                recettesData.forEach(recette => {
+                    const montantLisse = calculerMontantLisse(recette);
+                    const pourcentage = (montantLisse / analytics.totalRecettesLissees) * 100;
                     
-                    return `
+                    htmlRecettes += `
                         <tr>
-                            <td><strong>${cat}</strong></td>
-                            <td>${data.count}</td>
-                            <td><strong>${Math.round(data.total).toLocaleString('fr-FR')}€</strong></td>
-                            <td><span class="pourcentage">${pourcentage.toFixed(1)}%</span></td>
-                            <td>${Math.round(montantMoyen).toLocaleString('fr-FR')}€</td>
+                            <td>${recette.client || 'Client non défini'}</td>
+                            <td>€ ${Math.round(montantLisse).toLocaleString()}</td>
+                            <td>${pourcentage.toFixed(1)}%</td>
                         </tr>
                     `;
-                }).join('');
-            } else {
-                tbodyRepartitionRecettes.innerHTML = '<tr><td colspan="5" style="text-align: center;">Aucune recette</td></tr>';
+                });
+                
+                htmlRecettes += '</tbody></table></div>';
+                repartitionRecettes.innerHTML = htmlRecettes;
             }
-
-            // Répartition Charges par catégorie
-            const repartitionCharges = {};
-            chargesData.forEach(c => {
-                const montantLisse = calculerMontantLisse(c);
-                if (!repartitionCharges[c.categorie]) {
-                    repartitionCharges[c.categorie] = { count: 0, total: 0 };
-                }
-                repartitionCharges[c.categorie].count++;
-                repartitionCharges[c.categorie].total += montantLisse;
-            });
-
-            const tbodyRepartitionCharges = document.getElementById('repartitionCharges');
-            const entriesCharges = Object.entries(repartitionCharges)
-                .sort((a, b) => b[1].total - a[1].total);
-
-            if (entriesCharges.length > 0) {
-                tbodyRepartitionCharges.innerHTML = entriesCharges.map(([cat, data]) => {
-                    const pourcentage = analytics.totalChargesLissees > 0 ? 
-                        (data.total / analytics.totalChargesLissees * 100) : 0;
-                    const montantMoyen = data.count > 0 ? data.total / data.count : 0;
-                    
-                    return `
-                        <tr>
-                            <td><strong>${cat}</strong></td>
-                            <td>${data.count}</td>
-                            <td><strong>${Math.round(data.total).toLocaleString('fr-FR')}€</strong></td>
-                            <td><span class="pourcentage">${pourcentage.toFixed(1)}%</span></td>
-                            <td>${Math.round(montantMoyen).toLocaleString('fr-FR')}€</td>
-                        </tr>
-                    `;
-                }).join('');
-            } else {
-                tbodyRepartitionCharges.innerHTML = '<tr><td colspan="5" style="text-align: center;">Aucune charge</td></tr>';
-            }
-        }
-
-        function afficherTopContributeurs() {
-            // Top 10 Recettes
-            const recettesAvecMontantLisse = recettesData.map(r => ({
-                ...r,
-                montantLisse: calculerMontantLisse(r)
-            })).sort((a, b) => b.montantLisse - a.montantLisse).slice(0, 10);
-
-            const tbodyTopRecettes = document.getElementById('topRecettes');
-            if (recettesAvecMontantLisse.length > 0) {
-                tbodyTopRecettes.innerHTML = recettesAvecMontantLisse.map((r, index) => {
-                    const pourcentage = analytics.totalRecettesLissees > 0 ? 
-                        (r.montantLisse / analytics.totalRecettesLissees * 100) : 0;
-                    
-                    return `
-                        <tr>
-                            <td><strong>${index + 1}</strong></td>
-                            <td>${r.client || r.libelle}</td>
-                            <td>${r.categorie}</td>
-                            <td>${r.periodicite}</td>
-                            <td><strong>${Math.round(r.montantLisse).toLocaleString('fr-FR')}€</strong></td>
-                            <td><span class="pourcentage">${pourcentage.toFixed(1)}%</span></td>
-                        </tr>
-                    `;
-                }).join('');
-            } else {
-                tbodyTopRecettes.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aucune recette</td></tr>';
-            }
-
-            // Top 10 Charges
-            const chargesAvecMontantLisse = chargesData.map(c => ({
-                ...c,
-                montantLisse: calculerMontantLisse(c)
-            })).sort((a, b) => b.montantLisse - a.montantLisse).slice(0, 10);
-
-            const tbodyTopCharges = document.getElementById('topCharges');
-            if (chargesAvecMontantLisse.length > 0) {
-                tbodyTopCharges.innerHTML = chargesAvecMontantLisse.map((c, index) => {
-                    const pourcentage = analytics.totalChargesLissees > 0 ? 
-                        (c.montantLisse / analytics.totalChargesLissees * 100) : 0;
-                    
-                    return `
-                        <tr>
-                            <td><strong>${index + 1}</strong></td>
-                            <td>${c.element || c.libelle}</td>
-                            <td>${c.categorie}</td>
-                            <td>${c.periodicite}</td>
-                            <td><strong>${Math.round(c.montantLisse).toLocaleString('fr-FR')}€</strong></td>
-                            <td><span class="pourcentage">${pourcentage.toFixed(1)}%</span></td>
-                        </tr>
-                    `;
-                }).join('');
-            } else {
-                tbodyTopCharges.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aucune charge</td></tr>';
-            }
-        }
-
-        // ===================================
-        // FONCTIONS UTILITAIRES
-        // ===================================
-
-        function actualiserDonnees() {
-            console.log('🔄 Actualisation manuelle des données...');
-            chargerDonnees();
-        }
-
-        function exporterPDF() {
-            // Masquer les boutons pour l'impression
-            const controls = document.querySelector('.header-controls');
-            const originalDisplay = controls.style.display;
-            controls.style.display = 'none';
             
-            // Instructions pour l'utilisateur
-            const confirmation = confirm(
-                '🖨️ Export PDF - Instructions :\n\n' +
-                '1. Cliquez OK puis CTRL+P (Cmd+P sur Mac)\n' +
-                '2. Choisir "Enregistrer au format PDF"\n' +
-                '3. Sélectionner "Plus de paramètres"\n' +
-                '4. Cocher "Graphiques d\'arrière-plan"\n\n' +
-                'Continuer ?'
-            );
-
-            if (confirmation) {
-                // Déclencher l'impression
-                setTimeout(() => {
-                    window.print();
-                    // Rétablir l'affichage après impression
-                    setTimeout(() => {
-                        controls.style.display = originalDisplay;
-                    }, 1000);
-                }, 500);
+            // ========================================
+            // RÉPARTITION CHARGES
+            // ========================================
+            const repartitionCharges = document.getElementById('repartitionCharges');
+            if (chargesData.length === 0) {
+                repartitionCharges.innerHTML = '<p class="text-muted">Aucune charge active trouvée</p>';
             } else {
-                controls.style.display = originalDisplay;
+                let htmlCharges = '<div class="table-container"><table class="table table-sm">';
+                htmlCharges += '<thead><tr><th>Élément</th><th>Montant Lissé HT</th><th>%</th></tr></thead><tbody>';
+                
+                chargesData.forEach(charge => {
+                    const montantLisse = calculerMontantLisse(charge);
+                    const pourcentage = analytics.totalChargesLissees > 0 
+                        ? (montantLisse / analytics.totalChargesLissees) * 100 
+                        : 0;
+                    
+                    htmlCharges += `
+                        <tr>
+                            <td>${charge.element || 'Élément non défini'}</td>
+                            <td>€ ${Math.round(montantLisse).toLocaleString()}</td>
+                            <td>${pourcentage.toFixed(1)}%</td>
+                        </tr>
+                    `;
+                });
+                
+                htmlCharges += '</tbody></table></div>';
+                repartitionCharges.innerHTML = htmlCharges;
             }
+            
+            // ========================================
+            // TABLEAU DÉTAILLÉ TOUTES OPÉRATIONS
+            // ========================================
+            const tbody = document.getElementById('listeOperations');
+            let htmlOperations = '';
+            
+            // Ajouter recettes
+            recettesData.forEach(recette => {
+                const montantLisse = calculerMontantLisse(recette);
+                htmlOperations += `
+                    <tr>
+                        <td><span class="status-badge" style="background: #d4edda; color: #155724;">RECETTE</span></td>
+                        <td>${recette.client || 'Client non défini'} - ${recette.element || 'Élément non défini'}</td>
+                        <td class="positive">€ ${Math.round(recette.montantHT || 0).toLocaleString()}</td>
+                        <td>${recette.periodicite || 'MENSUEL'}</td>
+                        <td><span class="status-badge status-actif">${recette.statut || 'ACTIF'}</span></td>
+                        <td class="positive">€ ${Math.round(montantLisse).toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+            
+            // Ajouter charges
+            chargesData.forEach(charge => {
+                const montantLisse = calculerMontantLisse(charge);
+                htmlOperations += `
+                    <tr>
+                        <td><span class="status-badge" style="background: #f8d7da; color: #721c24;">CHARGE</span></td>
+                        <td>${charge.element || 'Élément non défini'}</td>
+                        <td class="negative">€ -${Math.round(Math.abs(charge.montantHT || 0)).toLocaleString()}</td>
+                        <td>${charge.periodicite || 'MENSUEL'}</td>
+                        <td><span class="status-badge status-actif">${charge.statut || 'ACTIF'}</span></td>
+                        <td class="negative">€ -${Math.round(montantLisse).toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = htmlOperations || '<tr><td colspan="6" class="text-muted">Aucune opération trouvée</td></tr>';
         }
     </script>
 </body>
