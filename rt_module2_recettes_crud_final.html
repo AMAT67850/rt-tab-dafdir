@@ -95,30 +95,20 @@
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #6c757d, #495057);
-            color: white;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
+            background: linear-gradient(135deg, #6c757d, #5a6268);
             color: white;
         }
 
         .search-box {
-            flex: 1;
+            position: relative;
             min-width: 300px;
             max-width: 400px;
         }
 
         .search-box input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e9ecef;
             border-radius: 8px;
             font-size: 14px;
             transition: border-color 0.3s ease;
@@ -129,9 +119,51 @@
             border-color: #27ae60;
         }
 
+        .search-box .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        /* NOUVEAUX FILTRES PAR TYPE */
+        .filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #27ae60;
+        }
+
         .stats {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
             margin-bottom: 25px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -145,19 +177,22 @@
 
         .stat-card {
             text-align: center;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
             border-left: 4px solid #27ae60;
         }
 
-        .stat-card h3 {
-            font-size: 1.8em;
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: 700;
             color: #27ae60;
             margin-bottom: 5px;
         }
 
-        .stat-card p {
-            color: #666;
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
             font-weight: 500;
         }
 
@@ -168,37 +203,26 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        .table-header {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 20px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .table-header h2 {
-            color: #495057;
-            font-size: 1.3em;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
         th {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
             font-weight: 600;
-            color: #495057;
-            font-size: 0.9em;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         td {
-            font-size: 0.85em;
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
         }
 
         tr:hover {
@@ -208,87 +232,136 @@
         .montant {
             text-align: right;
             font-weight: 600;
-            font-family: 'Courier New', monospace;
         }
 
         .montant.positif {
             color: #27ae60;
         }
 
-        .status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75em;
+        .montant.negatif {
+            color: #dc3545;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
             font-weight: 600;
             text-transform: uppercase;
         }
 
-        .status.actif {
+        .badge-actif {
             background: #d4edda;
             color: #155724;
         }
 
-        .status.inactif {
+        .badge-inactif {
             background: #f8d7da;
             color: #721c24;
         }
 
-        .periodicite {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.7em;
-            font-weight: 600;
-            text-transform: uppercase;
+        /* BADGES POUR LES TYPES */
+        .badge-type-bureau {
+            background: #e3f2fd;
+            color: #0d47a1;
         }
 
-        .periodicite.mensuel { background: #e3f2fd; color: #1565c0; }
-        .periodicite.trimestriel { background: #f3e5f5; color: #7b1fa2; }
-        .periodicite.semestriel { background: #fff3e0; color: #ef6c00; }
-        .periodicite.annuel { background: #ffebee; color: #c62828; }
+        .badge-type-coworking {
+            background: #f3e5f5;
+            color: #4a148c;
+        }
+
+        .badge-type-flex {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .badge-type-rocket {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+
+        .badge-periodicite-mensuel {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .badge-periodicite-trimestriel {
+            background: #fff3c4;
+            color: #f57c00;
+        }
+
+        .badge-periodicite-semestriel {
+            background: #e1f5fe;
+            color: #0277bd;
+        }
+
+        .badge-periodicite-annuel {
+            background: #fce4ec;
+            color: #c2185b;
+        }
 
         .actions {
             display: flex;
-            gap: 5px;
+            gap: 8px;
+            justify-content: center;
         }
 
-        .btn-small {
+        .btn-action {
             padding: 6px 10px;
-            font-size: 0.75em;
+            border: none;
             border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-action:hover {
+            transform: scale(1.1);
         }
 
         .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 1000;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            overflow-y: auto;
+            background-color: rgba(0,0,0,0.7);
         }
 
         .modal-content {
-            background: white;
-            margin: 50px auto;
+            background-color: white;
+            margin: 5% auto;
             padding: 0;
             border-radius: 12px;
-            max-width: 600px;
             width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
 
         .modal-header {
             background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
             padding: 20px 30px;
-            border-radius: 12px 12px 0 0;
+            border-bottom: none;
         }
 
         .modal-header h2 {
             margin: 0;
-            font-size: 1.3em;
+            font-size: 1.5em;
         }
 
         .close {
@@ -297,11 +370,12 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: -5px;
+            line-height: 1;
+            opacity: 0.7;
         }
 
         .close:hover {
-            opacity: 0.7;
+            opacity: 1;
         }
 
         .modal-body {
@@ -360,6 +434,16 @@
             gap: 20px;
         }
 
+        .montant-lisse {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: 600;
+            color: #27ae60;
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -378,6 +462,14 @@
             .search-box {
                 min-width: auto;
                 max-width: none;
+            }
+
+            .filters {
+                justify-content: center;
+            }
+
+            .filter-group select {
+                min-width: 120px;
             }
         }
 
@@ -398,118 +490,157 @@
 <body>
     <div class="header">
         <h1>💵 Gestion des Recettes Récurrentes</h1>
-        <p class="subtitle">Interface CRUD complète avec persistance localStorage et lissage automatique</p>
+        <p class="subtitle">Interface CRUD complète avec persistance localStorage et lissage automatique + FILTRES PAR TYPE</p>
     </div>
 
     <div class="container">
         <div class="controls">
             <div class="controls-left">
-                <button onclick="nouvelleRecette()" class="btn btn-primary">
+                <button class="btn btn-primary" onclick="nouvelleRecette()">
                     ➕ Nouvelle Recette
                 </button>
-                <button onclick="importerDonnees()" class="btn btn-warning">
-                    📥 Importer JSON
-                </button>
-                <button onclick="exporterDonnees()" class="btn btn-secondary">
-                    📤 Exporter JSON
-                </button>
+                <a href="index.html" class="btn btn-secondary">
+                    🏠 Dashboard
+                </a>
             </div>
-            
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Rechercher par client, élément ou commentaire..." onkeyup="filtrerRecettes()">
+
+            <!-- NOUVEAUX FILTRES PAR TYPE -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filtreType">Type :</label>
+                    <select id="filtreType" onchange="appliquerFiltres()">
+                        <option value="tous">Tous les types</option>
+                        <option value="bureau privatif">Bureau Privatif</option>
+                        <option value="coworking">Coworking</option>
+                        <option value="flex">Flex</option>
+                        <option value="rocket pass">Rocket Pass</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filtreStatut">Statut :</label>
+                    <select id="filtreStatut" onchange="appliquerFiltres()">
+                        <option value="tous">Tous</option>
+                        <option value="ACTIF">Actif</option>
+                        <option value="INACTIF">Inactif</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filtrePeriodicite">Périodicité :</label>
+                    <select id="filtrePeriodicite" onchange="appliquerFiltres()">
+                        <option value="toutes">Toutes</option>
+                        <option value="MENSUEL">Mensuel</option>
+                        <option value="BIMESTRIEL">Bimestriel</option>
+                        <option value="TRIMESTRIEL">Trimestriel</option>
+                        <option value="SEMESTRIEL">Semestriel</option>
+                        <option value="ANNUEL">Annuel</option>
+                    </select>
+                </div>
             </div>
-            
+
             <div class="controls-right">
-                <a href="index.html" class="btn btn-secondary">🏠 Dashboard</a>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Rechercher une recette..." onkeyup="appliquerFiltres()">
+                    <span class="search-icon">🔍</span>
+                </div>
             </div>
         </div>
 
+        <!-- Statistiques -->
         <div class="stats">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3 id="totalRecettes">0</h3>
-                    <p>Total Recettes</p>
+                    <div class="stat-value" id="totalRecettes">0</div>
+                    <div class="stat-label">Total Recettes</div>
                 </div>
                 <div class="stat-card">
-                    <h3 id="totalMontantHT">0€</h3>
-                    <p>Montant Total HT</p>
+                    <div class="stat-value" id="totalMontantHT">0€</div>
+                    <div class="stat-label">Total HT</div>
                 </div>
                 <div class="stat-card">
-                    <h3 id="totalMontantLisse">0€</h3>
-                    <p>Montant Lissé HT/Mois</p>
+                    <div class="stat-value" id="totalMontantLisse">0€</div>
+                    <div class="stat-label">Total Lissé/Mois</div>
                 </div>
                 <div class="stat-card">
-                    <h3 id="totalActifs">0</h3>
-                    <p>Contrats Actifs</p>
+                    <div class="stat-value" id="totalActifs">0</div>
+                    <div class="stat-label">Contrats Actifs</div>
                 </div>
             </div>
         </div>
 
+        <!-- Tableau des recettes -->
         <div class="table-container">
-            <div class="table-header">
-                <h2>📋 Liste des Recettes Récurrentes</h2>
-            </div>
-            <div style="overflow-x: auto;">
-                <table id="recettesTable">
-                    <thead>
-                        <tr>
-                            <th>Client</th>
-                            <th>Élément</th>
-                            <th>Montant HT</th>
-                            <th>Montant TTC</th>
-                            <th>Lissé/Mois</th>
-                            <th>Périodicité</th>
-                            <th>Statut</th>
-                            <th>Commentaire</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recettesTableBody">
-                        <tr>
-                            <td colspan="9" class="loading">Chargement des données...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Type</th> <!-- NOUVELLE COLONNE TYPE -->
+                        <th>Élément</th>
+                        <th>Montant HT</th>
+                        <th>Montant TTC</th>
+                        <th>Périodicité</th>
+                        <th>Lissé/Mois</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recettesTableBody">
+                    <tr>
+                        <td colspan="9" class="loading">Chargement des données...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Modal Édition/Création -->
-    <div id="modalRecette" class="modal">
+    <!-- Modal pour ajouter/modifier une recette -->
+    <div id="recetteModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Nouvelle Recette</h2>
                 <span class="close" onclick="fermerModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formRecette">
+                <form id="recetteForm">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="client">Client *</label>
-                            <input type="text" id="client" required placeholder="Nom du client">
+                            <input type="text" id="client" required>
                         </div>
                         <div class="form-group">
-                            <label for="element">Élément *</label>
-                            <input type="text" id="element" required placeholder="Description de la recette">
+                            <label for="type">Type *</label> <!-- NOUVEAU CHAMP TYPE -->
+                            <select id="type" required>
+                                <option value="">Choisir un type</option>
+                                <option value="bureau privatif">Bureau Privatif</option>
+                                <option value="coworking">Coworking</option>
+                                <option value="flex">Flex</option>
+                                <option value="rocket pass">Rocket Pass</option>
+                            </select>
                         </div>
                     </div>
                     
+                    <div class="form-group">
+                        <label for="element">Élément/Service *</label>
+                        <input type="text" id="element" required>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="montantHT">Montant HT (€) *</label>
-                            <input type="number" id="montantHT" step="0.01" required placeholder="0.00" oninput="calculerTTC()">
+                            <label for="montantHT">Montant HT *</label>
+                            <input type="number" id="montantHT" step="0.01" required oninput="calculerTTC(); calculerLisse();">
                         </div>
                         <div class="form-group">
-                            <label for="montantTTC">Montant TTC (€) *</label>
-                            <input type="number" id="montantTTC" step="0.01" required placeholder="0.00" oninput="calculerHT()">
+                            <label for="montantTTC">Montant TTC *</label>
+                            <input type="number" id="montantTTC" step="0.01" required>
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="periodicite">Périodicité *</label>
-                            <select id="periodicite" required onchange="mettreAJourLissage()">
-                                <option value="">Sélectionner...</option>
+                            <select id="periodicite" required onchange="calculerLisse()">
+                                <option value="">Choisir</option>
                                 <option value="MENSUEL">Mensuel</option>
                                 <option value="BIMESTRIEL">Bimestriel</option>
                                 <option value="TRIMESTRIEL">Trimestriel</option>
@@ -525,19 +656,19 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="commentaire">Commentaire</label>
-                        <textarea id="commentaire" rows="3" placeholder="Informations complémentaires (optionnel)"></textarea>
+                        <textarea id="commentaire" rows="3"></textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Montant Lissé HT/Mois : <strong id="montantLisse">0.00€</strong></label>
+
+                    <div class="montant-lisse">
+                        Montant lissé mensuel : <span id="montantLisse">0.00€</span>
                     </div>
-                    
+
                     <div class="form-buttons">
                         <button type="button" class="btn-modal btn-secondary" onclick="fermerModal()">Annuler</button>
-                        <button type="submit" class="btn-modal btn-primary">Enregistrer</button>
+                        <button type="submit" class="btn-modal btn-primary">Sauvegarder</button>
                     </div>
                 </form>
             </div>
@@ -548,7 +679,6 @@
         // Variables globales
         let recettes = [];
         let recetteEnEdition = null;
-        const TAUX_TVA = 0.20;
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
@@ -557,46 +687,92 @@
             mettreAJourStats();
         });
 
-        // Gestion localStorage
-        function sauvegarderRecettes() {
-            try {
-                // Marquer la date de modification pour la synchronisation
-                const timestamp = new Date().toISOString();
-                localStorage.setItem('recettesRT_lastModified', timestamp);
-                localStorage.setItem('recettesRT', JSON.stringify(recettes));
-                console.log('✅ Recettes sauvegardées:', recettes.length);
-            } catch (error) {
-                console.error('❌ Erreur sauvegarde:', error);
-                alert('Erreur lors de la sauvegarde !');
-            }
-        }
+        // DONNÉES DE DÉMONSTRATION pour test des filtres par type
+        const donneesDemo = [
+            { id: 1, client: "Entreprise Alpha", type: "bureau privatif", element: "Location bureau 20m²", montantHT: 800, montantTTC: 960, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Bureau individuel centre-ville" },
+            { id: 2, client: "Startup Beta", type: "coworking", element: "Abonnement coworking", montantHT: 300, montantTTC: 360, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Open space partagé" },
+            { id: 3, client: "Freelance Gamma", type: "flex", element: "Heures flex bureau", montantHT: 150, montantTTC: 180, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Utilisation ponctuelle" },
+            { id: 4, client: "Consultant Delta", type: "rocket pass", element: "Rocket Pass Premium", montantHT: 99, montantTTC: 118.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Accès illimité services" },
+            { id: 5, client: "PME Epsilon", type: "bureau privatif", element: "Location bureau 30m²", montantHT: 1200, montantTTC: 1440, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Bureau équipe 4 personnes" },
+            { id: 6, client: "Association Zeta", type: "coworking", element: "Abonnement associatif", montantHT: 200, montantTTC: 240, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Tarif préférentiel" },
+            { id: 7, client: "Designer Eta", type: "flex", element: "Créneaux soir/weekend", montantHT: 80, montantTTC: 96, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Horaires décalés" },
+            { id: 8, client: "Développeur Theta", type: "rocket pass", element: "Rocket Pass Standard", montantHT: 59, montantTTC: 70.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Accès services de base" },
+            { id: 9, client: "Cabinet Iota", type: "bureau privatif", element: "Suite bureau 50m²", montantHT: 2000, montantTTC: 2400, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Bureau direction + salle réunion" },
+            { id: 10, client: "Etudiant Kappa", type: "coworking", element: "Tarif étudiant", montantHT: 100, montantTTC: 120, periodicite: "MENSUEL", statut: "INACTIF", commentaire: "Suspendu temporairement" }
+        ];
 
+        // Gestion des données
         function chargerRecettes() {
             try {
                 const donneesLocales = localStorage.getItem('recettesRT');
                 if (donneesLocales) {
                     recettes = JSON.parse(donneesLocales);
-                    console.log('📥 Recettes chargées:', recettes.length);
+                    
+                    // MIGRATION : Ajouter le champ "type" aux anciens enregistrements
+                    let migrationNecessaire = false;
+                    recettes.forEach(recette => {
+                        if (!recette.type) {
+                            recette.type = 'bureau privatif'; // Valeur par défaut
+                            migrationNecessaire = true;
+                        }
+                    });
+                    
+                    if (migrationNecessaire) {
+                        sauvegarderRecettes();
+                        console.log('🔄 Migration automatique : champ "type" ajouté aux recettes existantes');
+                    }
+                    
+                    console.log('📥 Recettes chargées depuis localStorage:', recettes.length);
                 } else {
-                    recettes = [];
-                    console.log('📥 Aucune donnée locale trouvée');
+                    // UTILISER DONNÉES DE DÉMONSTRATION si pas de localStorage
+                    recettes = [...donneesDemo];
+                    console.log('📥 Données de démonstration chargées pour test des filtres:', recettes.length);
                 }
             } catch (error) {
                 console.error('❌ Erreur chargement:', error);
-                recettes = [];
+                recettes = [...donneesDemo];
+                console.log('📥 Données de démonstration chargées (fallback):', recettes.length);
+            }
+        }
+
+        function sauvegarderRecettes() {
+            try {
+                localStorage.setItem('recettesRT', JSON.stringify(recettes));
+                console.log('💾 Recettes sauvegardées');
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde:', error);
+                alert('Erreur lors de la sauvegarde des données');
             }
         }
 
         // Affichage et filtrage
         function afficherRecettes() {
             const tbody = document.getElementById('recettesTableBody');
+            let recettesFiltrees = [...recettes];
+
+            // Application des filtres
+            const filtreType = document.getElementById('filtreType').value;
+            const filtreStatut = document.getElementById('filtreStatut').value;
+            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             
-            let recettesFiltrees = recettes;
+            if (filtreType !== 'tous') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
+            }
+            
+            if (filtreStatut !== 'tous') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+            }
+            
+            if (filtrePeriodicite !== 'toutes') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
+            }
+            
             if (searchTerm) {
-                recettesFiltrees = recettes.filter(r => 
+                recettesFiltrees = recettesFiltrees.filter(r => 
                     r.client.toLowerCase().includes(searchTerm) ||
                     r.element.toLowerCase().includes(searchTerm) ||
+                    r.type.toLowerCase().includes(searchTerm) ||
                     (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
                 );
             }
@@ -611,28 +787,27 @@
                 return `
                     <tr>
                         <td><strong>${recette.client}</strong></td>
+                        <td><span class="badge badge-type-${recette.type.replace(' ', '-').toLowerCase()}">${recette.type}</span></td>
                         <td>${recette.element}</td>
                         <td class="montant positif">${recette.montantHT.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
                         <td class="montant positif">${recette.montantTTC.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                        <td><span class="badge badge-periodicite-${recette.periodicite.toLowerCase()}">${recette.periodicite}</span></td>
                         <td class="montant positif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                        <td><span class="periodicite ${recette.periodicite.toLowerCase()}">${recette.periodicite}</span></td>
-                        <td><span class="status ${recette.statut.toLowerCase()}">${recette.statut}</span></td>
-                        <td>${recette.commentaire || '-'}</td>
+                        <td><span class="badge badge-${recette.statut.toLowerCase()}">${recette.statut}</span></td>
                         <td class="actions">
-                            <button onclick="editerRecette(${recettes.indexOf(recette)})" class="btn btn-warning btn-small">✏️</button>
-                            <button onclick="supprimerRecette(${recettes.indexOf(recette)})" class="btn btn-danger btn-small">🗑️</button>
+                            <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id || index})">✏️</button>
+                            <button class="btn-action btn-delete" onclick="supprimerRecette(${recette.id || index})">🗑️</button>
                         </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        function filtrerRecettes() {
+        function appliquerFiltres() {
             afficherRecettes();
             mettreAJourStats();
         }
 
-        // Calculs
         function calculerMontantLisse(recette) {
             const facteurs = {
                 'MENSUEL': 1,
@@ -641,24 +816,17 @@
                 'SEMESTRIEL': 6,
                 'ANNUEL': 12
             };
+            
             return recette.montantHT / (facteurs[recette.periodicite] || 1);
         }
 
         function calculerTTC() {
             const montantHT = parseFloat(document.getElementById('montantHT').value) || 0;
-            const montantTTC = montantHT * (1 + TAUX_TVA);
+            const montantTTC = montantHT * 1.2; // TVA 20%
             document.getElementById('montantTTC').value = montantTTC.toFixed(2);
-            mettreAJourLissage();
         }
 
-        function calculerHT() {
-            const montantTTC = parseFloat(document.getElementById('montantTTC').value) || 0;
-            const montantHT = montantTTC / (1 + TAUX_TVA);
-            document.getElementById('montantHT').value = montantHT.toFixed(2);
-            mettreAJourLissage();
-        }
-
-        function mettreAJourLissage() {
+        function calculerLisse() {
             const montantHT = parseFloat(document.getElementById('montantHT').value) || 0;
             const periodicite = document.getElementById('periodicite').value;
             
@@ -676,13 +844,31 @@
 
         // Statistiques
         function mettreAJourStats() {
+            // Application des mêmes filtres que l'affichage
+            const filtreType = document.getElementById('filtreType').value;
+            const filtreStatut = document.getElementById('filtreStatut').value;
+            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            let recettesFiltrees = recettes;
+            
+            let recettesFiltrees = [...recettes];
+            
+            if (filtreType !== 'tous') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
+            }
+            
+            if (filtreStatut !== 'tous') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+            }
+            
+            if (filtrePeriodicite !== 'toutes') {
+                recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
+            }
             
             if (searchTerm) {
-                recettesFiltrees = recettes.filter(r => 
+                recettesFiltrees = recettesFiltrees.filter(r => 
                     r.client.toLowerCase().includes(searchTerm) ||
                     r.element.toLowerCase().includes(searchTerm) ||
+                    r.type.toLowerCase().includes(searchTerm) ||
                     (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
                 );
             }
@@ -702,17 +888,20 @@
         function nouvelleRecette() {
             recetteEnEdition = null;
             document.getElementById('modalTitle').textContent = 'Nouvelle Recette';
-            document.getElementById('formRecette').reset();
+            document.getElementById('recetteForm').reset();
             document.getElementById('montantLisse').textContent = '0.00€';
-            document.getElementById('modalRecette').style.display = 'block';
+            document.getElementById('recetteModal').style.display = 'block';
         }
 
-        function editerRecette(index) {
+        function modifierRecette(index) {
+            const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
+            if (!recette) return;
+
             recetteEnEdition = index;
-            const recette = recettes[index];
-            
             document.getElementById('modalTitle').textContent = 'Modifier Recette';
+            
             document.getElementById('client').value = recette.client;
+            document.getElementById('type').value = recette.type || 'bureau privatif'; // Valeur par défaut
             document.getElementById('element').value = recette.element;
             document.getElementById('montantHT').value = recette.montantHT;
             document.getElementById('montantTTC').value = recette.montantTTC;
@@ -720,510 +909,70 @@
             document.getElementById('statut').value = recette.statut;
             document.getElementById('commentaire').value = recette.commentaire || '';
             
-            mettreAJourLissage();
-            document.getElementById('modalRecette').style.display = 'block';
+            calculerLisse();
+            document.getElementById('recetteModal').style.display = 'block';
         }
 
-        function fermerModal() {
-            document.getElementById('modalRecette').style.display = 'none';
-            recetteEnEdition = null;
-        }
-
-        // Soumission formulaire
-        document.getElementById('formRecette').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const nouvelleRecette = {
-                client: document.getElementById('client').value.trim(),
-                element: document.getElementById('element').value.trim(),
-                montantHT: parseFloat(document.getElementById('montantHT').value),
-                montantTTC: parseFloat(document.getElementById('montantTTC').value),
-                periodicite: document.getElementById('periodicite').value,
-                statut: document.getElementById('statut').value,
-                commentaire: document.getElementById('commentaire').value.trim(),
-                dateCreation: recetteEnEdition !== null ? recettes[recetteEnEdition].dateCreation : new Date().toISOString(),
-                dateModification: new Date().toISOString()
-            };
-
-            if (recetteEnEdition !== null) {
-                recettes[recetteEnEdition] = nouvelleRecette;
-            } else {
-                recettes.push(nouvelleRecette);
-            }
-
-            sauvegarderRecettes();
-            afficherRecettes();
-            mettreAJourStats();
-            fermerModal();
-        });
-
-        // Suppression
         function supprimerRecette(index) {
-            const recette = recettes[index];
-            if (confirm(`Confirmer la suppression de la recette "${recette.element}" pour ${recette.client} ?`)) {
-                recettes.splice(index, 1);
+            const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
+            if (!recette) return;
+
+            if (confirm(`Êtes-vous sûr de vouloir supprimer la recette "${recette.client} - ${recette.element}" ?`)) {
+                recettes = recettes.filter(r => (r.id || recettes.indexOf(r)) !== index);
                 sauvegarderRecettes();
                 afficherRecettes();
                 mettreAJourStats();
             }
         }
 
-        // Import/Export
-        function exporterDonnees() {
-            const dataStr = JSON.stringify(recettes, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `recettes_rocket_tower_${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
+        function fermerModal() {
+            document.getElementById('recetteModal').style.display = 'none';
         }
 
-        function importerDonnees() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const donneesImportees = JSON.parse(e.target.result);
-                            if (Array.isArray(donneesImportees)) {
-                                recettes = donneesImportees;
-                                sauvegarderRecettes();
-                                afficherRecettes();
-                                mettreAJourStats();
-                                alert(`${donneesImportees.length} recettes importées avec succès !`);
-                            } else {
-                                alert('Format de fichier invalide !');
-                            }
-                        } catch (error) {
-                            alert('Erreur lors de la lecture du fichier !');
-                        }
-                    };
-                    reader.readAsText(file);
-                }
+        // Soumission du formulaire
+        document.getElementById('recetteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nouvelleRecette = {
+                client: document.getElementById('client').value,
+                type: document.getElementById('type').value, // NOUVEAU CHAMP
+                element: document.getElementById('element').value,
+                montantHT: parseFloat(document.getElementById('montantHT').value),
+                montantTTC: parseFloat(document.getElementById('montantTTC').value),
+                periodicite: document.getElementById('periodicite').value,
+                statut: document.getElementById('statut').value,
+                commentaire: document.getElementById('commentaire').value
             };
-            input.click();
-        }
 
-        // Fermer modal en cliquant à l'extérieur
-        window.onclick = function(event) {
-            const modal = document.getElementById('modalRecette');
-            if (event.target === modal) {
+            if (recetteEnEdition !== null) {
+                // Modification
+                const index = recettes.findIndex(r => (r.id || recettes.indexOf(r)) === recetteEnEdition);
+                if (index !== -1) {
+                    recettes[index] = { ...recettes[index], ...nouvelleRecette };
+                }
+            } else {
+                // Nouvelle recette
+                nouvelleRecette.id = Date.now();
+                recettes.push(nouvelleRecette);
+            }
+
+            sauvegarderRecettes();
+            fermerModal();
+            afficherRecettes();
+            mettreAJourStats();
+        });
+
+        // Fermeture modal avec Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
                 fermerModal();
             }
-        }
-    </script>
+        });
 
-    <!-- =============================================== -->
-    <!-- SCRIPT SYNCHRONISATION HYBRIDE - MODULE 2 RECETTES -->
-    <!-- =============================================== -->
-    <script>
-        // =================================
-        // CONFIGURATION GLOBALE
-        // =================================
-
-        const RT_SYNC_CONFIG = {
-            enabled: true,
-            autoSync: false, // Mode manuel par défaut pour sécurité
-            syncInterval: 300000, // 5 minutes
-            retryAttempts: 3,
-            
-            // Configuration SeaTable (identifiants Phase 2)
-            seatable: {
-                baseUrl: 'https://cloud.seatable.io',
-                workspaceId: '83314',
-                dtableUuid: 'ef333f2a-8a98-4935-87f3-7ffed2c8e298',
-                apiToken: 'af7d26a67a7e68ff3fa1243bc3d3baeb5d06eb07'
-            },
-            
-            // Mapping des clés localStorage vers tables SeaTable
-            tableMapping: {
-                'recettesRT': 'RECETTES',
-                'chargesRecurrentesRT': 'CHARGES RÉCURRENTES', 
-                'chargesPeriodiquesRT': 'CHARGES PÉRIODIQUES'
-            }
-        };
-
-        // =================================
-        // DÉTECTION AUTOMATIQUE MODULE
-        // =================================
-
-        class RTSyncDetector {
-            static detectModule() {
-                const url = window.location.pathname;
-                const title = document.title;
-                
-                if (url.includes('recettes') || title.includes('Recettes')) {
-                    return { type: 'recettes', storageKey: 'recettesRT', table: 'RECETTES' };
-                }
-                if (url.includes('charges') && url.includes('crud')) {
-                    return { type: 'charges_rec', storageKey: 'chargesRecurrentesRT', table: 'CHARGES RÉCURRENTES' };
-                }
-                if (url.includes('periodiques')) {
-                    return { type: 'charges_per', storageKey: 'chargesPeriodiquesRT', table: 'CHARGES PÉRIODIQUES' };
-                }
-                if (url.includes('analytics')) {
-                    return { type: 'analytics', storageKey: null, table: null };
-                }
-                if (url.includes('previsionnel')) {
-                    return { type: 'previsionnel', storageKey: 'previsionnel12moisRT', table: 'PRÉVISIONNEL' };
-                }
-                
-                return { type: 'unknown', storageKey: null, table: null };
-            }
-        }
-
-        // =================================
-        // CLASSE SYNCHRONISATION HYBRIDE
-        // =================================
-
-        class RTHybridSync {
-            constructor() {
-                this.module = RTSyncDetector.detectModule();
-                this.isOnline = navigator.onLine;
-                this.syncStatus = 'idle';
-                this.lastSync = this.getLastSyncTime();
-                this.pendingChanges = 0;
-                this.indicator = null;
-                
-                console.log(`[RT-Sync] Initialisation module : ${this.module.type}`);
-                
-                this.init();
-            }
-            
-            init() {
-                this.createSyncIndicator();
-                this.setupNetworkListeners();
-                
-                if (this.module.storageKey) {
-                    this.setupChangeListener();
-                    this.detectPendingChanges();
-                }
-            }
-            
-            // =================================
-            // INDICATEUR VISUEL
-            // =================================
-            
-            createSyncIndicator() {
-                const indicator = document.createElement('div');
-                indicator.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    width: 12px;
-                    height: 12px;
-                    border-radius: 50%;
-                    background: #6c757d;
-                    cursor: pointer;
-                    z-index: 10000;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                    transition: all 0.3s ease;
-                `;
-                indicator.title = 'Synchronisation Multi-Utilisateurs';
-                
-                // Effet hover
-                indicator.addEventListener('mouseenter', () => {
-                    indicator.style.transform = 'scale(1.3)';
-                });
-                
-                indicator.addEventListener('mouseleave', () => {
-                    indicator.style.transform = 'scale(1)';
-                });
-                
-                // Click pour ouvrir interface de synchronisation
-                indicator.addEventListener('click', () => {
-                    this.showSyncDetails();
-                });
-                
-                document.body.appendChild(indicator);
-                this.indicator = indicator;
-                
-                this.updateSyncStatus('idle');
-            }
-            
-            updateSyncStatus(status) {
-                this.syncStatus = status;
-                
-                if (!this.indicator) return;
-                
-                const colors = {
-                    'idle': '#6c757d',
-                    'synced': '#28a745', 
-                    'pending': '#ffc107',
-                    'syncing': '#007bff',
-                    'offline': '#dc3545',
-                    'error': '#dc3545',
-                    'online': '#28a745'
-                };
-                
-                this.indicator.style.background = colors[status] || '#6c757d';
-                
-                // Animation pour les états actifs
-                if (status === 'syncing') {
-                    this.indicator.style.animation = 'pulse 1s infinite';
-                } else {
-                    this.indicator.style.animation = '';
-                }
-                
-                // Mettre à jour le tooltip
-                const messages = {
-                    'idle': 'Synchronisation en veille',
-                    'synced': `Recettes synchronisées (${this.formatLastSync()})`,
-                    'pending': `${this.pendingChanges} changements à synchroniser`,
-                    'syncing': 'Synchronisation en cours...',
-                    'offline': 'Mode local (hors ligne)',
-                    'error': 'Erreur de synchronisation',
-                    'online': 'Connexion rétablie'
-                };
-                
-                this.indicator.title = messages[status] || 'Synchronisation Multi-Utilisateurs';
-            }
-            
-            // =================================
-            // INTERFACE DÉTAILS SYNCHRONISATION
-            // =================================
-            
-            showSyncDetails() {
-                const data = this.getLocalData();
-                const lastModified = localStorage.getItem(`${this.module.storageKey}_lastModified`);
-                
-                const details = `
-SYNCHRONISATION MULTI-UTILISATEURS
-Module : ${this.module.type.toUpperCase()}
-
-📊 DONNÉES LOCALES :
-• ${data ? data.length : 0} recettes récurrentes
-• Dernière modification : ${lastModified ? new Date(lastModified).toLocaleString() : 'Inconnue'}
-
-🔄 ÉTAT SYNCHRONISATION :
-• Statut : ${this.syncStatus.toUpperCase()}
-• Dernière sync : ${this.formatLastSync()}
-• Changements en attente : ${this.pendingChanges}
-• Connexion : ${this.isOnline ? 'En ligne' : 'Hors ligne'}
-
-💡 MODE HYBRIDE :
-✅ Vos données restent fonctionnelles localement
-✅ Synchronisation manuelle sécurisée
-✅ Partage multi-utilisateurs via SeaTable
-✅ Aucun impact sur les performances
-
-Voulez-vous ouvrir l'interface de synchronisation complète ?
-                `;
-                
-                if (confirm(details)) {
-                    window.open('rocket_tower_sync_system.html', '_blank');
-                }
-            }
-            
-            // =================================
-            // GESTION RÉSEAU
-            // =================================
-            
-            setupNetworkListeners() {
-                window.addEventListener('online', () => {
-                    this.isOnline = true;
-                    this.updateSyncStatus('online');
-                    console.log('[RT-Sync] Connexion rétablie');
-                });
-                
-                window.addEventListener('offline', () => {
-                    this.isOnline = false;
-                    this.updateSyncStatus('offline');
-                    console.log('[RT-Sync] Mode hors ligne activé');
-                });
-            }
-            
-            setupChangeListener() {
-                if (!this.module.storageKey) return;
-                
-                // Surveillance des modifications localStorage
-                const originalSetItem = localStorage.setItem;
-                const self = this;
-                
-                localStorage.setItem = function(key, value) {
-                    if (key === self.module.storageKey || key === `${self.module.storageKey}_lastModified`) {
-                        if (key === self.module.storageKey) {
-                            self.pendingChanges++;
-                            self.updateSyncStatus('pending');
-                            console.log(`[RT-Sync] Modification détectée: ${key}`);
-                        }
-                    }
-                    return originalSetItem.apply(this, arguments);
-                };
-            }
-            
-            detectPendingChanges() {
-                if (!this.module.storageKey) return;
-                
-                const lastModified = localStorage.getItem(`${this.module.storageKey}_lastModified`);
-                if (lastModified && (!this.lastSync || new Date(lastModified) > this.lastSync)) {
-                    this.pendingChanges = 1;
-                    this.updateSyncStatus('pending');
-                }
-            }
-            
-            // =================================
-            // SYNCHRONISATION EFFECTIVE
-            // =================================
-            
-            async performSync() {
-                if (!this.isOnline) {
-                    console.log('[RT-Sync] Synchronisation impossible : hors ligne');
-                    return false;
-                }
-                
-                this.updateSyncStatus('syncing');
-                
-                try {
-                    console.log('[RT-Sync] Démarrage synchronisation...');
-                    
-                    // Test connexion SeaTable
-                    const connected = await this.testSeaTableConnection();
-                    
-                    if (connected) {
-                        // Export données locales (simulation car API /rows/ non fonctionnelle)
-                        await this.exportToSeaTable();
-                        
-                        // Marquer comme synchronisé
-                        this.lastSync = new Date();
-                        localStorage.setItem(`${this.module.storageKey}_lastSync`, this.lastSync.toISOString());
-                        this.pendingChanges = 0;
-                        
-                        this.updateSyncStatus('synced');
-                        console.log('[RT-Sync] Synchronisation réussie');
-                        
-                        return true;
-                    } else {
-                        throw new Error('Connexion SeaTable échouée');
-                    }
-                    
-                } catch (error) {
-                    console.error('[RT-Sync] Erreur synchronisation:', error);
-                    this.updateSyncStatus('error');
-                    return false;
-                }
-            }
-            
-            async testSeaTableConnection() {
-                try {
-                    const response = await fetch(`${RT_SYNC_CONFIG.seatable.baseUrl}/api/v2.1/dtables/${RT_SYNC_CONFIG.seatable.dtableUuid}/metadata/`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Token ${RT_SYNC_CONFIG.seatable.apiToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    return response.ok;
-                } catch (error) {
-                    return false;
-                }
-            }
-            
-            async exportToSeaTable() {
-                const data = this.getLocalData();
-                console.log(`[RT-Sync] Simulation export ${data.length} enregistrements vers ${this.module.table}`);
-                
-                // Simulation délai réseau
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // Ici on implémenterait :
-                // 1. Génération CSV avec extracteurs Phase 1
-                // 2. Upload via interface SeaTable
-                // 3. Vérification import réussi
-                
-                return true;
-            }
-            
-            // =================================
-            // UTILITAIRES
-            // =================================
-            
-            getLocalData() {
-                try {
-                    const data = localStorage.getItem(this.module.storageKey);
-                    return data ? JSON.parse(data) : [];
-                } catch (error) {
-                    return [];
-                }
-            }
-            
-            getLastSyncTime() {
-                const stored = localStorage.getItem(`${this.module.storageKey}_lastSync`);
-                return stored ? new Date(stored) : null;
-            }
-            
-            formatLastSync() {
-                if (!this.lastSync) return 'Jamais';
-                
-                const now = new Date();
-                const diff = now - this.lastSync;
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                
-                if (hours < 1) return 'Il y a moins d\'1h';
-                if (hours < 24) return `Il y a ${hours}h`;
-                
-                const days = Math.floor(hours / 24);
-                return `Il y a ${days} jour${days > 1 ? 's' : ''}`;
-            }
-            
-            startPeriodicSync() {
-                setInterval(() => {
-                    if (this.pendingChanges > 0 && this.isOnline) {
-                        this.performSync();
-                    }
-                }, RT_SYNC_CONFIG.syncInterval);
-            }
-            
-            // =================================
-            // API PUBLIQUE
-            // =================================
-            
-            // Méthodes utilisables depuis les modules existants
-            manualSync() {
-                return this.performSync();
-            }
-            
-            getPendingChanges() {
-                return this.pendingChanges;
-            }
-            
-            getSyncStatus() {
-                return {
-                    status: this.syncStatus,
-                    lastSync: this.lastSync,
-                    pending: this.pendingChanges,
-                    online: this.isOnline,
-                    module: this.module.type
-                };
-            }
-        }
-
-        // =================================
-        // INITIALISATION AUTOMATIQUE
-        // =================================
-
-        // Démarrer la synchronisation hybride dès que le DOM est prêt
-        document.addEventListener('DOMContentLoaded', () => {
-            // Vérifier que nous ne sommes pas dans l'interface de synchronisation elle-même
-            if (!window.location.pathname.includes('sync_system')) {
-                window.rtSync = new RTHybridSync();
-                
-                // Exposer l'API globalement pour debug/test
-                window.RTSync = {
-                    sync: () => window.rtSync.manualSync(),
-                    status: () => window.rtSync.getSyncStatus(),
-                    pending: () => window.rtSync.getPendingChanges()
-                };
-                
-                console.log('[RT-Sync] Synchronisation hybride initialisée - Module Recettes');
-                console.log('[RT-Sync] Utilisez RTSync.status() pour vérifier l\'état');
+        // Fermeture modal en cliquant à l'extérieur
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('recetteModal')) {
+                fermerModal();
             }
         });
     </script>
