@@ -838,8 +838,11 @@
         }
 
         function appliquerFiltres() {
+            console.log('🔍 DEBUG: appliquerFiltres() appelée');
             afficherCharges();
+            console.log('🔍 DEBUG: Avant mettreAJourStats()');
             mettreAJourStats();
+            console.log('🔍 DEBUG: Après mettreAJourStats()');
         }
 
         function calculerMontantLisse(charge) {
@@ -911,6 +914,9 @@
             const totalMontantHT = chargesFiltrees.reduce((sum, c) => sum + Math.abs(c.montantHT), 0);
             const totalMontantLisse = chargesFiltrees.reduce((sum, c) => sum + calculerMontantLisse(c), 0);
             const totalActifs = chargesFiltrees.filter(c => c.statut === 'ACTIF').length;
+
+            // 🔍 DEBUG - À supprimer après correction
+            console.log(`📊 DEBUG Stats: Filtre=${filtreStatut}, Charges=${totalCharges}, HT=${Math.round(totalMontantHT)}, Lissé=${Math.round(totalMontantLisse)}`);
 
             document.getElementById('totalCharges').textContent = totalCharges;
             document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
