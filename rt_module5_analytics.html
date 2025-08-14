@@ -327,7 +327,7 @@
                 </div>
                 <div class="stat-card negative">
                     <h3 id="totalChargesLissees">0€</h3>
-                    <p>Charges Récurrentes HT Lissées</p>
+                    <p>Charges Récurrentes HT Lissées charges inactives exclues</p>
                 </div>
                 <div class="stat-card highlight">
                     <h3 id="resultatMensuel">0€</h3>
@@ -422,7 +422,6 @@
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Initialisation Analytics Dashboard CORRIGÉ');
             chargerDonneesLocalStorage();
             calculerAnalytics();
             afficherAnalytics();
@@ -430,7 +429,7 @@
         });
 
         function chargerDonneesLocalStorage() {
-            console.log('📊 === CHARGEMENT DONNÉES ANALYTICS CORRIGÉ v2 ===');
+            console.log('📊 === CHARGEMENT DONNÉES ANALYTICS FINAL ===');
             
             try {
                 // Lecture Module 2 (Recettes)
@@ -444,17 +443,15 @@
                     console.warn('⚠️ Aucune donnée recettes trouvée');
                 }
 
-                // Lecture Module 3 (Charges récurrentes) - CORRECTION DÉFINITIVE
+                // Lecture Module 3 (Charges récurrentes) - TOUTES pour cohérence avec Module 3
                 const chargesJSON = localStorage.getItem('chargesRecurrentesRT');
                 if (chargesJSON) {
                     const toutesCharges = JSON.parse(chargesJSON);
                     
-                    // 🔧 CORRECTION DÉFINITIVE : Filtrer EXACTEMENT comme le Module 3
-                    // Ne prendre QUE les charges ACTIVES pour les calculs financiers
+                    // 🔧 CORRECTION FINALE : Ne prendre QUE les charges ACTIVES pour le calcul lissé
                     chargesData = toutesCharges.filter(c => c.statut === 'ACTIF');
                     
-                    console.log(`✅ Charges chargées: ${chargesData.length} actives sur ${toutesCharges.length} total`);
-                    console.log('🎯 Module 5 prend maintenant uniquement les charges ACTIVES comme prévu');
+                    console.log(`✅ Charges chargées: ${chargesData.length} actives sur ${toutesCharges.length} total (ACTIVES seulement pour lissage)`);
                     
                 } else {
                     chargesData = [];
@@ -463,7 +460,7 @@
 
                 // Mise à jour info sources
                 document.getElementById('infoSources').textContent = 
-                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges actives • Données cohérentes`;
+                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges actives • Total Lissé = charges actives uniquement`;
 
             } catch (error) {
                 console.error('❌ Erreur chargement localStorage:', error);
@@ -488,14 +485,12 @@
         }
 
         function calculerAnalytics() {
-            console.log('🧮 === CALCUL ANALYTICS CORRIGÉ v2 ===');
-            
-            // Calculs de base avec montants lissés - MÉTHODE IDENTIQUE Module 3
+            // Calculs de base avec montants lissés - charges ACTIVES seulement
             analytics.totalRecettesLissees = recettesData.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
 
-            // 🔧 CORRECTION DÉFINITIVE : Calcul charges identique au Module 3
+            // Calcul charges ACTIVES lissées (cohérent avec Module 3)
             analytics.totalChargesLissees = chargesData.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
@@ -515,14 +510,6 @@
             // Équilibre financier
             analytics.equilibreFinancier = analytics.resultatMensuel >= 0 ? 'ATTEINT' : 
                 (Math.abs(analytics.resultatMensuel) / analytics.totalRecettesLissees > 0.1 ? 'CRITIQUE' : 'ALERTE');
-
-            // Log des résultats pour vérification
-            console.log('📊 Résultats Analytics CORRIGÉS:');
-            console.log(`  Recettes lissées: ${Math.round(analytics.totalRecettesLissees)}€`);
-            console.log(`  Charges lissées: ${Math.round(analytics.totalChargesLissees)}€ (ACTIVES uniquement)`);
-            console.log(`  Résultat mensuel: ${Math.round(analytics.resultatMensuel)}€`);
-            console.log(`  Ratio charges/recettes: ${Math.round(analytics.ratioChargesRecettes)}%`);
-            console.log('✅ Module 5 est maintenant cohérent avec Module 3');
         }
 
         function afficherAnalytics() {
@@ -613,7 +600,6 @@
         }
 
         function actualiserDonnees() {
-            console.log('🔄 Actualisation des données corrigées...');
             chargerDonneesLocalStorage();
             calculerAnalytics();
             afficherAnalytics();
