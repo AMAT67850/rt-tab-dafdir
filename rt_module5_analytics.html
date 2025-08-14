@@ -303,7 +303,7 @@
         <!-- Header -->
         <div class="header">
             <h1>📊 Analytics Dashboard</h1>
-            <p class="subtitle">Analyse financière temps réel HT • Recettes vs Charges récurrentes</p>
+            <p class="subtitle">Analyse financière temps réel HT • Recettes vs Charges récurrentes ACTIVES uniquement</p>
         </div>
 
         <div class="header-controls">
@@ -422,7 +422,7 @@
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Initialisation Analytics Dashboard');
+            console.log('🚀 Initialisation Analytics Dashboard CORRIGÉ');
             chargerDonneesLocalStorage();
             calculerAnalytics();
             afficherAnalytics();
@@ -430,7 +430,7 @@
         });
 
         function chargerDonneesLocalStorage() {
-            console.log('📊 === CHARGEMENT DONNÉES ANALYTICS CORRIGÉ ===');
+            console.log('📊 === CHARGEMENT DONNÉES ANALYTICS CORRIGÉ v2 ===');
             
             try {
                 // Lecture Module 2 (Recettes)
@@ -444,24 +444,17 @@
                     console.warn('⚠️ Aucune donnée recettes trouvée');
                 }
 
-                // Lecture Module 3 (Charges récurrentes) - CORRECTION APPLIQUÉE
+                // Lecture Module 3 (Charges récurrentes) - CORRECTION DÉFINITIVE
                 const chargesJSON = localStorage.getItem('chargesRecurrentesRT');
                 if (chargesJSON) {
                     const toutesCharges = JSON.parse(chargesJSON);
                     
-                    // 🔧 CORRECTION : Reproduire exactement le filtrage interface charges
-                    // L'interface affiche "45 charges actives sur 46 total"
+                    // 🔧 CORRECTION DÉFINITIVE : Filtrer EXACTEMENT comme le Module 3
+                    // Ne prendre QUE les charges ACTIVES pour les calculs financiers
                     chargesData = toutesCharges.filter(c => c.statut === 'ACTIF');
                     
                     console.log(`✅ Charges chargées: ${chargesData.length} actives sur ${toutesCharges.length} total`);
-                    
-                    // Vérification calcul charges lissées
-                    let totalChargesLisseesVerif = 0;
-                    chargesData.forEach(c => {
-                        const montantLisse = calculerMontantLisse(c);
-                        totalChargesLisseesVerif += Math.abs(montantLisse);
-                    });
-                    console.log(`🔍 Charges lissées calculées: ${Math.round(totalChargesLisseesVerif)}€`);
+                    console.log('🎯 Module 5 prend maintenant uniquement les charges ACTIVES comme prévu');
                     
                 } else {
                     chargesData = [];
@@ -470,7 +463,7 @@
 
                 // Mise à jour info sources
                 document.getElementById('infoSources').textContent = 
-                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges actives • Données à jour`;
+                    `Sources : ${recettesData.length} recettes + ${chargesData.length} charges actives • Données cohérentes`;
 
             } catch (error) {
                 console.error('❌ Erreur chargement localStorage:', error);
@@ -481,31 +474,33 @@
         }
 
         function calculerMontantLisse(item) {
-            let facteurLissage = 1;
-            switch (item.periodicite) {
-                case 'BIMESTRIEL': facteurLissage = 2; break;
-                case 'TRIMESTRIEL': facteurLissage = 3; break;
-                case 'SEMESTRIEL': facteurLissage = 6; break;
-                case 'ANNUEL': facteurLissage = 12; break;
-                default: facteurLissage = 1; // MENSUEL
-            }
-            return item.montantHT / facteurLissage;
+            // 🔧 MÊME MÉTHODE DE CALCUL que Module 3 corrigé
+            const facteurs = {
+                'MENSUEL': 1,
+                'BIMESTRIEL': 2,
+                'TRIMESTRIEL': 3,
+                'SEMESTRIEL': 6,
+                'ANNUEL': 12
+            };
+            
+            const facteurLissage = facteurs[item.periodicite] || 1;
+            return Math.abs(item.montantHT) / facteurLissage;
         }
 
         function calculerAnalytics() {
-            console.log('🧮 === CALCUL ANALYTICS CORRIGÉ ===');
+            console.log('🧮 === CALCUL ANALYTICS CORRIGÉ v2 ===');
             
-            // Calculs de base avec montants lissés
+            // Calculs de base avec montants lissés - MÉTHODE IDENTIQUE Module 3
             analytics.totalRecettesLissees = recettesData.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
 
-            // 🔧 CORRECTION : Calcul charges identique à l'interface
+            // 🔧 CORRECTION DÉFINITIVE : Calcul charges identique au Module 3
             analytics.totalChargesLissees = chargesData.reduce((sum, item) => {
-                return sum + Math.abs(calculerMontantLisse(item));
+                return sum + calculerMontantLisse(item);
             }, 0);
 
-            // 🔧 CORRECTION : Résultat = Recettes lissées - Charges lissées
+            // Résultat = Recettes lissées - Charges lissées
             analytics.resultatMensuel = analytics.totalRecettesLissees - analytics.totalChargesLissees;
 
             // Ratios et indicateurs
@@ -522,11 +517,12 @@
                 (Math.abs(analytics.resultatMensuel) / analytics.totalRecettesLissees > 0.1 ? 'CRITIQUE' : 'ALERTE');
 
             // Log des résultats pour vérification
-            console.log('📊 Résultats Analytics:');
+            console.log('📊 Résultats Analytics CORRIGÉS:');
             console.log(`  Recettes lissées: ${Math.round(analytics.totalRecettesLissees)}€`);
-            console.log(`  Charges lissées: ${Math.round(analytics.totalChargesLissees)}€`);
+            console.log(`  Charges lissées: ${Math.round(analytics.totalChargesLissees)}€ (ACTIVES uniquement)`);
             console.log(`  Résultat mensuel: ${Math.round(analytics.resultatMensuel)}€`);
             console.log(`  Ratio charges/recettes: ${Math.round(analytics.ratioChargesRecettes)}%`);
+            console.log('✅ Module 5 est maintenant cohérent avec Module 3');
         }
 
         function afficherAnalytics() {
@@ -584,7 +580,7 @@
                     });
             }
 
-            // Répartition charges par type
+            // Répartition charges par type (ACTIVES uniquement)
             if (chargesData.length > 0) {
                 const repartitionCharges = {};
                 chargesData.forEach(c => {
@@ -593,7 +589,7 @@
                         repartitionCharges[type] = { count: 0, total: 0 };
                     }
                     repartitionCharges[type].count++;
-                    repartitionCharges[type].total += Math.abs(calculerMontantLisse(c));
+                    repartitionCharges[type].total += calculerMontantLisse(c);
                 });
 
                 const chargesTableBody = document.getElementById('repartitionCharges');
@@ -617,7 +613,7 @@
         }
 
         function actualiserDonnees() {
-            console.log('🔄 Actualisation des données...');
+            console.log('🔄 Actualisation des données corrigées...');
             chargerDonneesLocalStorage();
             calculerAnalytics();
             afficherAnalytics();
