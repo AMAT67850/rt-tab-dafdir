@@ -970,14 +970,20 @@
                             <div class="detail-section">
                                 <h4>💸 Charges (${mois.detailCharges.length})</h4>
                                 <ul class="detail-list">
-                                    ${mois.detailCharges.map(c => `
+                                    ${mois.detailCharges.map((c, cIndex) => `
                                         <li>
                                             <span class="detail-label">
                                                 ${c.libelle}
                                                 ${c.type === 'specifique' ? ' 🎯' : ''}
                                                 ${c.periodicite ? ` (${c.periodicite})` : ''}
                                             </span>
-                                            <span class="detail-amount">${Math.round(c.montant).toLocaleString('fr-FR')}€</span>
+                                            <span class="detail-amount">
+                                                ${Math.round(c.montant).toLocaleString('fr-FR')}€
+                                                <span class="actions-ecriture">
+                                                    <button onclick="modifierEcriture('${mois.moisCle}', 'charge', ${cIndex})" class="btn-action" title="Modifier">✏️</button>
+                                                    <button onclick="supprimerEcriture('${mois.moisCle}', 'charge', ${cIndex})" class="btn-action" title="Supprimer">🗑️</button>
+                                                </span>
+                                            </span>
                                         </li>
                                     `).join('')}
                                 </ul>
