@@ -880,7 +880,8 @@
                             <div class="accordion-summary">
                                 Recettes: ${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€ • 
                                 Charges: ${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€ • 
-                                <span style="color: ${soldeCouleur}">Solde: ${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€</span>
+                                <span style="color: ${mois.solde >= 0 ? '#28a745' : '#dc3545'}">Solde mensuel: ${Math.round(mois.solde).toLocaleString('fr-FR')}€</span> • 
+                                <span style="color: ${soldeCouleur}">Solde cumulé: ${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€</span>
                             </div>
                         </div>
                         <div class="accordion-icon">▼</div>
@@ -926,7 +927,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="total-row" style="background: ${soldeCouleur}; color: white; margin-top: 20px;">
+                        <div class="total-row" style="background: ${mois.solde >= 0 ? '#28a745' : '#dc3545'}; color: white; margin-top: 20px;">
+                            <span>Résultat Mensuel</span>
+                            <span>${Math.round(mois.solde).toLocaleString('fr-FR')}€</span>
+                        </div>
+                        <div class="total-row" style="background: ${soldeCouleur}; color: white; margin-top: 10px;">
                             <span>Solde Cumulé ${mois.mois}</span>
                             <span>${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€</span>
                         </div>
