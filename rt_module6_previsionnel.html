@@ -380,8 +380,14 @@
                 color: #666;
             }
             
-            .accordion-content {
+            /* Mode détaillé : afficher tous les contenus */
+            .export-detaille .accordion-content {
                 display: block !important;
+            }
+            
+            /* Mode compact : masquer les contenus d'accordéon */
+            .export-compact .accordion-content {
+                display: none !important;
             }
             
             .accordion-header {
@@ -576,9 +582,6 @@
                 <div class="controls">
                     <button onclick="calculerPrevisionnel()" class="btn btn-primary">
                         🔄 Calculer Prévisionnel
-                    </button>
-                    <button onclick="ouvrirModalOperation()" class="btn btn-success">
-                        ➕ Ajouter Opération
                     </button>
                     <button onclick="exporterPDF(false)" class="btn btn-warning">
                         📄 Export PDF Compact
@@ -1170,7 +1173,16 @@
         // ===============================================
 
         function ouvrirModalOverrideRecurrent(moisCle, type, element = null) {
-            const modal = document.getElementById('modalOverride');
+            // Supprimer toute modal existante
+            const existingModal = document.getElementById('modalOverride');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            const modal = document.createElement('div');
+            modal.id = 'modalOverride';
+            modal.className = 'modal';
+            
             const isModification = element !== null;
             
             const titre = isModification ? 
@@ -1193,8 +1205,8 @@
                                 <label>Action</label>
                                 <select id="overrideAction" onchange="toggleOverrideFields()" required>
                                     <option value="">Choisir une action...</option>
-                                    <option value="supprimer">🗑️ Supprimer ce mois uniquement</option>
-                                    <option value="modifier">✏️ Modifier montant ce mois</option>
+                                    ${isModification ? '<option value="supprimer">🗑️ Supprimer ce mois uniquement</option>' : ''}
+                                    ${isModification ? '<option value="modifier">✏️ Modifier montant ce mois</option>' : ''}
                                     <option value="ajouter">➕ Ajouter ${type} temporaire</option>
                                     ${isModification ? '<option value="suspendre">⏸️ Suspendre temporairement</option>' : ''}
                                 </select>
@@ -1239,7 +1251,7 @@
                                 <button type="button" onclick="fermerModalOverride()" class="btn btn-secondary">
                                     Annuler
                                 </button>
-                                <button type="submit" class="btn btn-primary" id="btnAppliquerOverride">
+                                <button type="submit" class="btn btn-primary" id="btnAppliquerOverride" disabled>
                                     Appliquer Override
                                 </button>
                             </div>
@@ -1250,6 +1262,12 @@
             
             document.body.appendChild(modal);
             modal.style.display = 'block';
+            
+            // Pré-sélectionner "ajouter" si pas de modification
+            if (!isModification) {
+                document.getElementById('overrideAction').value = 'ajouter';
+                toggleOverrideFields();
+            }
         }
 
         function fermerModalOverride() {
@@ -1632,16 +1650,21 @@
             document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
             document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
             
+            // Supprimer les classes précédentes
+            document.body.classList.remove('export-compact', 'export-detaille');
+            
             // Gestion des accordéons selon le mode
             const accordeonHeaders = document.querySelectorAll('.accordion-header');
             const accordeonContents = document.querySelectorAll('.accordion-content');
             
             if (detaille) {
-                // Mode détaillé : ouvrir tous les accordéons
+                // Mode détaillé : ouvrir tous les accordéons et ajouter classe CSS
+                document.body.classList.add('export-detaille');
                 accordeonHeaders.forEach(header => header.classList.add('active'));
                 accordeonContents.forEach(content => content.classList.add('active'));
             } else {
-                // Mode compact : fermer tous les accordéons
+                // Mode compact : fermer tous les accordéons et ajouter classe CSS
+                document.body.classList.add('export-compact');
                 accordeonHeaders.forEach(header => header.classList.remove('active'));
                 accordeonContents.forEach(content => content.classList.remove('active'));
             }
@@ -1663,6 +1686,9 @@
                 setTimeout(() => {
                     window.print();
                 }, 500);
+            } else {
+                // Nettoyer les classes si annulé
+                document.body.classList.remove('export-compact', 'export-detaille');
             }
         }
 
