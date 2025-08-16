@@ -1173,7 +1173,7 @@
                         }
                     }
                 } else {
-                    // Pour les écritures récurrentes, créer un override temporaire
+                    // Pour les écritures récurrentes, créer ou mettre à jour un override temporaire
                     if (!window.overridesTemporaires) {
                         window.overridesTemporaires = {};
                     }
@@ -1181,16 +1181,29 @@
                         window.overridesTemporaires[moisCle] = { recettes: [], charges: [] };
                     }
                     
-                    window.overridesTemporaires[moisCle][type === 'recette' ? 'recettes' : 'charges'].push({
-                        index: index,
-                        libelle: ecriture.libelle,
-                        montantOriginal: ecriture.montant,
-                        nouveauMontant: montant
-                    });
+                    const overridesArray = window.overridesTemporaires[moisCle][type === 'recette' ? 'recettes' : 'charges'];
+                    
+                    // Chercher un override existant pour ce même index
+                    const overrideExistant = overridesArray.find(o => o.index === index);
+                    
+                    if (overrideExistant) {
+                        // Mettre à jour l'override existant
+                        overrideExistant.nouveauMontant = montant;
+                        console.log(`✏️ Override existant mis à jour: ${ecriture.libelle} = ${montant}€`);
+                    } else {
+                        // Créer un nouvel override
+                        overridesArray.push({
+                            index: index,
+                            libelle: ecriture.libelle,
+                            montantOriginal: ecriture.montant,
+                            nouveauMontant: montant
+                        });
+                        console.log(`✏️ Nouvel override créé: ${ecriture.libelle} = ${montant}€`);
+                    }
                 }
                 
                 calculerPrevisionnel();
-                console.log(`✏️ Écriture modifiée: ${ecriture.libelle} = ${montant}€`);
+                console.log(`✅ Écriture modifiée: ${ecriture.libelle} = ${montant}€`);
             }
         }
 
