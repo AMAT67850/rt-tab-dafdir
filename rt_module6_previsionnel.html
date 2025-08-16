@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔮 Prévisionnel 12 Mois • ROCKET TOWER</title>
+    <title>🚀 Module 6 - Prévisionnel 12 Mois (Corrigé)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -12,9 +13,8 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
             min-height: 100vh;
             padding: 20px;
         }
@@ -23,13 +23,14 @@
             max-width: 1400px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
         
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -38,13 +39,12 @@
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
-            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .subtitle {
-            font-size: 1.1em;
+            font-size: 1.2em;
             opacity: 0.9;
-            font-weight: 300;
         }
         
         .content {
@@ -52,50 +52,39 @@
         }
         
         .config-section {
-            background: white;
-            border-radius: 12px;
+            background: #f8f9fa;
+            border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .config-section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         
         .config-grid {
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            align-items: center;
-        }
-        
-        .form-group {
             margin-bottom: 20px;
         }
         
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .config-item label {
             font-weight: 600;
             color: #495057;
         }
         
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
+        .config-item input, .config-item select {
+            padding: 10px;
+            border: 2px solid #dee2e6;
             border-radius: 8px;
-            font-size: 14px;
-            background: white;
+            font-size: 16px;
             transition: border-color 0.3s ease;
         }
         
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        .config-item input:focus, .config-item select:focus {
             outline: none;
             border-color: #007bff;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
@@ -103,310 +92,307 @@
         
         .controls {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
-            align-items: center;
+            justify-content: flex-end;
         }
         
         .btn {
-            padding: 12px 20px;
+            padding: 12px 25px;
             border: none;
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
+            cursor: pointer;
             transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .btn-primary {
-            background: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: white;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
         }
         
         .btn-primary:hover {
-            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
         }
         
         .btn-success {
-            background: #28a745;
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
             color: white;
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
         }
         
         .btn-success:hover {
-            background: #1e7e34;
-        }
-        
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
         }
         
         .btn-warning {
-            background: #ffc107;
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
             color: #212529;
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
         }
         
         .btn-warning:hover {
-            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 193, 7, 0.4);
         }
-        
+
         .btn-info {
-            background: #17a2b8;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
             color: white;
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
         }
         
         .btn-info:hover {
-            background: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(23, 162, 184, 0.4);
         }
         
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #545b62;
+        .stats-section {
+            margin-bottom: 30px;
         }
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
         }
         
-        .stat-card {
-            background: white;
+        .stat-box {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
             padding: 25px;
-            border-radius: 12px;
+            border-radius: 15px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid #007bff;
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.2);
         }
         
-        .stat-card h3 {
-            font-size: 2em;
-            color: #2c3e50;
+        .stat-box.negative {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .stat-box.info {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
             margin-bottom: 10px;
-            font-weight: 700;
         }
         
-        .stat-card p {
-            color: #6c757d;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
         }
         
         .chart-section {
             background: white;
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
         .chart-section h2 {
-            color: #2c3e50;
+            color: #495057;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            text-align: center;
         }
         
         .chart-container {
             position: relative;
             height: 400px;
-            margin-top: 20px;
         }
         
-        /* Accordéons */
-        .accordion-item {
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+        .accordion {
+            margin-bottom: 20px;
         }
         
         .accordion-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
-            padding: 20px 25px;
+            padding: 20px;
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 600;
-            font-size: 16px;
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .accordion-header:hover {
-            background: linear-gradient(135deg, #0056b3, #004085);
+            background: linear-gradient(135deg, #5a6268 0%, #3d4142 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         .accordion-header.active {
-            background: linear-gradient(135deg, #28a745, #1e7e34);
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .accordion-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
         }
         
         .accordion-content {
             display: none;
-            padding: 25px;
-            background: #f8f9fa;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            overflow: hidden;
         }
         
         .accordion-content.active {
             display: block;
         }
         
-        .accordion-toggle {
-            font-size: 1.2em;
-            transition: transform 0.3s ease;
+        .accordion-body {
+            padding: 25px;
         }
         
-        .accordion-header.active .accordion-toggle {
-            transform: rotate(180deg);
-        }
-        
-        /* Détails mensuels */
-        .mois-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+        .modifications-appliquees {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
             margin-bottom: 20px;
         }
         
-        .stat-mini {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border-left: 4px solid #007bff;
+        .mois-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
         
-        .stat-mini.positive {
-            border-left-color: #28a745;
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
         }
         
-        .stat-mini.negative {
-            border-left-color: #dc3545;
-        }
-        
-        .stat-mini h4 {
-            font-size: 1.5em;
-            margin-bottom: 5px;
-            color: #2c3e50;
-        }
-        
-        .stat-mini p {
-            color: #6c757d;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .detail-section {
-            margin-top: 20px;
-        }
-        
-        .detail-section h4 {
-            color: #495057;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e9ecef;
-        }
-        
-        .detail-list {
-            list-style: none;
-            margin-bottom: 15px;
-        }
-        
-        .detail-item {
+        .ligne-detail {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
-            background: white;
-            margin-bottom: 5px;
-            border-radius: 6px;
-            border-left: 4px solid #e9ecef;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
         }
         
-        .detail-item.recette {
-            border-left-color: #28a745;
-            background: #f8fff9;
-        }
-        
-        .detail-item.charge {
-            border-left-color: #dc3545;
-            background: #fff8f8;
-        }
-        
-        .detail-item.operation {
-            border-left-color: #ffc107;
-            background: #fffdf7;
-        }
-        
-        .detail-libelle {
-            flex: 1;
-            font-weight: 500;
+        .ligne-detail:last-child {
+            border-bottom: none;
         }
         
         .detail-montant {
             font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .item-actions {
-            margin-left: 10px;
-            display: flex;
-            gap: 5px;
-        }
-        
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-        
-        .total-section {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border: 2px solid #e9ecef;
-        }
-        
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
             font-size: 1.1em;
-            color: #2c3e50;
         }
         
-        .solde-final {
-            background: #007bff;
-            color: white;
-            margin-top: 10px;
+        .detail-actions {
+            display: flex;
+            gap: 8px;
         }
         
-        .solde-final.deficit {
-            background: #dc3545;
+        .btn-xs {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+        
+        .section-total {
+            background: #e9ecef;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+        
+        .total-recettes {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .total-charges {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .solde-positif {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .solde-negatif {
+            background: #f5c6cb;
+            color: #721c24;
+        }
+        
+        /* Print Styles */
+        .print-info {
+            display: none;
+        }
+        
+        @media print {
+            body { 
+                background: white !important;
+                font-size: 12px;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: none;
+                margin: 0;
+            }
+            
+            .header {
+                background: #333 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .controls, .btn {
+                display: none !important;
+            }
+            
+            .print-info {
+                display: block;
+                text-align: center;
+                margin: 20px 0;
+                font-size: 11px;
+                color: #666;
+            }
+            
+            .accordion-content {
+                display: block !important;
+            }
+            
+            .accordion-header {
+                background: #f8f9fa !important;
+                color: #333 !important;
+                border: 1px solid #dee2e6;
+            }
+            
+            .chart-section {
+                page-break-inside: avoid;
+            }
         }
         
         /* Modal */
@@ -422,20 +408,26 @@
         }
         
         .modal-content {
-            background: white;
+            background-color: #fefefe;
             margin: 5% auto;
             padding: 0;
-            border-radius: 12px;
+            border-radius: 15px;
             width: 90%;
-            max-width: 600px;
+            max-width: 700px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
         .modal-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px 25px;
-            border-radius: 12px 12px 0 0;
+            border-radius: 15px 15px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -447,7 +439,6 @@
         }
         
         .close {
-            color: white;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
@@ -455,132 +446,153 @@
         }
         
         .close:hover {
-            opacity: 0.8;
+            opacity: 0.7;
         }
         
         .modal-body {
             padding: 25px;
         }
         
-        /* Print styles */
-        .print-info {
-            display: none;
-            text-align: center;
+        .form-group {
             margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
             border-radius: 8px;
-            font-size: 0.9em;
-            color: #6c757d;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
         }
         
-        @media print {
-            body {
-                background: white !important;
-                padding: 0;
-            }
-            
-            .container {
-                box-shadow: none !important;
-                margin: 0;
-                max-width: none;
-            }
-            
-            .config-section,
-            .btn,
-            .controls {
-                display: none !important;
-            }
-            
-            .print-info {
-                display: block !important;
-            }
-            
-            .accordion-content {
-                display: block !important;
-            }
-            
-            .chart-container {
-                height: 300px;
-            }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
         
+        /* Champs conditionnels */
+        #fieldsModification, #fieldsAjout {
+            border: 2px dashed #dee2e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
-                padding: 15px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
             }
             
             .config-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .controls {
                 justify-content: center;
             }
             
-            .btn {
-                flex: 1;
-                min-width: 120px;
-            }
-            
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
             
-            .mois-stats {
-                grid-template-columns: repeat(2, 1fr);
+            .mois-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .mois-actions .btn {
+                justify-content: center;
             }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>🔮 Prévisionnel 12 Mois</h1>
-            <p class="subtitle">Projection financière automatique • Recettes et Charges récurrentes HT • Système d'overrides temporaires</p>
+            <h1>🚀 ROCKET TOWER</h1>
+            <div class="subtitle">📊 Module 6 - Prévisionnel 12 Mois</div>
         </div>
-
+        
         <div class="content">
             <!-- Configuration -->
             <div class="config-section">
                 <h2>⚙️ Configuration</h2>
                 <div class="config-grid">
-                    <div>
-                        <div class="form-group">
-                            <label for="soldeInitial">Solde Initial (€)</label>
-                            <input type="number" id="soldeInitial" value="0" step="0.01">
-                        </div>
+                    <div class="config-item">
+                        <label for="soldeInitial">💰 Solde Initial (€)</label>
+                        <input type="number" id="soldeInitial" value="0" step="0.01" onchange="calculerPrevisionnel()">
                     </div>
-                    <div class="controls">
-                        <button onclick="calculerPrevisionnel()" class="btn btn-primary">🔄 Calculer Prévisionnel</button>
-                        <button onclick="ouvrirModalOperation()" class="btn btn-success">➕ Ajouter Opérations</button>
-                        <button onclick="exporterPDFComplet()" class="btn btn-danger">📄 Export PDF Complet</button>
-                        <button onclick="exporterPDFSynthese()" class="btn btn-warning">📋 Export PDF Synthèse</button>
-                        <a href="index.html" class="btn btn-secondary">🏠 Dashboard</a>
+                    <div class="config-item">
+                        <label for="moisDebut">📅 Mois de Début</label>
+                        <input type="month" id="moisDebut" onchange="calculerPrevisionnel()">
                     </div>
+                </div>
+                
+                <div class="controls">
+                    <button onclick="calculerPrevisionnel()" class="btn btn-primary">
+                        🔄 Calculer Prévisionnel
+                    </button>
+                    <button onclick="ouvrirModalOperation()" class="btn btn-success">
+                        ➕ Ajouter Opération
+                    </button>
+                    <button onclick="exporterPDF(false)" class="btn btn-warning">
+                        📄 Export PDF Compact
+                    </button>
+                    <button onclick="exporterPDF(true)" class="btn btn-info">
+                        📋 Export PDF Détaillé
+                    </button>
                 </div>
             </div>
 
-            <!-- Stats Résumé -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3 id="totalRecettes">0€</h3>
-                    <p>Total Recettes HT Annuel</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="totalCharges">0€</h3>
-                    <p>Total Charges HT Annuel</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="resultatAnnuel">0€</h3>
-                    <p>Résultat Prévisionnel HT</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="soldeFinal">0€</h3>
-                    <p>Solde Final Prévu</p>
+            <!-- Statistiques -->
+            <div class="stats-section">
+                <div class="stats-grid" id="statsContainer">
+                    <!-- Généré dynamiquement -->
                 </div>
             </div>
 
@@ -639,11 +651,15 @@
                     </div>
                     <div class="form-group">
                         <label>Commentaire (optionnel)</label>
-                        <textarea id="operationCommentaire" rows="3" placeholder="Informations complémentaires..."></textarea>
+                        <textarea id="operationCommentaire" rows="3"></textarea>
                     </div>
-                    <div style="text-align: right; margin-top: 20px;">
-                        <button type="button" onclick="fermerModal()" class="btn btn-secondary">Annuler</button>
-                        <button type="submit" class="btn btn-primary">Ajouter Opération</button>
+                    <div style="text-align: right; margin-top: 25px;">
+                        <button type="button" onclick="fermerModal()" class="btn btn-secondary">
+                            Annuler
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Ajouter Opération
+                        </button>
                     </div>
                 </form>
             </div>
@@ -652,126 +668,130 @@
 
     <!-- Modal Override -->
     <div id="modalOverride" class="modal">
-        <!-- Contenu généré dynamiquement -->
+        <!-- Généré dynamiquement -->
     </div>
 
     <script>
-        // ===================================
+        // ===============================================
         // VARIABLES GLOBALES
-        // ===================================
+        // ===============================================
         
+        let projectionMensuelle = [];
+        let chartInstance = null;
         let recettesData = [];
         let chargesData = [];
-        let chargesPeriodiquesData = [];
-        let projectionMensuelle = [];
         let operationsSpecifiques = {};
         let overridesRecurrents = {};
-        let chartInstance = null;
 
-        // ===================================
-        // CHARGEMENT DES DONNÉES
-        // ===================================
+        // ===============================================
+        // INITIALISATION
+        // ===============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser le mois de début (mois actuel)
+            const maintenant = new Date();
+            const moisActuel = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}`;
+            document.getElementById('moisDebut').value = moisActuel;
+            
+            chargerDonnees();
+            calculerPrevisionnel();
+            
+            console.log('✅ Module 6 - Prévisionnel initialisé avec succès');
+        });
 
         function chargerDonnees() {
             try {
-                // Recettes récurrentes (ACTIVES seulement)
-                const recettesJSON = localStorage.getItem('recettesRT');
-                if (recettesJSON) {
-                    const toutesRecettes = JSON.parse(recettesJSON);
-                    recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF');
-                    console.log(`✅ Recettes chargées: ${recettesData.length} actives sur ${toutesRecettes.length} total`);
-                } else {
-                    recettesData = [];
-                }
-
-                // Charges récurrentes (ACTIVES seulement)
-                const chargesJSON = localStorage.getItem('chargesRecurrentesRT');
-                if (chargesJSON) {
-                    const toutesCharges = JSON.parse(chargesJSON);
-                    chargesData = toutesCharges.filter(c => c.statut === 'ACTIF');
-                    console.log(`✅ Charges récurrentes chargées: ${chargesData.length} actives sur ${toutesCharges.length} total`);
-                } else {
-                    chargesData = [];
-                }
-
-                // Charges périodiques
-                const chargesPeriodiquesJSON = localStorage.getItem('chargesPeriodiquesRT');
-                if (chargesPeriodiquesJSON) {
-                    chargesPeriodiquesData = JSON.parse(chargesPeriodiquesJSON);
-                    console.log(`✅ Charges périodiques chargées: ${chargesPeriodiquesData.length}`);
-                } else {
-                    chargesPeriodiquesData = [];
-                }
-
-                // Opérations spécifiques
-                const operationsJSON = localStorage.getItem('previsionnel_operations');
-                if (operationsJSON) {
-                    operationsSpecifiques = JSON.parse(operationsJSON);
-                }
-
-                // Overrides recurrents
-                const overridesJSON = localStorage.getItem('previsionnel_overrides');
-                if (overridesJSON) {
-                    overridesRecurrents = JSON.parse(overridesJSON);
-                }
-
+                // Charger les recettes
+                const recettesStorage = localStorage.getItem('recettesRT');
+                recettesData = recettesStorage ? JSON.parse(recettesStorage) : [];
+                
+                // Charger les charges récurrentes
+                const chargesStorage = localStorage.getItem('chargesRecurrentesRT');
+                chargesData = chargesStorage ? JSON.parse(chargesStorage) : [];
+                
+                // Charger les opérations spécifiques
+                const operationsStorage = localStorage.getItem('operationsSpecifiquesRT');
+                operationsSpecifiques = operationsStorage ? JSON.parse(operationsStorage) : {};
+                
+                // Charger les overrides
+                const overridesStorage = localStorage.getItem('overridesRecurrentsRT');
+                overridesRecurrents = overridesStorage ? JSON.parse(overridesStorage) : {};
+                
+                console.log('✅ Données chargées:', {
+                    recettes: recettesData.length,
+                    charges: chargesData.length,
+                    operations: Object.keys(operationsSpecifiques).length,
+                    overrides: Object.keys(overridesRecurrents).length
+                });
+                
             } catch (error) {
                 console.error('❌ Erreur chargement données:', error);
-                recettesData = [];
-                chargesData = [];
-                chargesPeriodiquesData = [];
             }
         }
 
-        // ===================================
-        // CALCULS PRÉVISIONNELS
-        // ===================================
-
-        function doitApparaitreCeMois(item, dateMois) {
-            const moisActuel = dateMois.getMonth() + 1;
-            
-            // Gestion des mois spécifiques (ex: "1,4,7,10")
-            if (item.moisIntervention && 
-                item.moisIntervention.trim() && 
-                item.moisIntervention.trim().toLowerCase() !== 'tous') {
+        function sauvegarderToutesLesDonnees() {
+            try {
+                localStorage.setItem('operationsSpecifiquesRT', JSON.stringify(operationsSpecifiques));
+                localStorage.setItem('overridesRecurrentsRT', JSON.stringify(overridesRecurrents));
                 
-                const moisListe = item.moisIntervention.split(',').map(m => parseInt(m.trim())).filter(m => !isNaN(m));
-                return moisListe.includes(moisActuel);
+                console.log('✅ Données sauvegardées');
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde:', error);
             }
-            
-            // Gestion des périodicités standards
-            const periodicite = item.periodicite?.toUpperCase();
-            
-            switch (periodicite) {
-                case 'MENSUEL':
-                    return true;
-                    
-                case 'TRIMESTRIEL':
-                    return [1, 4, 7, 10].includes(moisActuel);
-                    
-                case 'SEMESTRIEL':
-                    return [1, 7].includes(moisActuel);
-                    
-                case 'ANNUEL':
-                    return moisActuel === 1; // Recettes annuelles uniquement en janvier (pas de lissage)
-                    
-                default:
-                    return true;
+        }
+
+        function sauvegarderPrevisionnel() {
+            try {
+                const donneesExport = {
+                    projectionMensuelle,
+                    dateCalcul: new Date().toISOString(),
+                    soldeInitial: parseFloat(document.getElementById('soldeInitial').value),
+                    moisDebut: document.getElementById('moisDebut').value
+                };
+                
+                localStorage.setItem('previsionnel12MoisRT', JSON.stringify(donneesExport));
+                console.log('✅ Prévisionnel sauvegardé');
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde prévisionnel:', error);
             }
+        }
+
+        // ===============================================
+        // LOGIQUE MÉTIER
+        // ===============================================
+
+        function doitApparaitreCeMois(element, dateMois) {
+            if (!element || !element.periodicite) return false;
+            
+            const periodicites = {
+                'MENSUEL': 1,
+                'BIMESTRIEL': 2,
+                'TRIMESTRIEL': 3,
+                'SEMESTRIEL': 6,
+                'ANNUEL': 12
+            };
+            
+            const periode = periodicites[element.periodicite];
+            if (!periode) return false;
+            
+            // Pour cette démo, on considère que les éléments récurrents apparaissent selon leur périodicité
+            const moisIndex = dateMois.getMonth();
+            return moisIndex % periode === 0;
         }
 
         function calculerPrevisionnel() {
-            console.log('🔮 === DÉBUT CALCUL PRÉVISIONNEL ===');
-            
-            const soldeInitial = parseFloat(document.getElementById('soldeInitial').value) || 0;
-            const dateDebut = new Date();
-            dateDebut.setDate(1); // Premier du mois
+            console.log('🔄 === DÉBUT CALCUL PRÉVISIONNEL AVEC OVERRIDES ===');
             
             projectionMensuelle = [];
+            const soldeInitial = parseFloat(document.getElementById('soldeInitial').value) || 0;
+            const moisDebut = document.getElementById('moisDebut').value;
             
-            console.log(`📅 Période: ${dateDebut.toLocaleDateString()} + 12 mois`);
-            console.log(`💰 Solde initial: ${soldeInitial}€`);
-            console.log(`📊 Sources: ${recettesData.length} recettes, ${chargesData.length} charges récurrentes, ${chargesPeriodiquesData.length} charges périodiques`);
+            if (!moisDebut) {
+                alert('Veuillez sélectionner un mois de début');
+                return;
+            }
+            
+            const dateDebut = new Date(moisDebut + '-01');
             
             for (let i = 0; i < 12; i++) {
                 const dateMois = new Date(dateDebut);
@@ -780,139 +800,32 @@
                 const moisNom = dateMois.toLocaleDateString('fr-FR', { 
                     year: 'numeric', 
                     month: 'long' 
-                }).replace(' ', ' ');
+                });
                 
                 const moisCle = `${dateMois.getFullYear()}-${String(dateMois.getMonth() + 1).padStart(2, '0')}`;
                 
-                console.log(`\n📅 === ${moisNom.toUpperCase()} (${moisCle}) ===`);
+                const { totalRecettes, totalCharges, detailRecettes, detailCharges } = 
+                    calculerRecurrentsAvecOverrides(dateMois, moisCle);
                 
-                let totalRecettes = 0;
-                let totalCharges = 0;
-                let detailRecettes = [];
-                let detailCharges = [];
-                
-                // Recettes récurrentes avec overrides
-                recettesData.forEach(recette => {
-                    // Vérifier si supprimée par override
-                    const overrides = overridesRecurrents[moisCle];
-                    if (overrides?.recettes?.supprimees?.includes(recette.id.toString())) {
-                        return; // Skip cette recette pour ce mois
-                    }
-                    
-                    if (doitApparaitreCeMois(recette, dateMois)) {
-                        let montant = Math.abs(recette.montantHT || 0);
-                        
-                        // Appliquer modification par override si existe
-                        if (overrides?.recettes?.modifiees?.[recette.id]) {
-                            montant = Math.abs(overrides.recettes.modifiees[recette.id].montantHT || 0);
-                        }
-                        
-                        totalRecettes += montant;
+                // Ajouter opérations spécifiques
+                const operationsMois = operationsSpecifiques[moisCle] || [];
+                operationsMois.forEach(op => {
+                    if (op.type === 'recette') {
+                        totalRecettes += Math.abs(op.montant);
                         detailRecettes.push({
-                            id: recette.id,
-                            libelle: `${recette.client} - ${recette.libelle}`,
-                            montant: montant,
-                            type: 'recurrente',
-                            periodicite: recette.periodicite
+                            libelle: op.libelle + ' 🎯',
+                            montant: Math.abs(op.montant),
+                            type: 'specifique'
                         });
-                        console.log(`💰 Recette: ${recette.client} = ${montant}€ (${recette.periodicite})`);
+                    } else {
+                        totalCharges += Math.abs(op.montant);
+                        detailCharges.push({
+                            libelle: op.libelle + ' 🎯',
+                            montant: Math.abs(op.montant),
+                            type: 'specifique'
+                        });
                     }
                 });
-                
-                // Charges récurrentes avec overrides
-                chargesData.forEach(charge => {
-                    // Vérifier si supprimée par override
-                    const overrides = overridesRecurrents[moisCle];
-                    if (overrides?.charges?.supprimees?.includes(charge.id.toString())) {
-                        return; // Skip cette charge pour ce mois
-                    }
-                    
-                    if (doitApparaitreCeMois(charge, dateMois)) {
-                        let montant = Math.abs(charge.montantHT || 0);
-                        
-                        // Appliquer modification par override si existe
-                        if (overrides?.charges?.modifiees?.[charge.id]) {
-                            montant = Math.abs(overrides.charges.modifiees[charge.id].montantHT || 0);
-                        }
-                        
-                        totalCharges += montant;
-                        detailCharges.push({
-                            id: charge.id,
-                            libelle: charge.element,
-                            montant: montant,
-                            type: 'recurrente',
-                            periodicite: charge.periodicite
-                        });
-                        console.log(`💸 Charge: ${charge.element} = ${montant}€ (${charge.periodicite})`);
-                    }
-                });
-                
-                // Charges périodiques
-                chargesPeriodiquesData.forEach(charge => {
-                    if (doitApparaitreCeMois(charge, dateMois)) {
-                        const montant = Math.abs(charge.montantHT || 0);
-                        totalCharges += montant;
-                        detailCharges.push({
-                            id: charge.id,
-                            libelle: `${charge.element} (périodique)`,
-                            montant: montant,
-                            type: 'periodique',
-                            periodicite: charge.periodicite
-                        });
-                        console.log(`💸 Charge périodique: ${charge.element} = ${montant}€`);
-                    }
-                });
-                
-                // Ajouter les éléments temporaires des overrides
-                const overrides = overridesRecurrents[moisCle];
-                if (overrides?.recettes?.ajoutees) {
-                    overrides.recettes.ajoutees.forEach(item => {
-                        const montant = Math.abs(item.montantHT || 0);
-                        totalRecettes += montant;
-                        detailRecettes.push({
-                            id: item.id,
-                            libelle: item.libelle + ' (temporaire)',
-                            montant: montant,
-                            type: 'temporaire'
-                        });
-                    });
-                }
-                
-                if (overrides?.charges?.ajoutees) {
-                    overrides.charges.ajoutees.forEach(item => {
-                        const montant = Math.abs(item.montantHT || 0);
-                        totalCharges += montant;
-                        detailCharges.push({
-                            id: item.id,
-                            libelle: item.libelle + ' (temporaire)',
-                            montant: montant,
-                            type: 'temporaire'
-                        });
-                    });
-                }
-                
-                // Opérations spécifiques (ancien système)
-                if (operationsSpecifiques[moisCle]) {
-                    operationsSpecifiques[moisCle].forEach(op => {
-                        if (op.type === 'recette') {
-                            totalRecettes += Math.abs(op.montant);
-                            detailRecettes.push({
-                                id: op.id,
-                                libelle: op.libelle + ' 🎯',
-                                montant: Math.abs(op.montant),
-                                type: 'operation'
-                            });
-                        } else {
-                            totalCharges += Math.abs(op.montant);
-                            detailCharges.push({
-                                id: op.id,
-                                libelle: op.libelle + ' 🎯',
-                                montant: Math.abs(op.montant),
-                                type: 'operation'
-                            });
-                        }
-                    });
-                }
                 
                 const solde = totalRecettes - totalCharges;
                 const soldeCumule = i === 0 ? 
@@ -921,172 +834,618 @@
                 
                 projectionMensuelle.push({
                     mois: moisNom,
-                    moisCle: moisCle,
-                    totalRecettes: totalRecettes,
-                    totalCharges: totalCharges,
-                    solde: solde,
-                    soldeCumule: soldeCumule,
-                    detailRecettes: detailRecettes,
-                    detailCharges: detailCharges
+                    moisCle,
+                    totalRecettes,
+                    totalCharges,
+                    solde,
+                    soldeCumule,
+                    detailRecettes,
+                    detailCharges
                 });
-                
-                console.log(`📊 Résultat: +${Math.round(totalRecettes)}€ -${Math.round(totalCharges)}€ = ${Math.round(solde)}€ (cumulé: ${Math.round(soldeCumule)}€)`);
             }
             
-            afficherPrevisionnel();
-            mettreAJourStats();
-            dessinerGraphique();
+            afficherStats();
+            afficherAccordeons();
+            mettreAJourGraphique();
+            sauvegarderPrevisionnel();
             
-            console.log('✅ === FIN CALCUL PRÉVISIONNEL ===');
+            console.log('✅ === FIN CALCUL PRÉVISIONNEL AVEC OVERRIDES ===');
         }
 
-        // ===================================
-        // AFFICHAGE
-        // ===================================
+        function calculerRecurrentsAvecOverrides(dateMois, moisCle) {
+            let totalRecettes = 0;
+            let totalCharges = 0;
+            let detailRecettes = [];
+            let detailCharges = [];
+            
+            const overridesMois = overridesRecurrents[moisCle] || { recettes: {}, charges: {} };
+            
+            // Recettes avec overrides
+            recettesData.forEach(recette => {
+                if (doitApparaitreCeMois(recette, dateMois)) {
+                    const overrides = overridesMois.recettes || {};
+                    
+                    // Vérifier si supprimée ou suspendue ce mois
+                    if (overrides.supprimees?.includes(recette.id) || 
+                        overrides.suspendues?.includes(recette.id)) {
+                        return;
+                    }
+                    
+                    // Appliquer modification temporaire si existe
+                    let montant = Math.abs(recette.montantHT || 0);
+                    if (overrides.modifiees?.[recette.id]) {
+                        montant = Math.abs(overrides.modifiees[recette.id].montantHT);
+                    }
+                    
+                    totalRecettes += montant;
+                    detailRecettes.push({
+                        libelle: `${recette.client} - ${recette.element}${overrides.modifiees?.[recette.id] ? ' ✏️' : ''}`,
+                        montant: montant,
+                        type: 'recurrente',
+                        periodicite: recette.periodicite,
+                        id: recette.id
+                    });
+                }
+            });
+            
+            // Ajouter recettes temporaires
+            if (overridesMois.recettes?.ajoutees) {
+                overridesMois.recettes.ajoutees.forEach(recetteTemp => {
+                    totalRecettes += Math.abs(recetteTemp.montantHT);
+                    detailRecettes.push({
+                        libelle: recetteTemp.libelle + ' 🆕',
+                        montant: Math.abs(recetteTemp.montantHT),
+                        type: 'temporaire',
+                        id: recetteTemp.id
+                    });
+                });
+            }
+            
+            // Charges avec overrides
+            chargesData.forEach(charge => {
+                if (doitApparaitreCeMois(charge, dateMois)) {
+                    const overrides = overridesMois.charges || {};
+                    
+                    if (overrides.supprimees?.includes(charge.id) || 
+                        overrides.suspendues?.includes(charge.id)) {
+                        return;
+                    }
+                    
+                    let montant = Math.abs(charge.montantHT || 0);
+                    if (overrides.modifiees?.[charge.id]) {
+                        montant = Math.abs(overrides.modifiees[charge.id].montantHT);
+                    }
+                    
+                    totalCharges += montant;
+                    detailCharges.push({
+                        libelle: `${charge.element}${overrides.modifiees?.[charge.id] ? ' ✏️' : ''}`,
+                        montant: montant,
+                        type: 'recurrente',
+                        periodicite: charge.periodicite,
+                        id: charge.id
+                    });
+                }
+            });
+            
+            // Ajouter charges temporaires
+            if (overridesMois.charges?.ajoutees) {
+                overridesMois.charges.ajoutees.forEach(chargeTemp => {
+                    totalCharges += Math.abs(chargeTemp.montantHT);
+                    detailCharges.push({
+                        libelle: chargeTemp.libelle + ' 🆕',
+                        montant: Math.abs(chargeTemp.montantHT),
+                        type: 'temporaire',
+                        id: chargeTemp.id
+                    });
+                });
+            }
+            
+            return { totalRecettes, totalCharges, detailRecettes, detailCharges };
+        }
 
-        function afficherPrevisionnel() {
+        // ===============================================
+        // AFFICHAGE
+        // ===============================================
+
+        function afficherStats() {
+            if (projectionMensuelle.length === 0) return;
+            
+            const totalRecettes = projectionMensuelle.reduce((sum, mois) => sum + mois.totalRecettes, 0);
+            const totalCharges = projectionMensuelle.reduce((sum, mois) => sum + mois.totalCharges, 0);
+            const soldeTotal = totalRecettes - totalCharges;
+            const soldeFinal = projectionMensuelle[projectionMensuelle.length - 1].soldeCumule;
+            
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-number">${Math.round(totalRecettes).toLocaleString()}€</div>
+                    <div class="stat-label">💰 Total Recettes (12 mois)</div>
+                </div>
+                <div class="stat-box negative">
+                    <div class="stat-number">${Math.round(totalCharges).toLocaleString()}€</div>
+                    <div class="stat-label">💸 Total Charges (12 mois)</div>
+                </div>
+                <div class="stat-box ${soldeTotal >= 0 ? '' : 'negative'}">
+                    <div class="stat-number">${Math.round(soldeTotal).toLocaleString()}€</div>
+                    <div class="stat-label">📊 Solde Net (12 mois)</div>
+                </div>
+                <div class="stat-box ${soldeFinal >= 0 ? '' : 'negative'} info">
+                    <div class="stat-number">${Math.round(soldeFinal).toLocaleString()}€</div>
+                    <div class="stat-label">🎯 Solde Final Cumulé</div>
+                </div>
+            `;
+        }
+
+        function afficherAccordeons() {
             const container = document.getElementById('accordeonContainer');
             container.innerHTML = '';
             
             projectionMensuelle.forEach((mois, index) => {
-                const accordeonItem = document.createElement('div');
-                accordeonItem.className = 'accordion-item';
-                
                 const overrideCount = compterOverridesMois(mois.moisCle);
-                const overrideIndicator = overrideCount > 0 ? ` (${overrideCount} modifications)` : '';
+                const hasOverrides = overrideCount > 0;
                 
-                accordeonItem.innerHTML = `
-                    <div class="accordion-header" onclick="toggleAccordeon(this)">
+                const accordion = document.createElement('div');
+                accordion.className = 'accordion';
+                accordion.innerHTML = `
+                    <div class="accordion-header" onclick="toggleAccordeon(${index})">
                         <div>
-                            <strong>${mois.mois}</strong>${overrideIndicator}
-                            <span style="margin-left: 15px; font-size: 14px; opacity: 0.9;">
-                                Résultat: ${Math.round(mois.solde).toLocaleString('fr-FR')}€ | 
-                                Cumulé: ${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€
+                            <strong>${mois.mois}</strong>
+                            <span style="margin-left: 15px; opacity: 0.8;">
+                                📈 ${Math.round(mois.totalRecettes).toLocaleString()}€ 
+                                | 📉 ${Math.round(mois.totalCharges).toLocaleString()}€ 
+                                | 💰 ${Math.round(mois.solde).toLocaleString()}€
+                                ${hasOverrides ? `| ✏️ ${overrideCount} modif(s)` : ''}
                             </span>
                         </div>
-                        <span class="accordion-toggle">▼</span>
+                        <span class="accordion-icon">▼</span>
                     </div>
-                    
-                    <div class="accordion-content">
-                        <div class="mois-stats">
-                            <div class="stat-mini positive">
-                                <h4>${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€</h4>
-                                <p>💰 Recettes</p>
+                    <div class="accordion-content" id="accordion-${index}">
+                        <div class="accordion-body">
+                            ${genererSectionModifications(mois.moisCle)}
+                            
+                            <div class="mois-actions">
+                                <button onclick="ouvrirModalOverrideRecurrent('${mois.moisCle}', 'recette')" class="btn btn-sm btn-success">
+                                    ➕ Ajouter Recette
+                                </button>
+                                <button onclick="ouvrirModalOverrideRecurrent('${mois.moisCle}', 'charge')" class="btn btn-sm btn-warning">
+                                    ➕ Ajouter Charge
+                                </button>
+                                <button onclick="afficherOverridesMois('${mois.moisCle}')" class="btn btn-sm btn-info">
+                                    👁️ Voir Modifications
+                                </button>
+                                <button onclick="reinitialiserMois('${mois.moisCle}')" class="btn btn-sm btn-secondary">
+                                    🔄 Réinitialiser
+                                </button>
                             </div>
-                            <div class="stat-mini negative">
-                                <h4>${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€</h4>
-                                <p>💸 Charges</p>
-                            </div>
-                            <div class="stat-mini ${mois.solde >= 0 ? 'positive' : 'negative'}">
-                                <h4>${Math.round(mois.solde).toLocaleString('fr-FR')}€</h4>
-                                <p>🔄 Résultat</p>
-                            </div>
-                            <div class="stat-mini ${mois.soldeCumule >= 0 ? 'positive' : 'negative'}">
-                                <h4>${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€</h4>
-                                <p>📈 Cumulé</p>
-                            </div>
-                        </div>
-                        
-                        ${genererSectionModifications(mois.moisCle)}
-                        
-                        <div class="detail-section">
-                            <h4>💰 Détail des Recettes</h4>
-                            <ul class="detail-list">
-                                ${mois.detailRecettes.map(r => `
-                                    <li class="detail-item recette">
-                                        <span class="detail-libelle">
-                                            ${r.libelle}
-                                            ${r.periodicite ? ` <small>(${r.periodicite})</small>` : ''}
+                            
+                            <!-- Recettes -->
+                            <h4 style="color: #28a745; margin-top: 25px;">💰 Recettes</h4>
+                            ${mois.detailRecettes.map(recette => `
+                                <div class="ligne-detail">
+                                    <div>
+                                        <strong>${recette.libelle}</strong>
+                                        ${recette.periodicite ? `<span style="opacity: 0.7; margin-left: 10px;">(${recette.periodicite})</span>` : ''}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <span class="detail-montant" style="color: #28a745;">
+                                            +${Math.round(recette.montant).toLocaleString()}€
                                         </span>
-                                        <span class="detail-montant">
-                                            ${Math.round(r.montant).toLocaleString('fr-FR')}€
-                                        </span>
-                                        ${r.type === 'recurrente' ? `
-                                            <div class="item-actions">
-                                                <button onclick="modifierRecurrentCeMois('${mois.moisCle}', 'recette', '${r.id}')" 
-                                                        class="btn btn-info btn-sm" title="Modifier ce mois">✏️</button>
-                                                <button onclick="supprimerRecurrentCeMois('${mois.moisCle}', 'recette', '${r.id}')" 
-                                                        class="btn btn-danger btn-sm" title="Supprimer ce mois">🗑️</button>
-                                            </div>
-                                        ` : ''}
-                                        ${r.type === 'operation' ? `
-                                            <div class="item-actions">
-                                                <button onclick="modifierOperationSpecifique('${mois.moisCle}', '${r.id}')" 
-                                                        class="btn btn-info btn-sm" title="Modifier">✏️</button>
-                                                <button onclick="supprimerOperationSpecifique('${mois.moisCle}', '${r.id}')" 
-                                                        class="btn btn-danger btn-sm" title="Supprimer">🗑️</button>
-                                            </div>
-                                        ` : ''}
-                                    </li>
-                                `).join('')}
-                            </ul>
-                            <div class="total-section">
-                                <div class="total-row">
-                                    <span>💰 Total Recettes</span>
-                                    <span>${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€</span>
+                                        <div class="detail-actions">
+                                            ${recette.type === 'recurrente' ? `
+                                                <button onclick="modifierRecurrentCeMois('${mois.moisCle}', 'recette', '${recette.id}')" 
+                                                        class="btn btn-xs btn-warning">✏️</button>
+                                                <button onclick="supprimerRecurrentCeMois('${mois.moisCle}', 'recette', '${recette.id}')" 
+                                                        class="btn btn-xs btn-secondary">🗑️</button>
+                                            ` : recette.type === 'temporaire' ? `
+                                                <button onclick="modifierEcritureTemporaire('${mois.moisCle}', 'recette', '${recette.id}')" 
+                                                        class="btn btn-xs btn-warning">✏️</button>
+                                                <button onclick="supprimerEcritureTemporaire('${mois.moisCle}', 'recette', '${recette.id}')" 
+                                                        class="btn btn-xs btn-secondary">🗑️</button>
+                                            ` : ''}
+                                        </div>
+                                    </div>
                                 </div>
+                            `).join('')}
+                            
+                            <div class="section-total total-recettes">
+                                Total Recettes : +${Math.round(mois.totalRecettes).toLocaleString()}€
                             </div>
-                        </div>
-                        
-                        <div class="detail-section">
-                            <h4>💸 Détail des Charges</h4>
-                            <ul class="detail-list">
-                                ${mois.detailCharges.map(c => `
-                                    <li class="detail-item charge">
-                                        <span class="detail-libelle">
-                                            ${c.libelle}
-                                            ${c.periodicite ? ` <small>(${c.periodicite})</small>` : ''}
+                            
+                            <!-- Charges -->
+                            <h4 style="color: #dc3545; margin-top: 25px;">💸 Charges</h4>
+                            ${mois.detailCharges.map(charge => `
+                                <div class="ligne-detail">
+                                    <div>
+                                        <strong>${charge.libelle}</strong>
+                                        ${charge.periodicite ? `<span style="opacity: 0.7; margin-left: 10px;">(${charge.periodicite})</span>` : ''}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <span class="detail-montant" style="color: #dc3545;">
+                                            -${Math.round(charge.montant).toLocaleString()}€
                                         </span>
-                                        <span class="detail-montant">
-                                            ${Math.round(c.montant).toLocaleString('fr-FR')}€
-                                        </span>
-                                        ${c.type === 'recurrente' ? `
-                                            <div class="item-actions">
-                                                <button onclick="modifierRecurrentCeMois('${mois.moisCle}', 'charge', '${c.id}')" 
-                                                        class="btn btn-info btn-sm" title="Modifier ce mois">✏️</button>
-                                                <button onclick="supprimerRecurrentCeMois('${mois.moisCle}', 'charge', '${c.id}')" 
-                                                        class="btn btn-danger btn-sm" title="Supprimer ce mois">🗑️</button>
-                                            </div>
-                                        ` : ''}
-                                        ${c.type === 'operation' ? `
-                                            <div class="item-actions">
-                                                <button onclick="modifierOperationSpecifique('${mois.moisCle}', '${c.id}')" 
-                                                        class="btn btn-info btn-sm" title="Modifier">✏️</button>
-                                                <button onclick="supprimerOperationSpecifique('${mois.moisCle}', '${c.id}')" 
-                                                        class="btn btn-danger btn-sm" title="Supprimer">🗑️</button>
-                                            </div>
-                                        ` : ''}
-                                    </li>
-                                `).join('')}
-                            </ul>
-                            <div class="total-section">
-                                <div class="total-row">
-                                    <span>💸 Total Charges</span>
-                                    <span>${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€</span>
+                                        <div class="detail-actions">
+                                            ${charge.type === 'recurrente' ? `
+                                                <button onclick="modifierRecurrentCeMois('${mois.moisCle}', 'charge', '${charge.id}')" 
+                                                        class="btn btn-xs btn-warning">✏️</button>
+                                                <button onclick="supprimerRecurrentCeMois('${mois.moisCle}', 'charge', '${charge.id}')" 
+                                                        class="btn btn-xs btn-secondary">🗑️</button>
+                                            ` : charge.type === 'temporaire' ? `
+                                                <button onclick="modifierEcritureTemporaire('${mois.moisCle}', 'charge', '${charge.id}')" 
+                                                        class="btn btn-xs btn-warning">✏️</button>
+                                                <button onclick="supprimerEcritureTemporaire('${mois.moisCle}', 'charge', '${charge.id}')" 
+                                                        class="btn btn-xs btn-secondary">🗑️</button>
+                                            ` : ''}
+                                        </div>
+                                    </div>
                                 </div>
+                            `).join('')}
+                            
+                            <div class="section-total total-charges">
+                                Total Charges : -${Math.round(mois.totalCharges).toLocaleString()}€
                             </div>
-                        </div>
-                        
-                        <div class="total-section solde-final ${mois.solde < 0 ? 'deficit' : ''}">
-                            <div class="total-row">
-                                <span>📊 Solde ${mois.mois}</span>
-                                <span>${Math.round(mois.solde).toLocaleString('fr-FR')}€</span>
+                            
+                            <!-- Solde -->
+                            <div class="section-total ${mois.solde >= 0 ? 'solde-positif' : 'solde-negatif'}">
+                                <strong>Solde du Mois : ${mois.solde >= 0 ? '+' : ''}${Math.round(mois.solde).toLocaleString()}€</strong>
                             </div>
-                        </div>
-                        
-                        <div style="text-align: center; margin-top: 20px;">
-                            <button onclick="ajouterRecetteCeMois('${mois.moisCle}')" class="btn btn-success btn-sm">
-                                ➕ Recette temporaire
-                            </button>
-                            <button onclick="ajouterChargeCeMois('${mois.moisCle}')" class="btn btn-warning btn-sm">
-                                ➕ Charge temporaire
-                            </button>
+                            
+                            <div class="section-total ${mois.soldeCumule >= 0 ? 'solde-positif' : 'solde-negatif'}">
+                                <strong>Solde Cumulé : ${mois.soldeCumule >= 0 ? '+' : ''}${Math.round(mois.soldeCumule).toLocaleString()}€</strong>
+                            </div>
                         </div>
                     </div>
                 `;
                 
-                container.appendChild(accordeonItem);
+                container.appendChild(accordion);
             });
+        }
+
+        function toggleAccordeon(index) {
+            const header = document.querySelector(`#accordion-${index}`).previousElementSibling;
+            const content = document.getElementById(`accordion-${index}`);
+            
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        function mettreAJourGraphique() {
+            const ctx = document.getElementById('prevChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            const labels = projectionMensuelle.map(m => m.mois.split(' ')[0]);
+            const soldes = projectionMensuelle.map(m => m.soldeCumule);
+            
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Solde Cumulé (€)',
+                        data: soldes,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#007bff',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '€';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Solde : ' + context.parsed.y.toLocaleString() + '€';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===============================================
+        // GESTION DES MODALS ET OVERRIDES
+        // ===============================================
+
+        function ouvrirModalOverrideRecurrent(moisCle, type, element = null) {
+            const modal = document.getElementById('modalOverride');
+            const isModification = element !== null;
+            
+            const titre = isModification ? 
+                `Modifier ${element.libelle || element.client} - ${moisCle}` : 
+                `Ajouter ${type} temporaire - ${moisCle}`;
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${titre}</h2>
+                        <span class="close" onclick="fermerModalOverride()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formOverride">
+                            <input type="hidden" id="overrideMoisCle" value="${moisCle}">
+                            <input type="hidden" id="overrideType" value="${type}">
+                            <input type="hidden" id="overrideElementId" value="${element?.id || ''}">
+                            
+                            <div class="form-group">
+                                <label>Action</label>
+                                <select id="overrideAction" onchange="toggleOverrideFields()" required>
+                                    <option value="">Choisir une action...</option>
+                                    <option value="supprimer">🗑️ Supprimer ce mois uniquement</option>
+                                    <option value="modifier">✏️ Modifier montant ce mois</option>
+                                    <option value="ajouter">➕ Ajouter ${type} temporaire</option>
+                                    ${isModification ? '<option value="suspendre">⏸️ Suspendre temporairement</option>' : ''}
+                                </select>
+                            </div>
+                            
+                            <div id="fieldsModification" style="display: none;">
+                                <div class="form-group">
+                                    <label>Nouveau montant HT (€)</label>
+                                    <input type="number" id="overrideNouveauMontant" step="0.01" 
+                                           value="${Math.abs(element?.montantHT || 0)}" placeholder="0.00">
+                                </div>
+                            </div>
+                            
+                            <div id="fieldsAjout" style="display: none;">
+                                <div class="form-group">
+                                    <label>Libellé</label>
+                                    <input type="text" id="overrideLibelle" placeholder="Nom du client/charge">
+                                </div>
+                                <div class="form-group">
+                                    <label>Montant HT (€)</label>
+                                    <input type="number" id="overrideMontant" step="0.01" placeholder="0.00">
+                                </div>
+                                <div class="form-group">
+                                    <label>Durée</label>
+                                    <select id="overrideDuree">
+                                        <option value="1">Ce mois uniquement</option>
+                                        <option value="2">2 mois</option>
+                                        <option value="3">3 mois</option>
+                                        <option value="6">6 mois</option>
+                                        <option value="12">12 mois (permanent)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Commentaire</label>
+                                <textarea id="overrideCommentaire" rows="3" 
+                                          placeholder="Raison de cette modification..."></textarea>
+                            </div>
+                            
+                            <div style="text-align: right; margin-top: 25px;">
+                                <button type="button" onclick="fermerModalOverride()" class="btn btn-secondary">
+                                    Annuler
+                                </button>
+                                <button type="submit" class="btn btn-primary" id="btnAppliquerOverride">
+                                    Appliquer Override
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+        }
+
+        function fermerModalOverride() {
+            const modal = document.getElementById('modalOverride');
+            if (modal) {
+                modal.style.display = 'none';
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.parentNode.removeChild(modal);
+                    }
+                }, 300);
+            }
+        }
+
+        function toggleOverrideFields() {
+            const action = document.getElementById('overrideAction').value;
+            const btnAppliquer = document.getElementById('btnAppliquerOverride');
+            
+            document.getElementById('fieldsModification').style.display = 
+                action === 'modifier' ? 'block' : 'none';
+            document.getElementById('fieldsAjout').style.display = 
+                action === 'ajouter' ? 'block' : 'none';
+                
+            // Activer/désactiver le bouton selon l'action sélectionnée
+            btnAppliquer.disabled = !action;
+        }
+
+        function appliquerOverride(event) {
+            event.preventDefault();
+            
+            const moisCle = document.getElementById('overrideMoisCle').value;
+            const type = document.getElementById('overrideType').value;
+            const action = document.getElementById('overrideAction').value;
+            const elementId = document.getElementById('overrideElementId').value;
+            
+            // Validation
+            if (!action) {
+                alert('Veuillez sélectionner une action');
+                return;
+            }
+            
+            // Initialiser la structure si nécessaire
+            if (!overridesRecurrents[moisCle]) {
+                overridesRecurrents[moisCle] = { recettes: {}, charges: {} };
+            }
+            if (!overridesRecurrents[moisCle][type + 's']) {
+                overridesRecurrents[moisCle][type + 's'] = {
+                    supprimees: [],
+                    modifiees: {},
+                    ajoutees: [],
+                    suspendues: []
+                };
+            }
+            
+            const overrideSection = overridesRecurrents[moisCle][type + 's'];
+            
+            switch (action) {
+                case 'supprimer':
+                    if (!overrideSection.supprimees.includes(elementId)) {
+                        overrideSection.supprimees.push(elementId);
+                    }
+                    break;
+                    
+                case 'modifier':
+                    const nouveauMontant = parseFloat(document.getElementById('overrideNouveauMontant').value);
+                    if (isNaN(nouveauMontant)) {
+                        alert('Veuillez saisir un montant valide');
+                        return;
+                    }
+                    overrideSection.modifiees[elementId] = { montantHT: nouveauMontant };
+                    break;
+                    
+                case 'ajouter':
+                    const libelle = document.getElementById('overrideLibelle').value;
+                    const montant = parseFloat(document.getElementById('overrideMontant').value);
+                    const duree = parseInt(document.getElementById('overrideDuree').value);
+                    
+                    if (!libelle || isNaN(montant)) {
+                        alert('Veuillez saisir un libellé et un montant valides');
+                        return;
+                    }
+                    
+                    // Ajouter sur plusieurs mois si nécessaire
+                    for (let i = 0; i < duree; i++) {
+                        const dateMois = new Date(moisCle + '-01');
+                        dateMois.setMonth(dateMois.getMonth() + i);
+                        const cibleMoisCle = dateMois.toISOString().slice(0, 7);
+                        
+                        if (!overridesRecurrents[cibleMoisCle]) {
+                            overridesRecurrents[cibleMoisCle] = { recettes: {}, charges: {} };
+                        }
+                        if (!overridesRecurrents[cibleMoisCle][type + 's']) {
+                            overridesRecurrents[cibleMoisCle][type + 's'] = {
+                                supprimees: [], modifiees: {}, ajoutees: [], suspendues: []
+                            };
+                        }
+                        
+                        overridesRecurrents[cibleMoisCle][type + 's'].ajoutees.push({
+                            id: Date.now() + i,
+                            libelle: libelle,
+                            montantHT: type === 'recette' ? montant : -montant,
+                            temporaire: true,
+                            dureeInitiale: duree,
+                            commentaire: document.getElementById('overrideCommentaire').value
+                        });
+                    }
+                    break;
+                    
+                case 'suspendre':
+                    if (!overrideSection.suspendues.includes(elementId)) {
+                        overrideSection.suspendues.push(elementId);
+                    }
+                    break;
+            }
+            
+            // Sauvegarder et recalculer
+            sauvegarderToutesLesDonnees();
+            fermerModalOverride();
+            calculerPrevisionnel();
+            
+            console.log('✅ Override appliqué:', { moisCle, type, action });
+        }
+
+        // ===============================================
+        // NOUVELLES FONCTIONS POUR LES ÉCRITURES TEMPORAIRES
+        // ===============================================
+
+        function modifierEcritureTemporaire(moisCle, type, ecritureId) {
+            // Trouver l'écriture temporaire
+            const overrides = overridesRecurrents[moisCle];
+            if (!overrides || !overrides[type + 's']?.ajoutees) return;
+            
+            const ecriture = overrides[type + 's'].ajoutees.find(e => e.id == ecritureId);
+            if (!ecriture) return;
+            
+            const nouveauLibelle = prompt('Nouveau libellé:', ecriture.libelle);
+            if (nouveauLibelle === null) return;
+            
+            const nouveauMontant = prompt('Nouveau montant HT (€):', Math.abs(ecriture.montantHT));
+            if (nouveauMontant === null) return;
+            
+            const montantVal = parseFloat(nouveauMontant);
+            if (isNaN(montantVal)) {
+                alert('Montant invalide');
+                return;
+            }
+            
+            // Mettre à jour l'écriture
+            ecriture.libelle = nouveauLibelle;
+            ecriture.montantHT = type === 'recette' ? montantVal : -montantVal;
+            
+            sauvegarderToutesLesDonnees();
+            calculerPrevisionnel();
+            
+            console.log('✅ Écriture temporaire modifiée:', { moisCle, type, ecritureId });
+        }
+
+        function supprimerEcritureTemporaire(moisCle, type, ecritureId) {
+            if (!confirm('Supprimer cette écriture temporaire ?')) return;
+            
+            const overrides = overridesRecurrents[moisCle];
+            if (!overrides || !overrides[type + 's']?.ajoutees) return;
+            
+            const index = overrides[type + 's'].ajoutees.findIndex(e => e.id == ecritureId);
+            if (index === -1) return;
+            
+            overrides[type + 's'].ajoutees.splice(index, 1);
+            
+            sauvegarderToutesLesDonnees();
+            calculerPrevisionnel();
+            
+            console.log('✅ Écriture temporaire supprimée:', { moisCle, type, ecritureId });
+        }
+
+        // ===============================================
+        // FONCTIONS UTILITAIRES
+        // ===============================================
+
+        function compterOverridesMois(moisCle) {
+            const overrides = overridesRecurrents[moisCle];
+            if (!overrides) return 0;
+            
+            let count = 0;
+            if (overrides.recettes) {
+                count += (overrides.recettes.supprimees || []).length;
+                count += Object.keys(overrides.recettes.modifiees || {}).length;
+                count += (overrides.recettes.ajoutees || []).length;
+                count += (overrides.recettes.suspendues || []).length;
+            }
+            if (overrides.charges) {
+                count += (overrides.charges.supprimees || []).length;
+                count += Object.keys(overrides.charges.modifiees || {}).length;
+                count += (overrides.charges.ajoutees || []).length;
+                count += (overrides.charges.suspendues || []).length;
+            }
+            return count;
         }
 
         function genererSectionModifications(moisCle) {
@@ -1096,7 +1455,7 @@
             }
             
             let html = `
-                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <div class="modifications-appliquees">
                     <h5 style="color: #856404; margin-bottom: 10px;">✏️ Modifications Appliquées ce Mois</h5>
                     <div style="font-size: 0.9em; color: #856404;">
             `;
@@ -1135,428 +1494,105 @@
             return html;
         }
 
-        function compterOverridesMois(moisCle) {
-            const overrides = overridesRecurrents[moisCle];
-            if (!overrides) return 0;
-            
-            let count = 0;
-            if (overrides.recettes) {
-                count += (overrides.recettes.supprimees || []).length;
-                count += Object.keys(overrides.recettes.modifiees || {}).length;
-                count += (overrides.recettes.ajoutees || []).length;
-            }
-            if (overrides.charges) {
-                count += (overrides.charges.supprimees || []).length;
-                count += Object.keys(overrides.charges.modifiees || {}).length;
-                count += (overrides.charges.ajoutees || []).length;
-            }
-            return count;
-        }
-
-        function toggleAccordeon(header) {
-            const content = header.nextElementSibling;
-            const toggle = header.querySelector('.accordion-toggle');
-            
-            header.classList.toggle('active');
-            content.classList.toggle('active');
-            
-            if (content.classList.contains('active')) {
-                toggle.textContent = '▲';
-            } else {
-                toggle.textContent = '▼';
-            }
-        }
-
-        function mettreAJourStats() {
-            if (projectionMensuelle.length === 0) return;
-            
-            const totalRecettesAnnuel = projectionMensuelle.reduce((sum, m) => sum + m.totalRecettes, 0);
-            const totalChargesAnnuel = projectionMensuelle.reduce((sum, m) => sum + m.totalCharges, 0);
-            const resultatAnnuel = totalRecettesAnnuel - totalChargesAnnuel;
-            const soldeFinal = projectionMensuelle[projectionMensuelle.length - 1].soldeCumule;
-            
-            document.getElementById('totalRecettes').textContent = Math.round(totalRecettesAnnuel).toLocaleString('fr-FR') + '€';
-            document.getElementById('totalCharges').textContent = Math.round(totalChargesAnnuel).toLocaleString('fr-FR') + '€';
-            document.getElementById('resultatAnnuel').textContent = Math.round(resultatAnnuel).toLocaleString('fr-FR') + '€';
-            document.getElementById('soldeFinal').textContent = Math.round(soldeFinal).toLocaleString('fr-FR') + '€';
-        }
-
-        function dessinerGraphique() {
-            const ctx = document.getElementById('prevChart').getContext('2d');
-            
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
-            
-            if (projectionMensuelle.length === 0) return;
-            
-            const labels = projectionMensuelle.map(m => m.mois.split(' ')[1]); // Seulement le mois
-            const soldes = projectionMensuelle.map(m => m.soldeCumule);
-            
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Solde Cumulé',
-                        data: soldes,
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.3,
-                        pointBackgroundColor: '#007bff',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            ticks: {
-                                callback: function(value) {
-                                    return Math.round(value).toLocaleString('fr-FR') + '€';
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    elements: {
-                        point: {
-                            hoverRadius: 8
-                        }
-                    }
-                }
-            });
-        }
-
-        // ===================================
-        // GESTION DES OVERRIDES
-        // ===================================
-
         function modifierRecurrentCeMois(moisCle, type, elementId) {
+            // Trouver l'élément original
             const dataSource = type === 'recette' ? recettesData : chargesData;
-            const element = dataSource.find(item => item.id.toString() === elementId.toString());
+            const element = dataSource.find(item => item.id == elementId);
             
-            if (!element) {
-                alert('Élément non trouvé');
-                return;
+            if (element) {
+                ouvrirModalOverrideRecurrent(moisCle, type, element);
             }
-            
-            ouvrirModalOverride(moisCle, type, element, true);
         }
 
         function supprimerRecurrentCeMois(moisCle, type, elementId) {
-            if (!confirm('Supprimer cet élément pour ce mois uniquement ?')) return;
+            const confirmation = confirm(`Supprimer cet élément pour ${moisCle} uniquement ?\n\nCela n'affectera pas les autres mois.`);
             
-            if (!overridesRecurrents[moisCle]) {
-                overridesRecurrents[moisCle] = { recettes: {}, charges: {} };
-            }
-            if (!overridesRecurrents[moisCle][type + 's']) {
-                overridesRecurrents[moisCle][type + 's'] = {
-                    supprimees: [],
-                    modifiees: {},
-                    ajoutees: []
-                };
-            }
-            
-            const overrideSection = overridesRecurrents[moisCle][type + 's'];
-            if (!overrideSection.supprimees.includes(elementId.toString())) {
-                overrideSection.supprimees.push(elementId.toString());
-            }
-            
-            sauvegarderOverrides();
-            calculerPrevisionnel();
-        }
-
-        function ajouterRecetteCeMois(moisCle) {
-            ouvrirModalOverride(moisCle, 'recette', null, false);
-        }
-
-        function ajouterChargeCeMois(moisCle) {
-            ouvrirModalOverride(moisCle, 'charge', null, false);
-        }
-
-        function ouvrirModalOverride(moisCle, type, element, isModification) {
-            const modal = document.getElementById('modalOverride');
-            
-            const titre = isModification ? 
-                `Modifier ${element.libelle || element.client} - ${moisCle}` : 
-                `Ajouter ${type} temporaire - ${moisCle}`;
-            
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>${titre}</h2>
-                        <span class="close" onclick="fermerModalOverride()">&times;</span>
-                    </div>
-                    <div class="modal-body">
-                        <form id="formOverride">
-                            <input type="hidden" id="overrideMoisCle" value="${moisCle}">
-                            <input type="hidden" id="overrideType" value="${type}">
-                            <input type="hidden" id="overrideElementId" value="${element?.id || ''}">
-                            
-                            <div class="form-group">
-                                <label>Action</label>
-                                <select id="overrideAction" onchange="toggleOverrideFields()" required>
-                                    <option value="">Choisir une action...</option>
-                                    ${isModification ? '<option value="supprimer">🗑️ Supprimer ce mois uniquement</option>' : ''}
-                                    ${isModification ? '<option value="modifier">✏️ Modifier montant ce mois</option>' : ''}
-                                    <option value="ajouter">➕ Ajouter ${type} temporaire</option>
-                                </select>
-                            </div>
-                            
-                            <div id="fieldsModification" style="display: none;">
-                                <div class="form-group">
-                                    <label>Nouveau montant HT (€)</label>
-                                    <input type="number" id="overrideNouveauMontant" step="0.01" 
-                                           value="${Math.abs(element?.montantHT || 0)}" placeholder="0.00">
-                                </div>
-                            </div>
-                            
-                            <div id="fieldsAjout" style="display: none;">
-                                <div class="form-group">
-                                    <label>Libellé</label>
-                                    <input type="text" id="overrideLibelle" placeholder="Nom du client/charge">
-                                </div>
-                                <div class="form-group">
-                                    <label>Montant HT (€)</label>
-                                    <input type="number" id="overrideMontant" step="0.01" placeholder="0.00">
-                                </div>
-                                <div class="form-group">
-                                    <label>Durée</label>
-                                    <select id="overrideDuree">
-                                        <option value="1">Ce mois uniquement</option>
-                                        <option value="2">2 mois</option>
-                                        <option value="3">3 mois</option>
-                                        <option value="6">6 mois</option>
-                                        <option value="12">12 mois</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Commentaire</label>
-                                <textarea id="overrideCommentaire" rows="3" 
-                                          placeholder="Raison de cette modification..."></textarea>
-                            </div>
-                            
-                            <div style="text-align: right; margin-top: 25px;">
-                                <button type="button" onclick="fermerModalOverride()" class="btn btn-secondary">
-                                    Annuler
-                                </button>
-                                <button type="submit" class="btn btn-primary" id="btnAppliquerOverride" disabled>
-                                    Appliquer Override
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            modal.style.display = 'block';
-        }
-
-        function toggleOverrideFields() {
-            const action = document.getElementById('overrideAction').value;
-            const btnApply = document.getElementById('btnAppliquerOverride');
-            
-            document.getElementById('fieldsModification').style.display = 
-                action === 'modifier' ? 'block' : 'none';
-            document.getElementById('fieldsAjout').style.display = 
-                action === 'ajouter' ? 'block' : 'none';
-            
-            // CORRECTION 1: Activer le bouton quand une action est sélectionnée
-            btnApply.disabled = !action;
-        }
-
-        function appliquerOverride(event) {
-            event.preventDefault();
-            
-            const moisCle = document.getElementById('overrideMoisCle').value;
-            const type = document.getElementById('overrideType').value;
-            const action = document.getElementById('overrideAction').value;
-            const elementId = document.getElementById('overrideElementId').value;
-            
-            if (!action) {
-                alert('Veuillez sélectionner une action');
-                return;
-            }
-            
-            // Initialiser la structure si nécessaire
-            if (!overridesRecurrents[moisCle]) {
-                overridesRecurrents[moisCle] = { recettes: {}, charges: {} };
-            }
-            if (!overridesRecurrents[moisCle][type + 's']) {
-                overridesRecurrents[moisCle][type + 's'] = {
-                    supprimees: [],
-                    modifiees: {},
-                    ajoutees: []
-                };
-            }
-            
-            const overrideSection = overridesRecurrents[moisCle][type + 's'];
-            
-            switch (action) {
-                case 'supprimer':
-                    if (!overrideSection.supprimees.includes(elementId)) {
-                        overrideSection.supprimees.push(elementId);
-                    }
-                    break;
-                    
-                case 'modifier':
-                    const nouveauMontant = parseFloat(document.getElementById('overrideNouveauMontant').value);
-                    if (isNaN(nouveauMontant)) {
-                        alert('Veuillez saisir un montant valide');
-                        return;
-                    }
-                    overrideSection.modifiees[elementId] = { montantHT: nouveauMontant };
-                    break;
-                    
-                case 'ajouter':
-                    const libelle = document.getElementById('overrideLibelle').value.trim();
-                    const montant = parseFloat(document.getElementById('overrideMontant').value);
-                    const duree = parseInt(document.getElementById('overrideDuree').value);
-                    
-                    if (!libelle || isNaN(montant)) {
-                        alert('Veuillez remplir tous les champs obligatoires');
-                        return;
-                    }
-                    
-                    // Ajouter sur plusieurs mois si nécessaire
-                    for (let i = 0; i < duree; i++) {
-                        const targetDate = new Date(moisCle + '-01');
-                        targetDate.setMonth(targetDate.getMonth() + i);
-                        const targetMoisCle = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}`;
-                        
-                        if (!overridesRecurrents[targetMoisCle]) {
-                            overridesRecurrents[targetMoisCle] = { recettes: {}, charges: {} };
-                        }
-                        if (!overridesRecurrents[targetMoisCle][type + 's']) {
-                            overridesRecurrents[targetMoisCle][type + 's'] = {
-                                supprimees: [],
-                                modifiees: {},
-                                ajoutees: []
-                            };
-                        }
-                        
-                        overridesRecurrents[targetMoisCle][type + 's'].ajoutees.push({
-                            id: Date.now() + i,
-                            libelle: libelle,
-                            montantHT: montant,
-                            commentaire: document.getElementById('overrideCommentaire').value
-                        });
-                    }
-                    break;
-            }
-            
-            sauvegarderOverrides();
-            fermerModalOverride();
-            calculerPrevisionnel();
-            
-            console.log('✅ Override appliqué:', { moisCle, type, action, elementId });
-        }
-
-        function fermerModalOverride() {
-            const modal = document.getElementById('modalOverride');
-            if (modal) {
-                modal.style.display = 'none';
-                modal.innerHTML = '';
-            }
-        }
-
-        function sauvegarderOverrides() {
-            try {
-                localStorage.setItem('previsionnel_overrides', JSON.stringify(overridesRecurrents));
-                console.log('✅ Overrides sauvegardés');
-            } catch (error) {
-                console.error('❌ Erreur sauvegarde overrides:', error);
-            }
-        }
-
-        // ===================================
-        // GESTION DES OPÉRATIONS SPÉCIFIQUES
-        // ===================================
-
-        function modifierOperationSpecifique(moisCle, operationId) {
-            const operations = operationsSpecifiques[moisCle];
-            if (!operations) return;
-            
-            const operation = operations.find(op => op.id.toString() === operationId.toString());
-            if (!operation) {
-                alert('Opération non trouvée');
-                return;
-            }
-            
-            // Pré-remplir le formulaire avec les données existantes
-            document.getElementById('operationType').value = operation.type;
-            document.getElementById('operationMois').value = moisCle;
-            document.getElementById('operationLibelle').value = operation.libelle;
-            document.getElementById('operationMontant').value = operation.montant;
-            document.getElementById('operationCommentaire').value = operation.commentaire || '';
-            
-            // Supprimer l'ancienne opération
-            supprimerOperationSpecifique(moisCle, operationId, false);
-            
-            // Ouvrir le modal pour édition
-            ouvrirModalOperation();
-        }
-
-        function supprimerOperationSpecifique(moisCle, operationId, confirm = true) {
-            if (confirm && !window.confirm('Supprimer cette opération ?')) return;
-            
-            if (operationsSpecifiques[moisCle]) {
-                operationsSpecifiques[moisCle] = operationsSpecifiques[moisCle].filter(
-                    op => op.id.toString() !== operationId.toString()
-                );
-                
-                if (operationsSpecifiques[moisCle].length === 0) {
-                    delete operationsSpecifiques[moisCle];
+            if (confirmation) {
+                // Initialiser la structure si nécessaire
+                if (!overridesRecurrents[moisCle]) {
+                    overridesRecurrents[moisCle] = { recettes: {}, charges: {} };
+                }
+                if (!overridesRecurrents[moisCle][type + 's']) {
+                    overridesRecurrents[moisCle][type + 's'] = {
+                        supprimees: [], modifiees: {}, ajoutees: [], suspendues: []
+                    };
                 }
                 
-                sauvegarderOperations();
+                // Ajouter à la liste des supprimés
+                const suppressions = overridesRecurrents[moisCle][type + 's'].supprimees;
+                if (!suppressions.includes(elementId)) {
+                    suppressions.push(elementId);
+                }
+                
+                sauvegarderToutesLesDonnees();
                 calculerPrevisionnel();
                 
-                console.log('✅ Opération supprimée:', { moisCle, operationId });
+                console.log(`🗑️ ${type} ${elementId} supprimé pour ${moisCle}`);
             }
         }
 
-        function sauvegarderOperations() {
-            try {
-                localStorage.setItem('previsionnel_operations', JSON.stringify(operationsSpecifiques));
-                console.log('✅ Opérations sauvegardées');
-            } catch (error) {
-                console.error('❌ Erreur sauvegarde opérations:', error);
+        function reinitialiserMois(moisCle) {
+            const confirmation = confirm(`Supprimer TOUTES les modifications pour ${moisCle} ?\n\nCette action est irréversible.`);
+            
+            if (confirmation) {
+                delete overridesRecurrents[moisCle];
+                sauvegarderToutesLesDonnees();
+                calculerPrevisionnel();
+                
+                alert(`✅ Mois ${moisCle} réinitialisé`);
             }
         }
 
-        // ===================================
-        // MODAL OPERATIONS
-        // ===================================
+        function afficherOverridesMois(moisCle) {
+            const overrides = overridesRecurrents[moisCle];
+            if (!overrides || compterOverridesMois(moisCle) === 0) {
+                alert(`Aucune modification pour ${moisCle}`);
+                return;
+            }
+            
+            let details = `📋 MODIFICATIONS POUR ${moisCle.toUpperCase()}\n\n`;
+            
+            // Détails recettes
+            if (overrides.recettes) {
+                details += "💰 RECETTES :\n";
+                if (overrides.recettes.supprimees?.length > 0) {
+                    details += `• Supprimées : ${overrides.recettes.supprimees.length}\n`;
+                }
+                if (Object.keys(overrides.recettes.modifiees || {}).length > 0) {
+                    details += `• Modifiées : ${Object.keys(overrides.recettes.modifiees).length}\n`;
+                }
+                if (overrides.recettes.ajoutees?.length > 0) {
+                    details += `• Ajoutées : ${overrides.recettes.ajoutees.length}\n`;
+                }
+                details += "\n";
+            }
+            
+            // Détails charges
+            if (overrides.charges) {
+                details += "💸 CHARGES :\n";
+                if (overrides.charges.supprimees?.length > 0) {
+                    details += `• Supprimées : ${overrides.charges.supprimees.length}\n`;
+                }
+                if (Object.keys(overrides.charges.modifiees || {}).length > 0) {
+                    details += `• Modifiées : ${Object.keys(overrides.charges.modifiees).length}\n`;
+                }
+                if (overrides.charges.ajoutees?.length > 0) {
+                    details += `• Ajoutées : ${overrides.charges.ajoutees.length}\n`;
+                }
+            }
+            
+            alert(details);
+        }
 
-        function genererOptionsMois() {
+        // ===============================================
+        // GESTION DES OPÉRATIONS SPÉCIFIQUES
+        // ===============================================
+
+        function remplirSelectMois() {
             const select = document.getElementById('operationMois');
             select.innerHTML = '';
             
-            const dateDebut = new Date();
-            dateDebut.setDate(1);
+            const dateDebut = new Date(document.getElementById('moisDebut').value + '-01');
             
             for (let i = 0; i < 12; i++) {
                 const dateMois = new Date(dateDebut);
@@ -1578,85 +1614,62 @@
 
         function ouvrirModalOperation() {
             document.getElementById('modalOperation').style.display = 'block';
-            genererOptionsMois();
+            document.getElementById('formOperation').reset();
+            remplirSelectMois();
         }
 
         function fermerModal() {
             document.getElementById('modalOperation').style.display = 'none';
-            document.getElementById('formOperation').reset();
         }
 
-        // ===================================
-        // EXPORT PDF (CORRECTION 2)
-        // ===================================
+        // ===============================================
+        // EXPORT PDF AMÉLIORÉ
+        // ===============================================
 
-        function exporterPDFComplet() {
+        function exporterPDF(detaille = false) {
             // Mise à jour des informations d'impression
             const maintenant = new Date();
             document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
             document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
             
-            // Ouvrir tous les accordéons pour l'impression complète
+            // Gestion des accordéons selon le mode
             const accordeonHeaders = document.querySelectorAll('.accordion-header');
             const accordeonContents = document.querySelectorAll('.accordion-content');
             
-            accordeonHeaders.forEach(header => header.classList.add('active'));
-            accordeonContents.forEach(content => content.classList.add('active'));
+            if (detaille) {
+                // Mode détaillé : ouvrir tous les accordéons
+                accordeonHeaders.forEach(header => header.classList.add('active'));
+                accordeonContents.forEach(content => content.classList.add('active'));
+            } else {
+                // Mode compact : fermer tous les accordéons
+                accordeonHeaders.forEach(header => header.classList.remove('active'));
+                accordeonContents.forEach(content => content.classList.remove('active'));
+            }
             
             // Instructions pour l'utilisateur
+            const mode = detaille ? 'Détaillé' : 'Compact';
             const confirmation = confirm(
-                '📄 Export PDF Complet - Instructions :\n\n' +
+                `🖨️ Export PDF ${mode} - Instructions :\n\n` +
                 '1. Cliquez OK puis CTRL+P (Cmd+P sur Mac)\n' +
                 '2. Choisir "Enregistrer au format PDF"\n' +
                 '3. Sélectionner "Plus de paramètres"\n' +
                 '4. Cocher "Graphiques d\'arrière-plan"\n\n' +
-                'Le document contiendra tous les détails mensuels.\n\n' +
+                `Mode ${mode} : ${detaille ? 'Tous les détails mensuels' : 'Résumé avec totaux uniquement'}\n\n` +
                 'Continuer ?'
             );
 
             if (confirmation) {
+                // Déclencher l'impression
                 setTimeout(() => {
                     window.print();
                 }, 500);
             }
         }
 
-        function exporterPDFSynthese() {
-            // Mise à jour des informations d'impression
-            const maintenant = new Date();
-            document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
-            document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
-            
-            // Fermer tous les accordéons pour la synthèse
-            const accordeonHeaders = document.querySelectorAll('.accordion-header');
-            const accordeonContents = document.querySelectorAll('.accordion-content');
-            
-            accordeonHeaders.forEach(header => header.classList.remove('active'));
-            accordeonContents.forEach(content => content.classList.remove('active'));
-            
-            // Instructions pour l'utilisateur
-            const confirmation = confirm(
-                '📋 Export PDF Synthèse - Instructions :\n\n' +
-                '1. Cliquez OK puis CTRL+P (Cmd+P sur Mac)\n' +
-                '2. Choisir "Enregistrer au format PDF"\n' +
-                '3. Sélectionner "Plus de paramètres"\n' +
-                '4. Cocher "Graphiques d\'arrière-plan"\n\n' +
-                'Le document ne contiendra que les totaux par mois.\n\n' +
-                'Continuer ?'
-            );
-
-            if (confirmation) {
-                setTimeout(() => {
-                    window.print();
-                }, 500);
-            }
-        }
-
-        // ===================================
+        // ===============================================
         // GESTIONNAIRES D'ÉVÉNEMENTS
-        // ===================================
+        // ===============================================
 
-        // Gestionnaire pour les opérations spécifiques
         document.getElementById('formOperation').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -1678,42 +1691,30 @@
                 commentaire
             });
             
-            sauvegarderOperations();
             fermerModal();
             calculerPrevisionnel();
             
             console.log('✅ Opération spécifique ajoutée:', { type, moisCle, libelle, montant });
         });
 
-        // Gestionnaire pour les overrides
+        // Gestionnaire pour les overrides - CORRIGÉ
         document.addEventListener('submit', function(e) {
             if (e.target.id === 'formOverride') {
-                e.preventDefault();
                 appliquerOverride(e);
             }
         });
 
         // Fermer modal en cliquant à l'extérieur
         window.onclick = function(event) {
-            const modalOperation = document.getElementById('modalOperation');
+            const modal = document.getElementById('modalOperation');
             const modalOverride = document.getElementById('modalOverride');
-            if (event.target === modalOperation) {
+            if (event.target === modal) {
                 fermerModal();
             }
             if (event.target === modalOverride) {
                 fermerModalOverride();
             }
         }
-
-        // ===================================
-        // INITIALISATION
-        // ===================================
-
-        window.addEventListener('load', function() {
-            console.log('🚀 Initialisation Module 6 - Prévisionnel');
-            chargerDonnees();
-            calculerPrevisionnel();
-        });
     </script>
 </body>
 </html>
