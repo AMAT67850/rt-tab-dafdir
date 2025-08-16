@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔮 Prévisionnel 12 Mois • ROCKET TOWER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* Header Cohérent */
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        /* Configuration */
+        .config-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .config-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        /* Boutons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8em;
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #007bff;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .stat-card p {
+            color: #6c757d;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+        
+        /* Chart Section */
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+        
+        /* Accordéon */
+        .accordion {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .accordion-header {
+            background: #f8f9fa;
+            padding: 20px 25px;
+            cursor: pointer;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .accordion-header:hover {
+            background: #e9ecef;
+        }
+        
+        .accordion-header.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .accordion-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .accordion-summary {
+            font-size: 0.85em;
+            opacity: 0.9;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .accordion-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        .accordion-content {
+            display: none;
+            padding: 25px;
+        }
+        
+        .accordion-content.active {
+            display: block;
+        }
+        
+        /* Badges de statut */
+        .summary-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .summary-badge:hover {
+            transform: translateY(-1px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .summary-badge.recettes {
+            background: rgba(40, 167, 69, 0.2);
+            color: #155724;
+        }
+        
+        .summary-badge.charges {
+            background: rgba(220, 53, 69, 0.2);
+            color: #721c24;
+        }
+        
+        .summary-badge.resultat {
+            background: rgba(0, 123, 255, 0.2);
+            color: #004085;
+        }
+        
+        .summary-badge.resultat.deficit {
+            background: rgba(253, 126, 20, 0.2);
+            color: #8a4100;
+        }
+        
+        .summary-badge.cumule {
+            background: rgba(40, 167, 69, 0.2);
+            color: #155724;
+        }
+        
+        .summary-badge.cumule.negatif {
+            background: rgba(220, 53, 69, 0.2);
+            color: #721c24;
+        }
+        
+        /* Détails mensuels */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-section h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .detail-list {
+            list-style: none;
+        }
+        
+        .detail-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .detail-list li:hover {
+            background: rgba(0, 123, 255, 0.05);
+            border-radius: 6px;
+            margin: 0 -8px;
+            padding: 10px 8px;
+        }
+        
+        .detail-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .detail-amount {
+            font-weight: 600;
+            color: #007bff;
+            margin-right: 10px;
+        }
+        
+        .total-row {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        /* Actions rapides */
+        .actions-rapides {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .actions-rapides:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+        }
+        
+        /* Boutons d'action sur les éléments */
+        .btn-action {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7em;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .btn-action:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+        }
+        
+        .btn-edit:hover {
+            background: linear-gradient(135deg, #e0a800, #d39e00);
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+        
+        .btn-delete:hover {
+            background: linear-gradient(135deg, #c82333, #bd2130);
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        /* Soldes container */
+        .soldes-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .solde-mensuel, .solde-cumule {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .solde-mensuel {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+        
+        .solde-mensuel.deficit {
+            background: linear-gradient(135deg, #fd7e14, #e65100);
+        }
+        
+        .solde-cumule {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .solde-cumule.negatif {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+        
+        .solde-mensuel:hover, .solde-cumule:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .solde-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .solde-montant {
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+        
+        /* Section modifications appliquées */
+        .modifications-appliquees {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            animation: slideInModifications 0.5s ease;
+        }
+        
+        @keyframes slideInModifications {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Explication améliorée */
+        .explication-soldes {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9ff, #e3f2fd);
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            border: 1px solid #bbdefb;
+            transition: all 0.3s ease;
+        }
+        
+        .explication-soldes:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+        }
+        
+        .ligne-explication {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #495057;
+            transition: color 0.3s ease;
+        }
+        
+        .ligne-explication:hover {
+            color: #007bff;
+        }
+        
+        .ligne-explication:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            opacity: 0.7;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        /* Champs conditionnels */
+        #fieldsModification, #fieldsAjout {
+            border: 2px dashed #dee2e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .actions-rapides {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn-small {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+            
+            .detail-list li {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .item-actions {
+                align-self: flex-end;
+            }
+            
+            .soldes-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+            
+            .accordion-summary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+        }
+        
+        /* Impression */
+        @media print {
+            body {
+                background: white;
+                font-size: 12px;
+            }
+            
+            .container {
+                box-shadow: none;
+                background: white;
+            }
+            
+            .header {
+                background: #2c3e50 !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .config-section {
+                display: none;
+            }
+            
+            .accordion-content {
+                display: block !important;
+            }
+            
+            .accordion-header {
+                background: #f8f9fa !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .btn, .actions-rapides, .btn-action, .item-actions {
+                display: none !important;
+            }
+            
+            .print-info {
+                display: block !important;
+            }
+        }
+        
+        .print-info {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔮 Prévisionnel 12 Mois</h1>
+            <p class="subtitle">Projection financière automatique • Recettes et Charges récurrentes HT • Système d'overrides temporaires</p>
+        </div>
+
+        <div class="content">
+            <!-- Configuration -->
+            <div class="config-section">
+                <h2>⚙️ Configuration</h2>
+                <div class="config-grid">
+                    <div>
+                        <div class="form-group">
+                            <label for="soldeInitial">Solde Initial (€)</label>
+                            <input type="number" id="soldeInitial" value="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button onclick="calculerPrevisionnel()" class="btn btn-primary">🔄 Calculer Prévisionnel</button>
+                        <button onclick="ouvrirModalOperation()" class="btn btn-success">➕ Ajouter Opérations</button>
+                        <button onclick="afficherHistoriqueArchive()" class="btn btn-info">📁 Voir Historique</button>
+                        <button onclick="exporterPDF()" class="btn btn-danger">🖨️ Export PDF</button>
+                        <a href="index.html" class="btn btn-secondary">🏠 Dashboard</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Résumé -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalRecettes">0€</h3>
+                    <p>Total Recettes HT Annuel</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalCharges">0€</h3>
+                    <p>Total Charges HT Annuel</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="resultatAnnuel">0€</h3>
+                    <p>Résultat Prévisionnel HT</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="soldeFinal">0€</h3>
+                    <p>Solde Final Prévu</p>
+                </div>
+            </div>
+
+            <!-- Graphique -->
+            <div class="chart-section">
+                <h2>📈 Évolution Solde Cumulé</h2>
+                <div class="chart-container">
+                    <canvas id="prevChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Accordéons Mensuels -->
+            <div id="accordeonContainer">
+                <!-- Généré dynamiquement -->
+            </div>
+
+            <!-- INFORMATIONS POUR IMPRESSION -->
+            <div class="print-info">
+                <p><strong>🚀 ROCKET TOWER - PRÉVISIONNEL 12 MOIS</strong></p>
+                <p>Rapport généré le <span id="dateImpression"></span> à <span id="heureImpression"></span></p>
+                <p>Période : <span id="periodeImpression">Août 2025 - Juillet 2026</span></p>
+                <p>Données sources : Recettes + Charges récurrentes • Généré automatiquement</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajout Opération -->
+    <div id="modalOperation" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nouvelle Opération</h2>
+                <span class="close" onclick="fermerModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="formOperation">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="operationType" required>
+                            <option value="recette">💰 Recette</option>
+                            <option value="charge">💸 Charge</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mois</label>
+                        <select id="operationMois" required>
+                            <!-- Généré dynamiquement -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Libellé</label>
+                        <input type="text" id="operationLibelle" required placeholder="Description de l'opération">
+                    </div>
+                    <div class="form-group">
+                        <label>Montant HT (€)</label>
+                        <input type="number" id="operationMontant" required step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Commentaire (optionnel)</label>
+                        <input type="text" id="operationCommentaire" placeholder="Informations complémentaires">
+                    </div>
+                    <div style="text-align: right; margin-top: 25px;">
+                        <button type="button" onclick="fermerModal()" class="btn btn-secondary">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===============================================
+        // VARIABLES GLOBALES
+        // ===============================================
+        
+        // Variables existantes
+        let recettesData = [];
+        let chargesData = [];
+        let projectionMensuelle = [];
+        let operationsSpecifiques = {}; // { "2025-08": [operations], ... }
+        let prevChart = null;
+
+        // NOUVELLES VARIABLES POUR OVERRIDES
+        let overridesRecurrents = {}; // Modifications temporaires des récurrents
+        let archiveOverrides = {}; // Archive des overrides obsolètes
+        let configurationTemporelle = {
+            periodeReference: new Date().toISOString().slice(0, 7), // "2025-08"
+            modeGlissement: "automatique", // "automatique" | "manuel"
+            derniereActualisation: null,
+            archiveOperations: {}
+        };
+
+        // ===============================================
+        // INITIALISATION
+        // ===============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Prévisionnel 12 Mois avec Overrides - Initialisation');
+            chargerDonnees();
+            chargerOverrides(); // NOUVEAU
+            initialiserModalMois();
+            
+            // Calculer automatiquement au démarrage
+            setTimeout(() => {
+                calculerPrevisionnel();
+            }, 500);
+        });
+
+        function chargerDonnees() {
+            try {
+                console.log('📊 Chargement des données prévisionnel...');
+                
+                // Charger les données des modules
+                const recettesStorage = localStorage.getItem('recettesRT');
+                const chargesStorage = localStorage.getItem('chargesRecurrentesRT');
+                const prevStorage = localStorage.getItem('previsionnel12moisRT');
+                
+                recettesData = recettesStorage ? JSON.parse(recettesStorage) : [];
+                chargesData = chargesStorage ? JSON.parse(chargesStorage) : [];
+                
+                console.log(`📥 Données chargées: ${recettesData.length} recettes, ${chargesData.length} charges`);
+                
+                // Charger les données spécifiques du prévisionnel
+                if (prevStorage) {
+                    const prevData = JSON.parse(prevStorage);
+                    document.getElementById('soldeInitial').value = prevData.soldeInitial || 0;
+                    operationsSpecifiques = prevData.operationsSpecifiques || {};
+                    console.log('💾 Configuration prévisionnel restaurée');
+                }
+
+            } catch (error) {
+                console.error('❌ Erreur chargement:', error);
+                alert('Erreur lors du chargement des données: ' + error.message);
+            }
+        }
+
+        function chargerOverrides() {
+            try {
+                const overridesStorage = localStorage.getItem('previsionnel_overrides');
+                const configStorage = localStorage.getItem('previsionnel_config_temporelle');
+                const archiveStorage = localStorage.getItem('previsionnel_archive');
+                
+                if (overridesStorage) {
+                    overridesRecurrents = JSON.parse(overridesStorage);
+                }
+                
+                if (configStorage) {
+                    configurationTemporelle = { 
+                        ...configurationTemporelle, 
+                        ...JSON.parse(configStorage) 
+                    };
+                } else {
+                    // Initialiser la configuration la première fois
+                    configurationTemporelle.periodeReference = new Date().toISOString().slice(0, 7);
+                }
+                
+                if (archiveStorage) {
+                    archiveOverrides = JSON.parse(archiveStorage);
+                }
+                
+                console.log('📂 Overrides chargés:', Object.keys(overridesRecurrents).length, 'mois actifs');
+                console.log('📁 Archive chargée:', Object.keys(archiveOverrides).length, 'années');
+            } catch (error) {
+                console.error('❌ Erreur chargement overrides:', error);
+            }
+        }
+
+        // ===============================================
+        // GESTION TEMPORELLE ET GLISSEMENT
+        // ===============================================
+
+        function verifierGlissementTemporel() {
+            const moisActuel = new Date().toISOString().slice(0, 7); // "2025-09"
+            const periodeRef = configurationTemporelle.periodeReference;
+            
+            if (moisActuel !== periodeRef) {
+                console.log(`🔄 Glissement temporel détecté: ${periodeRef} → ${moisActuel}`);
+                
+                if (configurationTemporelle.modeGlissement === "automatique") {
+                    migrerDonneesTemporelles(periodeRef, moisActuel);
+                } else {
+                    proposerMigrationManuelle(periodeRef, moisActuel);
+                }
+            }
+        }
+
+        function migrerDonneesTemporelles(anciennePeriode, nouvellePeriode) {
+            console.log("📦 Migration automatique des données...");
+            
+            // 1. Identifier les mois qui sortent de la fenêtre
+            const moisSortants = identifierMoisSortants(anciennePeriode, nouvellePeriode);
+            
+            // 2. Archiver les mois sortants
+            if (moisSortants.length > 0) {
+                archiverMoisSortants(moisSortants);
+            }
+            
+            // 3. Mettre à jour la période de référence
+            configurationTemporelle.periodeReference = nouvellePeriode;
+            configurationTemporelle.derniereActualisation = new Date().toISOString();
+            
+            // 4. Sauvegarder
+            sauvegarderToutesLesDonnees();
+            
+            alert(`✅ Migration automatique effectuée vers ${nouvellePeriode}\n${moisSortants.length} mois archivés.`);
+        }
+
+        function identifierMoisSortants(anciennePeriode, nouvellePeriode) {
+            const dateAncienne = new Date(anciennePeriode + '-01');
+            const dateNouvelle = new Date(nouvellePeriode + '-01');
+            
+            const moisSortants = [];
+            
+            // Parcourir les 12 mois de l'ancienne période
+            for (let i = 0; i < 12; i++) {
+                const moisCourant = new Date(dateAncienne);
+                moisCourant.setMonth(moisCourant.getMonth() + i);
+                const moisCle = moisCourant.toISOString().slice(0, 7);
+                
+                // Vérifier si ce mois sera encore dans la nouvelle fenêtre
+                const estDansNouvelleFenotre = verifierMoisDansFenotre(moisCle, nouvellePeriode);
+                
+                if (!estDansNouvelleFenotre && overridesRecurrents[moisCle]) {
+                    moisSortants.push({
+                        moisCle: moisCle,
+                        overrides: overridesRecurrents[moisCle],
+                        metadata: {
+                            nombreModifications: compterOverridesMois(moisCle),
+                            dateArchivage: new Date().toISOString()
+                        }
+                    });
+                }
+            }
+            
+            return moisSortants;
+        }
+
+        function verifierMoisDansFenotre(moisCle, nouvellePeriodeDebut) {
+            const moisAVerifier = new Date(moisCle + '-01');
+            const debutFenotre = new Date(nouvellePeriodeDebut + '-01');
+            const finFenotre = new Date(debutFenotre);
+            finFenotre.setMonth(finFenotre.getMonth() + 11); // +11 pour 12 mois
+            
+            return moisAVerifier >= debutFenotre && moisAVerifier <= finFenotre;
+        }
+
+        function archiverMoisSortants(moisSortants) {
+            moisSortants.forEach(mois => {
+                const annee = mois.moisCle.split('-')[0];
+                
+                // Initialiser l'année dans l'archive si nécessaire
+                if (!archiveOverrides[annee]) {
+                    archiveOverrides[annee] = {};
+                }
+                
+                // Archiver avec métadonnées
+                archiveOverrides[annee][mois.moisCle] = {
+                    ...mois.overrides,
+                    metadata: mois.metadata
+                };
+                
+                // Supprimer des overrides actifs
+                delete overridesRecurrents[mois.moisCle];
+                
+                console.log(`📁 Archivé: ${mois.moisCle} (${mois.metadata.nombreModifications} modifs)`);
+            });
+        }
+
+        // ===============================================
+        // CALCUL PRINCIPAL AVEC OVERRIDES
+        // ===============================================
+
+        function doitApparaitreCeMois(item, dateMois) {
+            const moisActuel = dateMois.getMonth() + 1; // 1-12
+            
+            // Gestion mois spécifiques (format numérique : "1,4,7,10")
+            if (item.moisIntervention && 
+                item.moisIntervention.trim() && 
+                item.moisIntervention.trim().toLowerCase() !== 'tous') {
+                
+                const moisListe = item.moisIntervention.split(',').map(m => parseInt(m.trim())).filter(m => !isNaN(m));
+                return moisListe.includes(moisActuel);
+            }
+            
+            // Gestion des périodicités standards
+            const periodicite = item.periodicite?.toUpperCase();
+            
+            switch (periodicite) {
+                case 'MENSUEL':
+                    return true;
+                    
+                case 'TRIMESTRIEL':
+                    return [1, 4, 7, 10].includes(moisActuel);
+                    
+                case 'SEMESTRIEL':
+                    return [1, 7].includes(moisActuel);
+                    
+                case 'ANNUEL':
+                    return moisActuel === 1;
+                    
+                default:
+                    return true;
+            }
+        }
+
+        function calculerPrevisionnel() {
+            console.log('🔮 === DÉBUT CALCUL PRÉVISIONNEL AVEC OVERRIDES ===');
+            
+            // Vérifier glissement temporel
+            verifierGlissementTemporel();
+            
+            const soldeInitial = parseFloat(document.getElementById('soldeInitial').value) || 0;
+            const dateDebut = new Date(configurationTemporelle.periodeReference + '-01');
+            
+            projectionMensuelle = [];
+            
+            console.log(`📅 Période: ${configurationTemporelle.periodeReference} + 12 mois`);
+            console.log(`💰 Solde initial: ${soldeInitial}€`);
+            
+            for (let i = 0; i < 12; i++) {
+                const dateMois = new Date(dateDebut);
+                dateMois.setMonth(dateMois.getMonth() + i);
+                
+                const moisNom = dateMois.toLocaleDateString('fr-FR', { 
+                    year: 'numeric', 
+                    month: 'long' 
+                }).replace(' ', ' ');
+                
+                const moisCle = `${dateMois.getFullYear()}-${String(dateMois.getMonth() + 1).padStart(2, '0')}`;
+                
+                // Calcul avec overrides
+                let { totalRecettes, totalCharges, detailRecettes, detailCharges } = 
+                    calculerRecurrentsAvecOverrides(dateMois, moisCle);
+                
+                // Ajouter opérations spécifiques (ancien système)
+                if (operationsSpecifiques[moisCle]) {
+                    operationsSpecifiques[moisCle].forEach(op => {
+                        if (op.type === 'recette') {
+                            totalRecettes += op.montant;
+                            detailRecettes.push({
+                                libelle: op.libelle + ' 🎯',
+                                montant: op.montant,
+                                type: 'specifique'
+                            });
+                        } else {
+                            totalCharges += op.montant;
+                            detailCharges.push({
+                                libelle: op.libelle + ' 🎯',
+                                montant: op.montant,
+                                type: 'specifique'
+                            });
+                        }
+                    });
+                }
+                
+                const solde = totalRecettes - totalCharges;
+                const soldeCumule = i === 0 ? soldeInitial + solde : 
+                    projectionMensuelle[i-1].soldeCumule + solde;
+                
+                projectionMensuelle.push({
+                    mois: moisNom,
+                    moisCle,
+                    totalRecettes,
+                    totalCharges,
+                    solde,
+                    soldeCumule,
+                    detailRecettes,
+                    detailCharges
+                });
+            }
+            
+            afficherStats();
+            afficherAccordeons();
+            mettreAJourGraphique();
+            sauvegarderPrevisionnel();
+            
+            console.log('✅ === FIN CALCUL PRÉVISIONNEL AVEC OVERRIDES ===');
+        }
+
+        function calculerRecurrentsAvecOverrides(dateMois, moisCle) {
+            let totalRecettes = 0;
+            let totalCharges = 0;
+            let detailRecettes = [];
+            let detailCharges = [];
+            
+            const overridesMois = overridesRecurrents[moisCle] || { recettes: {}, charges: {} };
+            
+            // Recettes avec overrides
+            recettesData.forEach(recette => {
+                if (doitApparaitreCeMois(recette, dateMois)) {
+                    const overrides = overridesMois.recettes || {};
+                    
+                    // Vérifier si supprimée ou suspendue ce mois
+                    if (overrides.supprimees?.includes(recette.id) || 
+                        overrides.suspendues?.includes(recette.id)) {
+                        return;
+                    }
+                    
+                    // Appliquer modification temporaire si existe
+                    let montant = Math.abs(recette.montantHT || 0);
+                    if (overrides.modifiees?.[recette.id]) {
+                        montant = Math.abs(overrides.modifiees[recette.id].montantHT);
+                    }
+                    
+                    totalRecettes += montant;
+                    detailRecettes.push({
+                        libelle: `${recette.client} - ${recette.element}${overrides.modifiees?.[recette.id] ? ' ✏️' : ''}`,
+                        montant: montant,
+                        type: 'recurrente',
+                        periodicite: recette.periodicite,
+                        id: recette.id
+                    });
+                }
+            });
+            
+            // Ajouter recettes temporaires
+            if (overridesMois.recettes?.ajoutees) {
+                overridesMois.recettes.ajoutees.forEach(recetteTemp => {
+                    totalRecettes += Math.abs(recetteTemp.montantHT);
+                    detailRecettes.push({
+                        libelle: recetteTemp.libelle + ' 🆕',
+                        montant: Math.abs(recetteTemp.montantHT),
+                        type: 'temporaire'
+                    });
+                });
+            }
+            
+            // Charges avec overrides
+            chargesData.forEach(charge => {
+                if (doitApparaitreCeMois(charge, dateMois)) {
+                    const overrides = overridesMois.charges || {};
+                    
+                    if (overrides.supprimees?.includes(charge.id) || 
+                        overrides.suspendues?.includes(charge.id)) {
+                        return;
+                    }
+                    
+                    let montant = Math.abs(charge.montantHT || 0);
+                    if (overrides.modifiees?.[charge.id]) {
+                        montant = Math.abs(overrides.modifiees[charge.id].montantHT);
+                    }
+                    
+                    totalCharges += montant;
+                    detailCharges.push({
+                        libelle: `${charge.element}${overrides.modifiees?.[charge.id] ? ' ✏️' : ''}`,
+                        montant: montant,
+                        type: 'recurrente',
+                        periodicite: charge.periodicite,
+                        id: charge.id
+                    });
+                }
+            });
+            
+            // Ajouter charges temporaires
+            if (overridesMois.charges?.ajoutees) {
+                overridesMois.charges.ajoutees.forEach(chargeTemp => {
+                    totalCharges += Math.abs(chargeTemp.montantHT);
+                    detailCharges.push({
+                        libelle: chargeTemp.libelle + ' 🆕',
+                        montant: Math.abs(chargeTemp.montantHT),
+                        type: 'temporaire'
+                    });
+                });
+            }
+            
+            return { totalRecettes, totalCharges, detailRecettes, detailCharges };
+        }
+
+        // ===============================================
+        // INTERFACE ACCORDÉONS AVEC OVERRIDES
+        // ===============================================
+
+        function afficherAccordeons() {
+            const container = document.getElementById('accordeonContainer');
+            container.innerHTML = '';
+
+            projectionMensuelle.forEach((mois, index) => {
+                const soldeCumuleCouleur = mois.soldeCumule >= 0 ? '#28a745' : '#dc3545';
+                const soldeMensuelCouleur = mois.solde >= 0 ? '#007bff' : '#fd7e14';
+                
+                const cumuleCssClass = mois.soldeCumule >= 0 ? 'cumule' : 'cumule negatif';
+                const mensuelCssClass = mois.solde >= 0 ? 'resultat' : 'resultat deficit';
+                
+                // Vérifier s'il y a des overrides pour ce mois
+                const aDesOverrides = overridesRecurrents[mois.moisCle] && 
+                    compterOverridesMois(mois.moisCle) > 0;
+                
+                const accordeon = document.createElement('div');
+                accordeon.className = 'accordion';
+                accordeon.innerHTML = `
+                    <div class="accordion-header" onclick="toggleAccordeon(${index})">
+                        <div>
+                            <div class="accordion-title">
+                                📅 ${mois.mois} ${aDesOverrides ? '✏️' : ''}
+                            </div>
+                            <div class="accordion-summary">
+                                <span class="summary-badge recettes">
+                                    💰 ${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€
+                                </span>
+                                <span class="summary-badge charges">
+                                    💸 ${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€
+                                </span>
+                                <span class="summary-badge ${mensuelCssClass}">
+                                    🔄 ${Math.round(mois.solde).toLocaleString('fr-FR')}€
+                                </span>
+                                <span class="summary-badge ${cumuleCssClass}">
+                                    📊 ${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€
+                                </span>
+                            </div>
+                        </div>
+                        <div class="accordion-icon">▼</div>
+                    </div>
+                    <div class="accordion-content" id="accordeon-${index}">
+                        
+                        <!-- SECTION ACTIONS RAPIDES -->
+                        <div class="actions-rapides">
+                            <button onclick="ouvrirModalOverrideRecurrent('${mois.moisCle}', 'recette')" 
+                                    class="btn btn-success btn-small">
+                                ➕ Ajouter Recette
+                            </button>
+                            <button onclick="ouvrirModalOverrideRecurrent('${mois.moisCle}', 'charge')" 
+                                    class="btn btn-danger btn-small">
+                                ➕ Ajouter Charge
+                            </button>
+                            <button onclick="afficherOverridesMois('${mois.moisCle}')" 
+                                    class="btn btn-info btn-small">
+                                ✏️ Voir Modifications (${compterOverridesMois(mois.moisCle)})
+                            </button>
+                            <button onclick="reinitialiserMois('${mois.moisCle}')" 
+                                    class="btn btn-secondary btn-small">
+                                🔄 Réinitialiser
+                            </button>
+                        </div>
+                        
+                        <div class="detail-grid">
+                            <!-- SECTION RECETTES AMÉLIORÉE -->
+                            <div class="detail-section">
+                                <h4>💰 Recettes (${mois.detailRecettes.length})</h4>
+                                <ul class="detail-list">
+                                    ${mois.detailRecettes.map(r => {
+                                        const isModifiable = r.type === 'recurrente' && r.id;
+                                        
+                                        return `
+                                        <li>
+                                            <span class="detail-label">
+                                                ${r.libelle}
+                                                ${r.periodicite ? ` <small>(${r.periodicite})</small>` : ''}
+                                            </span>
+                                            <span class="detail-amount">
+                                                ${Math.round(r.montant).toLocaleString('fr-FR')}€
+                                            </span>
+                                            ${isModifiable ? `
+                                                <div class="item-actions">
+                                                    <button onclick="modifierRecurrentCeMois('${mois.moisCle}', 'recette', '${r.id}')" 
+                                                            class="btn-action btn-edit" title="Modifier ce mois">✏️</button>
+                                                    <button onclick="supprimerRecurrentCeMois('${mois.moisCle}', 'recette', '${r.id}')" 
+                                                            class="btn-action btn-delete" title="Supprimer ce mois">🗑️</button>
+                                                </div>
+                                            ` : ''}
+                                        </li>
+                                    `;
+                                    }).join('')}
+                                </ul>
+                                <div class="total-row">
+                                    <span>💰 Total Recettes</span>
+                                    <span>${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€</span>
+                                </div>
+                            </div>
+                            
+                            <!-- SECTION CHARGES AMÉLIORÉE -->
+                            <div class="detail-section">
+                                <h4>💸 Charges (${mois.detailCharges.length})</h4>
+                                <ul class="detail-list">
+                                    ${mois.detailCharges.map(c => {
+                                        const isModifiable = c.type === 'recurrente' && c.id;
+                                        
+                                        return `
+                                        <li>
+                                            <span class="detail-label">
+                                                ${c.libelle}
+                                                ${c.periodicite ? ` <small>(${c.periodicite})</small>` : ''}
+                                            </span>
+                                            <span class="detail-amount">
+                                                ${Math.round(c.montant).toLocaleString('fr-FR')}€
+                                            </span>
+                                            ${isModifiable ? `
+                                                <div class="item-actions">
+                                                    <button onclick="modifierRecurrentCeMois('${mois.moisCle}', 'charge', '${c.id}')" 
+                                                            class="btn-action btn-edit" title="Modifier ce mois">✏️</button>
+                                                    <button onclick="supprimerRecurrentCeMois('${mois.moisCle}', 'charge', '${c.id}')" 
+                                                            class="btn-action btn-delete" title="Supprimer ce mois">🗑️</button>
+                                                </div>
+                                            ` : ''}
+                                        </li>
+                                    `;
+                                    }).join('')}
+                                </ul>
+                                <div class="total-row">
+                                    <span>💸 Total Charges</span>
+                                    <span>${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- SECTION SOLDES AVEC DESIGN AMÉLIORÉ -->
+                        <div class="soldes-container">
+                            <div class="solde-mensuel ${mois.solde < 0 ? 'deficit' : ''}">
+                                <div class="solde-label">🔄 Résultat ${mois.mois}</div>
+                                <div class="solde-montant">${Math.round(mois.solde).toLocaleString('fr-FR')}€</div>
+                            </div>
+                            <div class="solde-cumule ${mois.soldeCumule < 0 ? 'negatif' : ''}">
+                                <div class="solde-label">📊 Solde Cumulé</div>
+                                <div class="solde-montant">${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}€</div>
+                            </div>
+                        </div>
+                        
+                        <!-- SECTION MODIFICATIONS APPLIQUÉES -->
+                        ${genererSectionModifications(mois.moisCle)}
+                        
+                        <!-- EXPLICATION AVEC DESIGN AMÉLIORÉ -->
+                        <div class="explication-soldes">
+                            <div class="ligne-explication">
+                                <span>🔄</span>
+                                <strong>Résultat du mois :</strong> 
+                                <span>${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}€ - ${Math.round(mois.totalCharges).toLocaleString('fr-FR')}€ = ${Math.round(mois.solde).toLocaleString('fr-FR')}€</span>
+                            </div>
+                            <div class="ligne-explication">
+                                <span>📈</span>
+                                <strong>Solde cumulé :</strong> 
+                                <span>${index === 0 ? 'Solde initial' : 'Cumulé précédent'} + Résultat ${mois.mois}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(accordeon);
+            });
+        }
+
+        // ===============================================
+        // GESTION DES OVERRIDES
+        // ===============================================
+
+        function ouvrirModalOverrideRecurrent(moisCle, type, element = null) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'modalOverride';
+            
+            const isModification = element !== null;
+            const titre = isModification ? 
+                `Modifier ${element.libelle || element.client} - ${moisCle}` : 
+                `Ajouter ${type} temporaire - ${moisCle}`;
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${titre}</h2>
+                        <span class="close" onclick="fermerModalOverride()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formOverride">
+                            <input type="hidden" id="overrideMoisCle" value="${moisCle}">
+                            <input type="hidden" id="overrideType" value="${type}">
+                            <input type="hidden" id="overrideElementId" value="${element?.id || ''}">
+                            
+                            <div class="form-group">
+                                <label>Action</label>
+                                <select id="overrideAction" onchange="toggleOverrideFields()" required>
+                                    <option value="">Choisir une action...</option>
+                                    <option value="supprimer">🗑️ Supprimer ce mois uniquement</option>
+                                    <option value="modifier">✏️ Modifier montant ce mois</option>
+                                    <option value="ajouter">➕ Ajouter ${type} temporaire</option>
+                                    ${isModification ? '<option value="suspendre">⏸️ Suspendre temporairement</option>' : ''}
+                                </select>
+                            </div>
+                            
+                            <div id="fieldsModification" style="display: none;">
+                                <div class="form-group">
+                                    <label>Nouveau montant HT (€)</label>
+                                    <input type="number" id="overrideNouveauMontant" step="0.01" 
+                                           value="${element?.montantHT || ''}" placeholder="0.00">
+                                </div>
+                            </div>
+                            
+                            <div id="fieldsAjout" style="display: none;">
+                                <div class="form-group">
+                                    <label>Libellé</label>
+                                    <input type="text" id="overrideLibelle" placeholder="Nom du client/charge">
+                                </div>
+                                <div class="form-group">
+                                    <label>Montant HT (€)</label>
+                                    <input type="number" id="overrideMontant" step="0.01" placeholder="0.00">
+                                </div>
+                                <div class="form-group">
+                                    <label>Durée</label>
+                                    <select id="overrideDuree">
+                                        <option value="1">Ce mois uniquement</option>
+                                        <option value="2">2 mois</option>
+                                        <option value="3">3 mois</option>
+                                        <option value="6">6 mois</option>
+                                        <option value="12">12 mois (permanent)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Commentaire</label>
+                                <textarea id="overrideCommentaire" rows="3" 
+                                          placeholder="Raison de cette modification..."></textarea>
+                            </div>
+                            
+                            <div style="text-align: right; margin-top: 25px;">
+                                <button type="button" onclick="fermerModalOverride()" class="btn btn-secondary">
+                                    Annuler
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    Appliquer Override
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+        }
+
+        function toggleOverrideFields() {
+            const action = document.getElementById('overrideAction').value;
+            
+            document.getElementById('fieldsModification').style.display = 
+                action === 'modifier' ? 'block' : 'none';
+            document.getElementById('fieldsAjout').style.display = 
+                action === 'ajouter' ? 'block' : 'none';
+        }
+
+        function appliquerOverride(event) {
+            event.preventDefault();
+            
+            const moisCle = document.getElementById('overrideMoisCle').value;
+            const type = document.getElementById('overrideType').value;
+            const action = document.getElementById('overrideAction').value;
+            const elementId = document.getElementById('overrideElementId').value;
+            
+            // Initialiser la structure si nécessaire
+            if (!overridesRecurrents[moisCle]) {
+                overridesRecurrents[moisCle] = { recettes: {}, charges: {} };
+            }
+            if (!overridesRecurrents[moisCle][type + 's']) {
+                overridesRecurrents[moisCle][type + 's'] = {
+                    supprimees: [],
+                    modifiees: {},
+                    ajoutees: [],
+                    suspendues: []
+                };
+            }
+            
+            const overrideSection = overridesRecurrents[moisCle][type + 's'];
+            
+            switch (action) {
+                case 'supprimer':
+                    if (!overrideSection.supprimees.includes(elementId)) {
+                        overrideSection.supprimees.push(elementId);
+                    }
+                    break;
+                    
+                case 'modifier':
+                    const nouveauMontant = parseFloat(document.getElementById('overrideNouveauMontant').value);
+                    overrideSection.modifiees[elementId] = { montantHT: nouveauMontant };
+                    break;
+                    
+                case 'ajouter':
+                    const libelle = document.getElementById('overrideLibelle').value;
+                    const montant = parseFloat(document.getElementById('overrideMontant').value);
+                    const duree = parseInt(document.getElementById('overrideDuree').value);
+                    
+                    // Ajouter sur plusieurs mois si nécessaire
+                    for (let i = 0; i < duree; i++) {
+                        const dateMois = new Date(moisCle + '-01');
+                        dateMois.setMonth(dateMois.getMonth() + i);
+                        const cibleMoisCle = dateMois.toISOString().slice(0, 7);
+                        
+                        if (!overridesRecurrents[cibleMoisCle]) {
+                            overridesRecurrents[cibleMoisCle] = { recettes: {}, charges: {} };
+                        }
+                        if (!overridesRecurrents[cibleMoisCle][type + 's']) {
+                            overridesRecurrents[cibleMoisCle][type + 's'] = {
+                                supprimees: [], modifiees: {}, ajoutees: [], suspendues: []
+                            };
+                        }
+                        
+                        overridesRecurrents[cibleMoisCle][type + 's'].ajoutees.push({
+                            id: Date.now() + i,
+                            libelle: libelle,
+                            montantHT: type === 'recette' ? montant : -montant,
+                            temporaire: true,
+                            dureeInitiale: duree,
+                            commentaire: document.getElementById('overrideCommentaire').value
+                        });
+                    }
+                    break;
+                    
+                case 'suspendre':
+                    if (!overrideSection.suspendues.includes(elementId)) {
+                        overrideSection.suspendues.push(elementId);
+                    }
+                    break;
+            }
+            
+            // Sauvegarder et recalculer
+            sauvegarderToutesLesDonnees();
+            fermerModalOverride();
+            calculerPrevisionnel();
+            
+            console.log('✅ Override appliqué:', { moisCle, type, action });
+        }
+
+        // ===============================================
+        // FONCTIONS UTILITAIRES
+        // ===============================================
+
+        function compterOverridesMois(moisCle) {
+            const overrides = overridesRecurrents[moisCle];
+            if (!overrides) return 0;
+            
+            let count = 0;
+            if (overrides.recettes) {
+                count += (overrides.recettes.supprimees || []).length;
+                count += Object.keys(overrides.recettes.modifiees || {}).length;
+                count += (overrides.recettes.ajoutees || []).length;
+                count += (overrides.recettes.suspendues || []).length;
+            }
+            if (overrides.charges) {
+                count += (overrides.charges.supprimees || []).length;
+                count += Object.keys(overrides.charges.modifiees || {}).length;
+                count += (overrides.charges.ajoutees || []).length;
+                count += (overrides.charges.suspendues || []).length;
+            }
+            return count;
+        }
+
+        function genererSectionModifications(moisCle) {
+            const overrides = overridesRecurrents[moisCle];
+            if (!overrides || compterOverridesMois(moisCle) === 0) {
+                return '';
+            }
+            
+            let html = `
+                <div class="modifications-appliquees">
+                    <h5 style="color: #856404; margin-bottom: 10px;">✏️ Modifications Appliquées ce Mois</h5>
+                    <div style="font-size: 0.9em; color: #856404;">
+            `;
+            
+            // Afficher les modifications de recettes
+            if (overrides.recettes) {
+                if (overrides.recettes.supprimees?.length > 0) {
+                    html += `<div>🗑️ Recettes supprimées : ${overrides.recettes.supprimees.length}</div>`;
+                }
+                if (Object.keys(overrides.recettes.modifiees || {}).length > 0) {
+                    html += `<div>✏️ Recettes modifiées : ${Object.keys(overrides.recettes.modifiees).length}</div>`;
+                }
+                if (overrides.recettes.ajoutees?.length > 0) {
+                    html += `<div>🆕 Recettes ajoutées : ${overrides.recettes.ajoutees.length}</div>`;
+                }
+            }
+            
+            // Afficher les modifications de charges
+            if (overrides.charges) {
+                if (overrides.charges.supprimees?.length > 0) {
+                    html += `<div>🗑️ Charges supprimées : ${overrides.charges.supprimees.length}</div>`;
+                }
+                if (Object.keys(overrides.charges.modifiees || {}).length > 0) {
+                    html += `<div>✏️ Charges modifiées : ${Object.keys(overrides.charges.modifiees).length}</div>`;
+                }
+                if (overrides.charges.ajoutees?.length > 0) {
+                    html += `<div>🆕 Charges ajoutées : ${overrides.charges.ajoutees.length}</div>`;
+                }
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            return html;
+        }
+
+        function modifierRecurrentCeMois(moisCle, type, elementId) {
+            // Trouver l'élément original
+            const dataSource = type === 'recette' ? recettesData : chargesData;
+            const element = dataSource.find(item => item.id == elementId);
+            
+            if (element) {
+                ouvrirModalOverrideRecurrent(moisCle, type, element);
+            }
+        }
+
+        function supprimerRecurrentCeMois(moisCle, type, elementId) {
+            const confirmation = confirm(`Supprimer cet élément pour ${moisCle} uniquement ?\n\nCela n'affectera pas les autres mois.`);
+            
+            if (confirmation) {
+                // Initialiser la structure si nécessaire
+                if (!overridesRecurrents[moisCle]) {
+                    overridesRecurrents[moisCle] = { recettes: {}, charges: {} };
+                }
+                if (!overridesRecurrents[moisCle][type + 's']) {
+                    overridesRecurrents[moisCle][type + 's'] = {
+                        supprimees: [], modifiees: {}, ajoutees: [], suspendues: []
+                    };
+                }
+                
+                // Ajouter à la liste des supprimés
+                const suppressions = overridesRecurrents[moisCle][type + 's'].supprimees;
+                if (!suppressions.includes(elementId)) {
+                    suppressions.push(elementId);
+                }
+                
+                sauvegarderToutesLesDonnees();
+                calculerPrevisionnel();
+                
+                console.log(`🗑️ ${type} ${elementId} supprimé pour ${moisCle}`);
+            }
+        }
+
+        function reinitialiserMois(moisCle) {
+            const confirmation = confirm(`Supprimer TOUTES les modifications pour ${moisCle} ?\n\nCette action est irréversible.`);
+            
+            if (confirmation) {
+                delete overridesRecurrents[moisCle];
+                sauvegarderToutesLesDonnees();
+                calculerPrevisionnel();
+                
+                alert(`✅ Mois ${moisCle} réinitialisé`);
+            }
+        }
+
+        function afficherOverridesMois(moisCle) {
+            const overrides = overridesRecurrents[moisCle];
+            if (!overrides || compterOverridesMois(moisCle) === 0) {
+                alert(`Aucune modification pour ${moisCle}`);
+                return;
+            }
+            
+            let details = `📋 MODIFICATIONS POUR ${moisCle.toUpperCase()}\n\n`;
+            
+            // Détails recettes
+            if (overrides.recettes) {
+                details += "💰 RECETTES :\n";
+                if (overrides.recettes.supprimees?.length > 0) {
+                    details += `• Supprimées : ${overrides.recettes.supprimees.length}\n`;
+                }
+                if (Object.keys(overrides.recettes.modifiees || {}).length > 0) {
+                    details += `• Modifiées : ${Object.keys(overrides.recettes.modifiees).length}\n`;
+                }
+                if (overrides.recettes.ajoutees?.length > 0) {
+                    details += `• Ajoutées : ${overrides.recettes.ajoutees.length}\n`;
+                    overrides.recettes.ajoutees.forEach(r => {
+                        details += `  - ${r.libelle} : ${r.montantHT}€\n`;
+                    });
+                }
+                details += "\n";
+            }
+            
+            // Détails charges
+            if (overrides.charges) {
+                details += "💸 CHARGES :\n";
+                if (overrides.charges.supprimees?.length > 0) {
+                    details += `• Supprimées : ${overrides.charges.supprimees.length}\n`;
+                }
+                if (Object.keys(overrides.charges.modifiees || {}).length > 0) {
+                    details += `• Modifiées : ${Object.keys(overrides.charges.modifiees).length}\n`;
+                }
+                if (overrides.charges.ajoutees?.length > 0) {
+                    details += `• Ajoutées : ${overrides.charges.ajoutees.length}\n`;
+                    overrides.charges.ajoutees.forEach(c => {
+                        details += `  - ${c.libelle} : ${Math.abs(c.montantHT)}€\n`;
+                    });
+                }
+            }
+            
+            alert(details);
+        }
+
+        function afficherHistoriqueArchive() {
+            const anneesArchive = Object.keys(archiveOverrides);
+            
+            if (anneesArchive.length === 0) {
+                alert("📁 Aucun historique d'archive disponible.");
+                return;
+            }
+            
+            let details = "📁 HISTORIQUE DES ARCHIVES\n\n";
+            
+            anneesArchive.forEach(annee => {
+                details += `📅 ANNÉE ${annee} :\n`;
+                const moisAnnee = Object.keys(archiveOverrides[annee]);
+                moisAnnee.forEach(moisCle => {
+                    const archive = archiveOverrides[annee][moisCle];
+                    const nbModifs = compterModificationsArchive(archive);
+                    details += `  • ${moisCle} : ${nbModifs} modifications archivées\n`;
+                });
+                details += "\n";
+            });
+            
+            details += "💡 Les archives sont conservées automatiquement lors du glissement temporel.";
+            
+            alert(details);
+        }
+
+        function compterModificationsArchive(archive) {
+            let count = 0;
+            if (archive.recettes) {
+                count += (archive.recettes.supprimees || []).length;
+                count += Object.keys(archive.recettes.modifiees || {}).length;
+                count += (archive.recettes.ajoutees || []).length;
+            }
+            if (archive.charges) {
+                count += (archive.charges.supprimees || []).length;
+                count += Object.keys(archive.charges.modifiees || {}).length;
+                count += (archive.charges.ajoutees || []).length;
+            }
+            return count;
+        }
+
+        function fermerModalOverride() {
+            const modal = document.getElementById('modalOverride');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // ===============================================
+        // AUTRES FONCTIONS (CONSERVÉES)
+        // ===============================================
+
+        function sauvegarderPrevisionnel() {
+            try {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    soldeInitial: parseFloat(document.getElementById('soldeInitial').value),
+                    projectionMensuelle: projectionMensuelle,
+                    operationsSpecifiques: operationsSpecifiques
+                };
+                localStorage.setItem('previsionnel12moisRT', JSON.stringify(data));
+                
+                // HOOK SYNCHRONISATION : Marquer changement pour sync
+                localStorage.setItem('previsionnel12moisRT_lastModified', new Date().toISOString());
+                
+                console.log('💾 Prévisionnel sauvegardé');
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde:', error);
+            }
+        }
+
+        function sauvegarderToutesLesDonnees() {
+            try {
+                localStorage.setItem('previsionnel_overrides', JSON.stringify(overridesRecurrents));
+                localStorage.setItem('previsionnel_config_temporelle', JSON.stringify(configurationTemporelle));
+                localStorage.setItem('previsionnel_archive', JSON.stringify(archiveOverrides));
+                sauvegarderPrevisionnel();
+                console.log('💾 Toutes les données sauvegardées');
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde globale:', error);
+            }
+        }
+
+        function afficherStats() {
+            const totalRecettes = projectionMensuelle.reduce((sum, m) => sum + m.totalRecettes, 0);
+            const totalCharges = projectionMensuelle.reduce((sum, m) => sum + m.totalCharges, 0);
+            const resultatAnnuel = totalRecettes - totalCharges;
+            const soldeFinal = projectionMensuelle.length > 0 ? projectionMensuelle[projectionMensuelle.length - 1].soldeCumule : 0;
+
+            document.getElementById('totalRecettes').textContent = Math.round(totalRecettes).toLocaleString('fr-FR') + '€';
+            document.getElementById('totalCharges').textContent = Math.round(totalCharges).toLocaleString('fr-FR') + '€';
+            document.getElementById('resultatAnnuel').textContent = Math.round(resultatAnnuel).toLocaleString('fr-FR') + '€';
+            document.getElementById('soldeFinal').textContent = Math.round(soldeFinal).toLocaleString('fr-FR') + '€';
+        }
+
+        function toggleAccordeon(index) {
+            const header = document.querySelector(`#accordeonContainer .accordion:nth-child(${index + 1}) .accordion-header`);
+            const content = document.getElementById(`accordeon-${index}`);
+            
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        function mettreAJourGraphique() {
+            const ctx = document.getElementById('prevChart').getContext('2d');
+            
+            if (prevChart) {
+                prevChart.destroy();
+            }
+            
+            const labels = projectionMensuelle.map(m => m.mois.split(' ')[0]); // Juste le mois
+            const data = projectionMensuelle.map(m => Math.round(m.soldeCumule));
+            
+            prevChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Solde Cumulé (€)',
+                        data: data,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#007bff',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('fr-FR') + '€';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        function initialiserModalMois() {
+            const select = document.getElementById('operationMois');
+            const dateDebut = new Date(configurationTemporelle.periodeReference + '-01');
+            
+            for (let i = 0; i < 12; i++) {
+                const dateMois = new Date(dateDebut);
+                dateMois.setMonth(dateMois.getMonth() + i);
+                
+                const moisNom = dateMois.toLocaleDateString('fr-FR', { 
+                    year: 'numeric', 
+                    month: 'long' 
+                });
+                
+                const moisCle = `${dateMois.getFullYear()}-${String(dateMois.getMonth() + 1).padStart(2, '0')}`;
+                
+                const option = document.createElement('option');
+                option.value = moisCle;
+                option.textContent = moisNom;
+                select.appendChild(option);
+            }
+        }
+
+        function ouvrirModalOperation() {
+            document.getElementById('modalOperation').style.display = 'block';
+            document.getElementById('formOperation').reset();
+        }
+
+        function fermerModal() {
+            document.getElementById('modalOperation').style.display = 'none';
+        }
+
+        function exporterPDF() {
+            // Mise à jour des informations d'impression
+            const maintenant = new Date();
+            document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
+            document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
+            
+            // Ouvrir tous les accordéons pour l'impression
+            const accordeonHeaders = document.querySelectorAll('.accordion-header');
+            const accordeonContents = document.querySelectorAll('.accordion-content');
+            
+            accordeonHeaders.forEach(header => header.classList.add('active'));
+            accordeonContents.forEach(content => content.classList.add('active'));
+            
+            // Instructions pour l'utilisateur
+            const confirmation = confirm(
+                '🖨️ Export PDF - Instructions :\n\n' +
+                '1. Cliquez OK puis CTRL+P (Cmd+P sur Mac)\n' +
+                '2. Choisir "Enregistrer au format PDF"\n' +
+                '3. Sélectionner "Plus de paramètres"\n' +
+                '4. Cocher "Graphiques d\'arrière-plan"\n\n' +
+                'Continuer ?'
+            );
+
+            if (confirmation) {
+                // Déclencher l'impression
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+            }
+        }
+
+        // Gestionnaires d'événements
+        document.getElementById('formOperation').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('operationType').value;
+            const moisCle = document.getElementById('operationMois').value;
+            const libelle = document.getElementById('operationLibelle').value;
+            const montant = parseFloat(document.getElementById('operationMontant').value);
+            const commentaire = document.getElementById('operationCommentaire').value;
+            
+            if (!operationsSpecifiques[moisCle]) {
+                operationsSpecifiques[moisCle] = [];
+            }
+            
+            operationsSpecifiques[moisCle].push({
+                id: Date.now(),
+                type,
+                libelle,
+                montant,
+                commentaire
+            });
+            
+            fermerModal();
+            calculerPrevisionnel();
+            
+            console.log('✅ Opération spécifique ajoutée:', { type, moisCle, libelle, montant });
+        });
+
+        // Gestionnaire pour les overrides
+        document.addEventListener('submit', function(e) {
+            if (e.target.id === 'formOverride') {
+                e.preventDefault();
+                appliquerOverride(e);
+            }
+        });
+
+        // Fermer modal en cliquant à l'extérieur
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalOperation');
+            const modalOverride = document.getElementById('modalOverride');
+            if (event.target === modal) {
+                fermerModal();
+            }
+            if (event.target === modalOverride) {
+                fermerModalOverride();
+            }
+        }
+    </script>
+</body>
+</html>
