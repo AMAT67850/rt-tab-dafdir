@@ -318,6 +318,28 @@
         .detail-amount {
             font-weight: 600;
             color: #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .actions-ecriture {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+        
+        .btn-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn-action:hover {
+            opacity: 1;
         }
         
         .total-row {
@@ -666,6 +688,8 @@
                     const prevData = JSON.parse(prevStorage);
                     document.getElementById('soldeInitial').value = prevData.soldeInitial || 0;
                     operationsSpecifiques = prevData.operationsSpecifiques || {};
+                    window.overridesTemporaires = prevData.overridesTemporaires || {};
+                    window.suppressionsTemporaires = prevData.suppressionsTemporaires || {};
                     console.log('💾 Configuration prévisionnel restaurée');
                 }
 
@@ -681,7 +705,9 @@
                     timestamp: new Date().toISOString(),
                     soldeInitial: parseFloat(document.getElementById('soldeInitial').value),
                     projectionMensuelle: projectionMensuelle,
-                    operationsSpecifiques: operationsSpecifiques
+                    operationsSpecifiques: operationsSpecifiques,
+                    overridesTemporaires: window.overridesTemporaires || {},
+                    suppressionsTemporaires: window.suppressionsTemporaires || {}
                 };
                 localStorage.setItem('previsionnel12moisRT', JSON.stringify(data));
                 
@@ -764,32 +790,60 @@
                 let detailCharges = [];
                 
                 // Recettes récurrentes
-                recettesData.forEach(recette => {
+                recettesData.forEach((recette, recetteIndex) => {
                     if (doitApparaitreCeMois(recette, dateMois)) {
-                        const montant = Math.abs(recette.montantHT || 0);
-                        totalRecettes += montant;
-                        detailRecettes.push({
-                            libelle: `${recette.client} - ${recette.libelle}`,
-                            montant: montant,
-                            type: 'recurrente',
-                            periodicite: recette.periodicite
-                        });
-                        console.log(`💰 Recette: ${recette.client} = ${montant}€ (${recette.periodicite})`);
+                        // Vérifier si supprimée temporairement
+                        const suppressions = window.suppressionsTemporaires?.[moisCle]?.recettes || [];
+                        const estSupprimee = suppressions.some(s => s.index === recetteIndex);
+                        
+                        if (!estSupprimee) {
+                            let montant = Math.abs(recette.montantHT || 0);
+                            
+                            // Vérifier si modifiée temporairement
+                            const overrides = window.overridesTemporaires?.[moisCle]?.recettes || [];
+                            const override = overrides.find(o => o.index === recetteIndex);
+                            if (override) {
+                                montant = override.nouveauMontant;
+                            }
+                            
+                            totalRecettes += montant;
+                            detailRecettes.push({
+                                libelle: `${recette.client} - ${recette.libelle}${override ? ' ✏️' : ''}`,
+                                montant: montant,
+                                type: 'recurrente',
+                                periodicite: recette.periodicite
+                            });
+                            console.log(`💰 Recette: ${recette.client} = ${montant}€ (${recette.periodicite})`);
+                        }
                     }
                 });
                 
                 // Charges récurrentes
-                chargesData.forEach(charge => {
+                chargesData.forEach((charge, chargeIndex) => {
                     if (doitApparaitreCeMois(charge, dateMois)) {
-                        const montant = Math.abs(charge.montantHT || 0);
-                        totalCharges += montant;
-                        detailCharges.push({
-                            libelle: `${charge.element}`,
-                            montant: montant,
-                            type: 'recurrente',
-                            periodicite: charge.periodicite
-                        });
-                        console.log(`💸 Charge: ${charge.element} = ${montant}€ (${charge.periodicite})`);
+                        // Vérifier si supprimée temporairement
+                        const suppressions = window.suppressionsTemporaires?.[moisCle]?.charges || [];
+                        const estSupprimee = suppressions.some(s => s.index === chargeIndex);
+                        
+                        if (!estSupprimee) {
+                            let montant = Math.abs(charge.montantHT || 0);
+                            
+                            // Vérifier si modifiée temporairement
+                            const overrides = window.overridesTemporaires?.[moisCle]?.charges || [];
+                            const override = overrides.find(o => o.index === chargeIndex);
+                            if (override) {
+                                montant = override.nouveauMontant;
+                            }
+                            
+                            totalCharges += montant;
+                            detailCharges.push({
+                                libelle: `${charge.element}${override ? ' ✏️' : ''}`,
+                                montant: montant,
+                                type: 'recurrente',
+                                periodicite: charge.periodicite
+                            });
+                            console.log(`💸 Charge: ${charge.element} = ${montant}€ (${charge.periodicite})`);
+                        }
                     }
                 });
                 
@@ -891,14 +945,20 @@
                             <div class="detail-section">
                                 <h4>💰 Recettes (${mois.detailRecettes.length})</h4>
                                 <ul class="detail-list">
-                                    ${mois.detailRecettes.map(r => `
+                                    ${mois.detailRecettes.map((r, rIndex) => `
                                         <li>
                                             <span class="detail-label">
                                                 ${r.libelle}
                                                 ${r.type === 'specifique' ? ' 🎯' : ''}
                                                 ${r.periodicite ? ` (${r.periodicite})` : ''}
                                             </span>
-                                            <span class="detail-amount">${Math.round(r.montant).toLocaleString('fr-FR')}€</span>
+                                            <span class="detail-amount">
+                                                ${Math.round(r.montant).toLocaleString('fr-FR')}€
+                                                <span class="actions-ecriture">
+                                                    <button onclick="modifierEcriture('${mois.moisCle}', 'recette', ${rIndex})" class="btn-action" title="Modifier">✏️</button>
+                                                    <button onclick="supprimerEcriture('${mois.moisCle}', 'recette', ${rIndex})" class="btn-action" title="Supprimer">🗑️</button>
+                                                </span>
+                                            </span>
                                         </li>
                                     `).join('')}
                                 </ul>
@@ -1075,6 +1135,102 @@
             
             console.log('✅ Opération spécifique ajoutée:', { type, moisCle, libelle, montant });
         });
+
+        // ===================================
+        // GESTION MODIFICATION/SUPPRESSION ÉCRITURES
+        // ===================================
+
+        function modifierEcriture(moisCle, type, index) {
+            const moisData = projectionMensuelle.find(m => m.moisCle === moisCle);
+            if (!moisData) return;
+            
+            const ecriture = type === 'recette' ? moisData.detailRecettes[index] : moisData.detailCharges[index];
+            if (!ecriture) return;
+            
+            const nouveauMontant = prompt(
+                `Modifier le montant de : ${ecriture.libelle}\n\nMontant actuel : ${ecriture.montant}€\nNouveau montant :`,
+                ecriture.montant
+            );
+            
+            if (nouveauMontant !== null && !isNaN(parseFloat(nouveauMontant))) {
+                const montant = parseFloat(nouveauMontant);
+                
+                // Si c'est une écriture spécifique, modifier directement dans operationsSpecifiques
+                if (ecriture.type === 'specifique') {
+                    const operations = operationsSpecifiques[moisCle];
+                    if (operations) {
+                        const opIndex = operations.findIndex(op => 
+                            op.type === type && op.libelle === ecriture.libelle.replace(' 🎯', '')
+                        );
+                        if (opIndex !== -1) {
+                            operations[opIndex].montant = montant;
+                        }
+                    }
+                } else {
+                    // Pour les écritures récurrentes, créer un override temporaire
+                    if (!window.overridesTemporaires) {
+                        window.overridesTemporaires = {};
+                    }
+                    if (!window.overridesTemporaires[moisCle]) {
+                        window.overridesTemporaires[moisCle] = { recettes: [], charges: [] };
+                    }
+                    
+                    window.overridesTemporaires[moisCle][type === 'recette' ? 'recettes' : 'charges'].push({
+                        index: index,
+                        libelle: ecriture.libelle,
+                        montantOriginal: ecriture.montant,
+                        nouveauMontant: montant
+                    });
+                }
+                
+                calculerPrevisionnel();
+                console.log(`✏️ Écriture modifiée: ${ecriture.libelle} = ${montant}€`);
+            }
+        }
+
+        function supprimerEcriture(moisCle, type, index) {
+            const moisData = projectionMensuelle.find(m => m.moisCle === moisCle);
+            if (!moisData) return;
+            
+            const ecriture = type === 'recette' ? moisData.detailRecettes[index] : moisData.detailCharges[index];
+            if (!ecriture) return;
+            
+            const confirmation = confirm(`Supprimer cette écriture ?\n\n${ecriture.libelle}\n${ecriture.montant}€`);
+            
+            if (confirmation) {
+                // Si c'est une écriture spécifique, supprimer de operationsSpecifiques
+                if (ecriture.type === 'specifique') {
+                    const operations = operationsSpecifiques[moisCle];
+                    if (operations) {
+                        const opIndex = operations.findIndex(op => 
+                            op.type === type && op.libelle === ecriture.libelle.replace(' 🎯', '')
+                        );
+                        if (opIndex !== -1) {
+                            operations.splice(opIndex, 1);
+                            if (operations.length === 0) {
+                                delete operationsSpecifiques[moisCle];
+                            }
+                        }
+                    }
+                } else {
+                    // Pour les écritures récurrentes, créer un override de suppression
+                    if (!window.suppressionsTemporaires) {
+                        window.suppressionsTemporaires = {};
+                    }
+                    if (!window.suppressionsTemporaires[moisCle]) {
+                        window.suppressionsTemporaires[moisCle] = { recettes: [], charges: [] };
+                    }
+                    
+                    window.suppressionsTemporaires[moisCle][type === 'recette' ? 'recettes' : 'charges'].push({
+                        index: index,
+                        libelle: ecriture.libelle
+                    });
+                }
+                
+                calculerPrevisionnel();
+                console.log(`🗑️ Écriture supprimée: ${ecriture.libelle}`);
+            }
+        }
 
         // ===================================
         // EXPORT PDF
