@@ -571,7 +571,7 @@
                 <div class="config-grid">
                     <div class="config-item">
                         <label for="soldeInitial">💰 Solde Initial (€)</label>
-                        <input type="number" id="soldeInitial" value="0" step="0.01" onchange="calculerPrevisionnel()">
+                        <input type="number" id="soldeInitial" value="10000" step="0.01" onchange="calculerPrevisionnel()">
                     </div>
                     <div class="config-item">
                         <label for="moisDebut">📅 Mois de Début</label>
@@ -639,6 +639,80 @@
         let operationsSpecifiques = {};
         let overridesRecurrents = {};
 
+        // DONNÉES DE DÉMONSTRATION INTÉGRÉES
+        const donneesDemo = {
+            recettes: [
+                {
+                    id: 1001,
+                    client: "ACME Corp",
+                    type: "bureau privatif",
+                    element: "Location bureau 25m²",
+                    montantHT: 2500,
+                    montantTTC: 3000,
+                    periodicite: "MENSUEL",
+                    statut: "ACTIF",
+                    commentaire: "Contrat 3 ans"
+                },
+                {
+                    id: 1002,
+                    client: "TechStart",
+                    type: "espace de coworking",
+                    element: "Poste flexible",
+                    montantHT: 800,
+                    montantTTC: 960,
+                    periodicite: "MENSUEL",
+                    statut: "ACTIF",
+                    commentaire: "Forfait mensuel"
+                },
+                {
+                    id: 1003,
+                    client: "BigCompany",
+                    type: "salle de réunion",
+                    element: "Formation trimestrielle",
+                    montantHT: 1200,
+                    montantTTC: 1440,
+                    periodicite: "TRIMESTRIEL",
+                    statut: "ACTIF",
+                    commentaire: "Sessions de formation"
+                }
+            ],
+            charges: [
+                {
+                    id: 2001,
+                    fournisseur: "Banque Populaire",
+                    type: "emprunts",
+                    element: "Remboursement prêt immo",
+                    montantHT: -1200,
+                    montantTTC: -1200,
+                    periodicite: "MENSUEL",
+                    statut: "ACTIF",
+                    commentaire: "Prêt 15 ans"
+                },
+                {
+                    id: 2002,
+                    fournisseur: "EDF",
+                    type: "autres",
+                    element: "Électricité",
+                    montantHT: -300,
+                    montantTTC: -360,
+                    periodicite: "BIMESTRIEL",
+                    statut: "ACTIF",
+                    commentaire: "Facture énergétique"
+                },
+                {
+                    id: 2003,
+                    fournisseur: "Orange",
+                    type: "télécomm",
+                    element: "Internet + Téléphone",
+                    montantHT: -80,
+                    montantTTC: -96,
+                    periodicite: "MENSUEL",
+                    statut: "ACTIF",
+                    commentaire: "Forfait professionnel"
+                }
+            ]
+        };
+
         // ===============================================
         // INITIALISATION
         // ===============================================
@@ -659,11 +733,21 @@
             try {
                 // Charger les recettes
                 const recettesStorage = localStorage.getItem('recettesRT');
-                recettesData = recettesStorage ? JSON.parse(recettesStorage) : [];
+                if (recettesStorage) {
+                    recettesData = JSON.parse(recettesStorage);
+                } else {
+                    recettesData = donneesDemo.recettes;
+                    console.log('📊 Utilisation des données de démonstration - Recettes');
+                }
                 
                 // Charger les charges récurrentes
                 const chargesStorage = localStorage.getItem('chargesRecurrentesRT');
-                chargesData = chargesStorage ? JSON.parse(chargesStorage) : [];
+                if (chargesStorage) {
+                    chargesData = JSON.parse(chargesStorage);
+                } else {
+                    chargesData = donneesDemo.charges;
+                    console.log('📊 Utilisation des données de démonstration - Charges');
+                }
                 
                 // Charger les opérations spécifiques
                 const operationsStorage = localStorage.getItem('operationsSpecifiquesRT');
@@ -818,7 +902,7 @@
             
             // Recettes avec overrides
             recettesData.forEach(recette => {
-                if (doitApparaitreCeMois(recette, dateMois)) {
+                if (recette.statut === 'ACTIF' && doitApparaitreCeMois(recette, dateMois)) {
                     const overrides = overridesMois.recettes || {};
                     
                     // Vérifier si supprimée ou suspendue ce mois
@@ -859,7 +943,7 @@
             
             // Charges avec overrides
             chargesData.forEach(charge => {
-                if (doitApparaitreCeMois(charge, dateMois)) {
+                if (charge.statut === 'ACTIF' && doitApparaitreCeMois(charge, dateMois)) {
                     const overrides = overridesMois.charges || {};
                     
                     if (overrides.supprimees?.includes(charge.id) || 
@@ -1126,12 +1210,6 @@
         // ===============================================
 
         function ouvrirModalOverrideRecurrent(moisCle, type, element = null) {
-            // Supprimer toute modal existante
-            const existingModal = document.getElementById('modalOverride');
-            if (existingModal) {
-                existingModal.innerHTML = '';
-            }
-            
             const modal = document.getElementById('modalOverride');
             const isModification = element !== null;
             
