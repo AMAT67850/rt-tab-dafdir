@@ -759,7 +759,7 @@
         });
 
         function chargerRecettes() {
-            const stored = localStorage.getItem('recettes_rocket_tower');
+            const stored = localStorage.getItem('recettesRT');
             if (stored) {
                 recettes = JSON.parse(stored);
                 
@@ -782,7 +782,7 @@
         }
 
         function sauvegarderRecettes() {
-            localStorage.setItem('recettes_rocket_tower', JSON.stringify(recettes));
+            localStorage.setItem('recettesRT', JSON.stringify(recettes));
         }
 
         function afficherRecettes() {
