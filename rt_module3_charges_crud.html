@@ -229,6 +229,36 @@
             background-color: #f8f9fa;
         }
 
+        /* Colonne drag handle plus étroite */
+        th:first-child {
+            width: 40px;
+            text-align: center;
+        }
+
+        /* Style pour la poignée de drag */
+        td:first-child {
+            text-align: center;
+            cursor: move;
+            color: #adb5bd;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        td:first-child:hover {
+            color: #dc3545;
+        }
+
+        /* Styles pour le drag & drop */
+        .dragging {
+            opacity: 0.5;
+            background-color: #e9ecef;
+        }
+
+        .drag-over {
+            border-top: 3px solid #dc3545;
+        }
+
+
         .montant {
             text-align: right;
             font-weight: 600;
@@ -596,7 +626,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalMontantLisse">0€</div>
-                    <div class="stat-label">Total Lissé/Mois charges inactives incluses</div>
+                    <div class="stat-label">Total Lissé/Mois</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalActifs">0</div>
@@ -610,6 +640,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>⋮⋮</th>
                         <th>Fournisseur</th>
                         <th>Type</th> <!-- NOUVELLE COLONNE TYPE -->
                         <th>Élément</th>
@@ -623,7 +654,7 @@
                 </thead>
                 <tbody id="chargesTableBody">
                     <tr>
-                        <td colspan="9" class="loading">Chargement des données...</td>
+                        <td colspan="10" class="loading">Chargement des données...</td>
                     </tr>
                 </tbody>
             </table>
@@ -721,18 +752,19 @@
         // Variables globales
         let charges = [];
         let chargeEnEdition = null;
+        let draggedElement = null;
 
-        // DONNÉES DE DÉMONSTRATION pour test des filtres par type charges
+        // DONNÃ‰ES DE DÃ‰MONSTRATION pour test des filtres par type charges
         const donneesDemo = [
             { id: 1, fournisseur: "Banque Principale", type: "emprunts", element: "Emprunt immobilier local", montantHT: -2500, montantTTC: -3000, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Financement bureau principal" },
-            { id: 2, fournisseur: "Crédit Agricole", type: "frais bancaires", element: "Frais de tenue de compte", montantHT: -15, montantTTC: -18, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Compte professionnel principal" },
-            { id: 3, fournisseur: "SCI Immobilier", type: "loyers", element: "Loyer bureau centre-ville", montantHT: -1800, montantTTC: -2160, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Local commercial 150m²" },
-            { id: 4, fournisseur: "Orange Business", type: "télécomm.", element: "Abonnement internet fibre", montantHT: -89, montantTTC: -106.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Fibre 1Gb symétrique" },
-            { id: 5, fournisseur: "AXA Pro", type: "assurances", element: "Assurance responsabilité civile", montantHT: -250, montantTTC: -300, periodicite: "ANNUEL", statut: "ACTIF", commentaire: "Couverture activité coworking" },
-            { id: 6, fournisseur: "Peugeot Lease", type: "véhicules", element: "Leasing véhicule utilitaire", montantHT: -320, montantTTC: -384, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Partner électrique" },
-            { id: 7, fournisseur: "Adobe", type: "abonnements", element: "Creative Cloud Équipe", montantHT: -59, montantTTC: -70.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "5 licences design" },
+            { id: 2, fournisseur: "CrÃ©dit Agricole", type: "frais bancaires", element: "Frais de tenue de compte", montantHT: -15, montantTTC: -18, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Compte professionnel principal" },
+            { id: 3, fournisseur: "SCI Immobilier", type: "loyers", element: "Loyer bureau centre-ville", montantHT: -1800, montantTTC: -2160, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Local commercial 150mÂ²" },
+            { id: 4, fournisseur: "Orange Business", type: "tÃ©lÃ©comm.", element: "Abonnement internet fibre", montantHT: -89, montantTTC: -106.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Fibre 1Gb symÃ©trique" },
+            { id: 5, fournisseur: "AXA Pro", type: "assurances", element: "Assurance responsabilitÃ© civile", montantHT: -250, montantTTC: -300, periodicite: "ANNUEL", statut: "ACTIF", commentaire: "Couverture activitÃ© coworking" },
+            { id: 6, fournisseur: "Peugeot Lease", type: "véhicules", element: "Leasing vÃ©hicule utilitaire", montantHT: -320, montantTTC: -384, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Partner Ã©lectrique" },
+            { id: 7, fournisseur: "Adobe", type: "abonnements", element: "Creative Cloud Ã‰quipe", montantHT: -59, montantTTC: -70.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "5 licences design" },
             { id: 8, fournisseur: "Paie RH", type: "rémunérations", element: "Salaire gestionnaire", montantHT: -2800, montantTTC: -2800, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Temps plein 35h" },
-            { id: 9, fournisseur: "Expert Comptable", type: "ES", element: "Expertise comptable", montantHT: -180, montantTTC: -216, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Tenue comptabilité" },
+            { id: 9, fournisseur: "Expert Comptable", type: "ES", element: "Expertise comptable", montantHT: -180, montantTTC: -216, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Tenue comptabilitÃ©" },
             { id: 10, fournisseur: "Formation Pro", type: "abonnements", element: "Plateforme e-learning", montantHT: -99, montantTTC: -118.8, periodicite: "ANNUEL", statut: "INACTIF", commentaire: "Suspendu temporairement" },
             { id: 11, fournisseur: "Divers", type: "autres", element: "Frais divers bureau", montantHT: -50, montantTTC: -60, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Petites fournitures" }
         ];
@@ -753,9 +785,9 @@
                     console.log('🔥 Charges chargées depuis localStorage:', charges.length);
                     
                     // PAS DE MIGRATION AUTOMATIQUE - l'utilisateur ajoutera manuellement
-                    console.log('ℹ️ Pas de migration automatique - types à ajouter manuellement');
+                    console.log('ℹ️ Pas de migration automatique - types Ã  ajouter manuellement');
                 } else {
-                    // UTILISER DONNÉES DE DÉMONSTRATION si pas de localStorage
+                    // UTILISER DONNÃ‰ES DE DÃ‰MONSTRATION si pas de localStorage
                     charges = [...donneesDemo];
                     console.log('🔥 Données de démonstration chargées pour test des filtres:', charges.length);
                 }
@@ -809,7 +841,7 @@
             }
 
             if (chargesFiltrees.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="no-data">Aucune charge trouvée</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="no-data">Aucune charge trouvée</td></tr>';
                 return;
             }
 
@@ -819,7 +851,8 @@
                 const typeBadge = charge.type ? `<span class="badge badge-type-${typeFormatted}">${charge.type}</span>` : '<span class="badge" style="background:#f8f9fa;color:#6c757d;">Non défini</span>';
                 
                 return `
-                    <tr>
+                    <tr draggable="true" data-id="${charge.id}" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+                        <td>⋮⋮</td>
                         <td><strong>${charge.fournisseur}</strong></td>
                         <td>${typeBadge}</td>
                         <td>${charge.element}</td>
@@ -839,7 +872,7 @@
 
         function appliquerFiltres() {
             afficherCharges();
-            mettreAJourStats();
+            setTimeout(() => mettreAJourStats(), 10); // Force la synchronisation des filtres
         }
 
         function calculerMontantLisse(charge) {
@@ -878,7 +911,7 @@
 
         // Statistiques
         function mettreAJourStats() {
-            // Application des mêmes filtres que l'affichage
+            // Application des mÃªmes filtres que l'affichage
             const filtreType = document.getElementById('filtreType').value;
             const filtreStatut = document.getElementById('filtreStatut').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
@@ -912,22 +945,10 @@
             const totalMontantLisse = chargesFiltrees.reduce((sum, c) => sum + calculerMontantLisse(c), 0);
             const totalActifs = chargesFiltrees.filter(c => c.statut === 'ACTIF').length;
 
-            // 🔍 DEBUG - À supprimer après correction
-            console.log(`📊 DEBUG Stats: Filtre=${filtreStatut}, Charges=${totalCharges}, HT=${Math.round(totalMontantHT)}, Lissé=${Math.round(totalMontantLisse)}`);
-
             document.getElementById('totalCharges').textContent = totalCharges;
             document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
-            
-            // 🔍 DEBUG DOM
-            const elemLisse = document.getElementById('totalMontantLisse');
-            const nouvelleLisse = totalMontantLisse.toLocaleString('fr-FR') + '€';
-            console.log(`🔍 DEBUG DOM: Element trouvé=${!!elemLisse}, Ancienne valeur="${elemLisse?.textContent}", Nouvelle valeur="${nouvelleLisse}"`);
-            
-            document.getElementById('totalMontantLisse').textContent = nouvelleLisse;
+            document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
             document.getElementById('totalActifs').textContent = totalActifs;
-            
-            // 🔍 Vérification après mise à jour
-            console.log(`🔍 DEBUG DOM APRÈS: Valeur actuelle="${document.getElementById('totalMontantLisse').textContent}"`);
         }
 
         // Gestion Modal
@@ -947,7 +968,7 @@
             document.getElementById('modalTitle').textContent = 'Modifier Charge';
             
             document.getElementById('fournisseur').value = charge.fournisseur;
-            document.getElementById('type').value = charge.type || ''; // Peut être vide si pas encore défini
+            document.getElementById('type').value = charge.type || ''; // Peut Ãªtre vide si pas encore défini
             document.getElementById('element').value = charge.element;
             document.getElementById('montantHT').value = charge.montantHT;
             document.getElementById('montantTTC').value = charge.montantTTC;
@@ -963,7 +984,7 @@
             const charge = charges.find(c => (c.id || charges.indexOf(c)) === index);
             if (!charge) return;
 
-            if (confirm(`Êtes-vous sûr de vouloir supprimer la charge "${charge.fournisseur} - ${charge.element}" ?`)) {
+            if (confirm(`ÃŠtes-vous sÃ»r de vouloir supprimer la charge "${charge.fournisseur} - ${charge.element}" ?`)) {
                 charges = charges.filter(c => (c.id || charges.indexOf(c)) !== index);
                 sauvegarderCharges();
                 afficherCharges();
@@ -1015,12 +1036,80 @@
             }
         });
 
-        // Fermeture modal en cliquant à l'extérieur
+        // Fermeture modal en cliquant Ã  l'extÃ©rieur
         window.addEventListener('click', function(e) {
             if (e.target === document.getElementById('chargeModal')) {
                 fermerModal();
             }
         });
+
+        // Fonctions de drag & drop
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.innerHTML);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            
+            // Nettoyer toutes les classes drag-over
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            
+            e.dataTransfer.dropEffect = 'move';
+            
+            const target = e.target.closest('tr');
+            if (target && target !== draggedElement && target.hasAttribute('draggable')) {
+                target.classList.add('drag-over');
+            }
+            
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            const target = e.target.closest('tr');
+            
+            if (draggedElement !== target && target && target.hasAttribute('draggable')) {
+                // Récupérer les IDs
+                const draggedId = parseInt(draggedElement.getAttribute('data-id'));
+                const targetId = parseInt(target.getAttribute('data-id'));
+                
+                // Trouver les indices dans le tableau
+                const draggedIndex = charges.findIndex(c => c.id === draggedId);
+                const targetIndex = charges.findIndex(c => c.id === targetId);
+                
+                // Réorganiser le tableau
+                const [draggedCharge] = charges.splice(draggedIndex, 1);
+                charges.splice(targetIndex, 0, draggedCharge);
+                
+                // Mettre à jour les ordres
+                charges.forEach((charge, index) => {
+                    charge.ordre = index;
+                });
+                
+                // Sauvegarder et rafraîchir
+                sauvegarderCharges();
+                afficherCharges();
+                mettreAJourStats();
+            }
+            
+            target.classList.remove('drag-over');
+            
+            return false;
+        }
     </script>
 </body>
 </html>
