@@ -296,19 +296,34 @@
             color: #1565c0;
         }
 
-        .badge-type-flex-plus {
-            background: #f3e5f5;
-            color: #6a1b9a;
+        .badge-type-coworking {
+            background: #e8f5e9;
+            color: #388e3c;
         }
 
-        .badge-type-rocket-pass-plus {
+        .badge-type-rocket-pass {
             background: #fff3e0;
-            color: #e65100;
+            color: #f57c00;
+        }
+
+        .badge-type-flex {
+            background: #f3e5f5;
+            color: #7b1fa2;
         }
 
         .badge-type-coworking-plus {
-            background: #e8f5e9;
+            background: #c8e6c9;
             color: #2e7d32;
+        }
+
+        .badge-type-rocket-pass-plus {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+
+        .badge-type-flex-plus {
+            background: #e1bee7;
+            color: #6a1b9a;
         }
 
         .badge-type-salle-de-reunion {
@@ -573,9 +588,12 @@
                     <select id="filtreType" onchange="appliquerFiltres()">
                         <option value="tous">Tous les types</option>
                         <option value="bureau privatif">Bureau privatif</option>
-                        <option value="flex +">Flex +</option>
-                        <option value="rocket pass +">Rocket Pass +</option>
+                        <option value="coworking">Coworking</option>
+                        <option value="rocket pass">Rocket Pass</option>
+                        <option value="flex">Flex</option>
                         <option value="coworking +">Coworking +</option>
+                        <option value="rocket pass +">Rocket Pass +</option>
+                        <option value="flex +">Flex +</option>
                         <option value="salle de reunion">Salle de réunion</option>
                         <option value="domiciliation">Domiciliation</option>
                         <option value="autre">Autre</option>
@@ -679,9 +697,12 @@
                         <label>Type *</label>
                         <select id="type" required>
                             <option value="bureau privatif">Bureau privatif</option>
-                            <option value="flex +">Flex +</option>
-                            <option value="rocket pass +">Rocket Pass +</option>
+                            <option value="coworking">Coworking</option>
+                            <option value="rocket pass">Rocket Pass</option>
+                            <option value="flex">Flex</option>
                             <option value="coworking +">Coworking +</option>
+                            <option value="rocket pass +">Rocket Pass +</option>
+                            <option value="flex +">Flex +</option>
                             <option value="salle de reunion">Salle de réunion</option>
                             <option value="domiciliation">Domiciliation</option>
                             <option value="autre">Autre</option>
@@ -816,6 +837,33 @@
                 );
             }
 
+            // Tri par type dans l'ordre défini, puis par ordre personnalisé
+            const ordreTypes = {
+                'bureau privatif': 1,
+                'coworking': 2,
+                'rocket pass': 3,
+                'flex': 4,
+                'coworking +': 5,
+                'rocket pass +': 6,
+                'flex +': 7,
+                'salle de reunion': 8,
+                'domiciliation': 9,
+                'autre': 10
+            };
+            
+            recettesFiltrees.sort((a, b) => {
+                const typeA = ordreTypes[a.type] || 999;
+                const typeB = ordreTypes[b.type] || 999;
+                
+                // Si même type, trier par ordre personnalisé
+                if (typeA === typeB) {
+                    return a.ordre - b.ordre;
+                }
+                
+                // Sinon trier par type
+                return typeA - typeB;
+            });
+
             if (recettesFiltrees.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="10" class="no-data">Aucune recette trouvée</td></tr>';
                 return;
@@ -825,10 +873,12 @@
                 const montantLisse = calculerMontantLisse(recette);
                 let typeCssClass = recette.type.toLowerCase();
                 
-                // Mapping spécifique pour les types avec "+"
-                if (recette.type === "flex +") typeCssClass = "flex-plus";
+                // Mapping spécifique pour les types
+                if (recette.type === "coworking +") typeCssClass = "coworking-plus";
                 else if (recette.type === "rocket pass +") typeCssClass = "rocket-pass-plus";
-                else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
+                else if (recette.type === "flex +") typeCssClass = "flex-plus";
+                else if (recette.type === "rocket pass") typeCssClass = "rocket-pass";
+                else if (recette.type === "salle de reunion") typeCssClass = "salle-de-reunion";
                 else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
                 
                 return `
