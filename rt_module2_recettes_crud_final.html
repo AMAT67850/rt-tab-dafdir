@@ -219,152 +219,59 @@
             z-index: 10;
         }
 
-        /* Colonne drag handle plus étroite */
-        th:first-child {
-            width: 40px;
-            text-align: center;
-        }
-
         td {
             padding: 12px;
             border-bottom: 1px solid #e9ecef;
             vertical-align: middle;
         }
 
-        /* Style pour la poignée de drag */
-        td:first-child {
-            text-align: center;
-            cursor: move;
-            color: #adb5bd;
-            font-size: 18px;
-            user-select: none;
-        }
-
-        td:first-child:hover {
-            color: #27ae60;
-        }
-
         tr:hover {
-            background-color: #f8f9fa;
+            background: #f8f9fa;
         }
 
-        tbody tr:last-child td {
-            border-bottom: none;
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Badges Type */
+        .badge-type-coworking { background: #e3f2fd; color: #1565c0; }
+        .badge-type-flex { background: #f3e5f5; color: #7b1fa2; }
+        .badge-type-rocket-pass { background: #fff3e0; color: #e65100; }
+        .badge-type-coworking-plus { background: #e1f5fe; color: #01579b; }
+        .badge-type-flex-plus { background: #f1f8e9; color: #558b2f; }
+        .badge-type-rocket-pass-plus { background: #ffe0b2; color: #ef6c00; }
+        .badge-type-bureau-privatif { background: #e8eaf6; color: #283593; }
+        .badge-type-flex-nomade { background: #fce4ec; color: #c2185b; }
+
+        /* Badges Périodicité */
+        .badge-periodicite-mensuel { background: #c8e6c9; color: #2e7d32; }
+        .badge-periodicite-bimestriel { background: #b2dfdb; color: #00695c; }
+        .badge-periodicite-trimestriel { background: #b3e5fc; color: #0277bd; }
+        .badge-periodicite-semestriel { background: #d1c4e9; color: #4527a0; }
+        .badge-periodicite-annuel { background: #ffccbc; color: #d84315; }
+
+        /* Badges Statut */
+        .badge-actif { background: #c8e6c9; color: #2e7d32; }
+        .badge-inactif { background: #ffcdd2; color: #c62828; }
+
+        /* Badge Sortant */
+        .badge-sortant { 
+            background: #fff3e0; 
+            color: #e65100;
+            border: 1px solid #ffb74d;
         }
 
         .montant {
-            font-weight: 600;
+            font-weight: 700;
             text-align: right;
         }
 
-        .positif {
+        .montant.positif {
             color: #27ae60;
-        }
-
-        .negatif {
-            color: #e74c3c;
-        }
-
-        /* Badges */
-        .badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            white-space: nowrap;
-        }
-
-        .badge-actif {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-inactif {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .badge-standby {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        /* Badges types de recette */
-        .badge-type-bureau-privatif {
-            background: #e3f2fd;
-            color: #1565c0;
-        }
-
-        .badge-type-coworking {
-            background: #e8f5e9;
-            color: #388e3c;
-        }
-
-        .badge-type-rocket-pass {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .badge-type-flex {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        .badge-type-coworking-plus {
-            background: #c8e6c9;
-            color: #2e7d32;
-        }
-
-        .badge-type-rocket-pass-plus {
-            background: #ffe0b2;
-            color: #e65100;
-        }
-
-        .badge-type-flex-plus {
-            background: #e1bee7;
-            color: #6a1b9a;
-        }
-
-        .badge-type-salle-de-reunion {
-            background: #fce4ec;
-            color: #c2185b;
-        }
-
-        .badge-type-domiciliation {
-            background: #e0f2f1;
-            color: #00695c;
-        }
-
-        .badge-type-autre {
-            background: #f5f5f5;
-            color: #424242;
-        }
-
-        /* Badges périodicité */
-        .badge-periodicite-mensuel {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .badge-periodicite-bimestriel {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        .badge-periodicite-trimestriel {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .badge-periodicite-semestriel {
-            background: #fce4ec;
-            color: #c2185b;
-        }
-
-        .badge-periodicite-annuel {
-            background: #e8f5e9;
-            color: #388e3c;
         }
 
         .actions {
@@ -379,20 +286,27 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            transition: all 0.3s ease;
-            background: transparent;
+            transition: all 0.2s ease;
         }
 
-        .btn-action:hover {
-            transform: scale(1.1);
+        .btn-edit {
+            background: #007bff;
+            color: white;
         }
 
         .btn-edit:hover {
-            background: #fff3cd;
+            background: #0056b3;
+            transform: scale(1.1);
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
         }
 
         .btn-delete:hover {
-            background: #f8d7da;
+            background: #c82333;
+            transform: scale(1.1);
         }
 
         .no-data {
@@ -411,23 +325,19 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
         }
 
         .modal-content {
-            background-color: white;
-            margin: 5% auto;
+            background: white;
+            margin: 50px auto;
             padding: 0;
-            border-radius: 12px;
             width: 90%;
-            max-width: 600px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 700px;
+            border-radius: 12px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
             animation: slideDown 0.3s ease;
         }
 
@@ -445,33 +355,17 @@
         .modal-header {
             background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
-            padding: 20px 25px;
+            padding: 25px;
             border-radius: 12px 12px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .modal-header h2 {
+            font-size: 1.8em;
             margin: 0;
-            font-size: 1.5em;
-        }
-
-        .close {
-            color: white;
-            font-size: 32px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        .close:hover {
-            transform: scale(1.2);
         }
 
         .modal-body {
-            padding: 25px;
+            padding: 30px;
         }
 
         .form-group {
@@ -482,7 +376,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #333;
+            color: #495057;
         }
 
         .form-group input,
@@ -494,7 +388,6 @@
             border-radius: 8px;
             font-size: 14px;
             transition: border-color 0.3s ease;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .form-group input:focus,
@@ -511,92 +404,119 @@
 
         .form-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
         }
 
-        .readonly-field {
-            background-color: #f8f9fa;
-            color: #6c757d;
-            cursor: not-allowed;
+        /* Checkbox pour Sortant */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff3e0;
+            border-radius: 8px;
+            border: 2px solid #ffb74d;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-weight: 600;
+            color: #e65100;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .lisse-result {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .lisse-result strong {
+            display: block;
+            font-size: 1.4em;
+            color: #27ae60;
+            margin-top: 5px;
         }
 
         .modal-footer {
-            padding: 20px 25px;
-            background-color: #f8f9fa;
-            border-radius: 0 0 12px 12px;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
             display: flex;
             gap: 10px;
             justify-content: flex-end;
         }
 
-        /* Styles pour le drag & drop */
-        .dragging {
-            opacity: 0.5;
-            background-color: #e9ecef;
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
         }
 
-        .drag-over {
-            border-top: 3px solid #27ae60;
+        .btn-cancel:hover {
+            background: #5a6268;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
             }
             
-            .controls {
-                flex-direction: column;
+            .header h1 {
+                font-size: 1.8em;
             }
             
-            .controls-left,
-            .controls-right {
-                width: 100%;
-                flex-direction: column;
-            }
-            
-            .search-box {
-                width: 100%;
-                max-width: none;
+            table {
+                font-size: 0.9em;
             }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>💵 Rocket Tower</h1>
-        <div class="subtitle">Gestion des Recettes Récurrentes</div>
+        <h1>💵 Rocket Tower - Gestion Recettes</h1>
+        <p class="subtitle">Système de gestion des recettes récurrentes avec localStorage</p>
     </div>
 
     <div class="container">
-        <!-- Contrôles -->
+        <!-- Contrôles et Boutons -->
         <div class="controls">
             <div class="controls-left">
-                <button class="btn btn-primary" onclick="nouvelleRecette()">
-                    ➕ Nouvelle Recette
-                </button>
-                <a href="index.html" class="btn btn-secondary">
-                    🏠 Retour Dashboard
-                </a>
+                <button class="btn btn-primary" onclick="nouvelleRecette()">➕ Nouvelle Recette</button>
+                <a href="index.html" class="btn btn-secondary">🏠 Retour Dashboard</a>
             </div>
 
-            <!-- FILTRES -->
+            <div class="controls-right">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Rechercher..." oninput="afficherRecettes()">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="controls">
             <div class="filters">
                 <div class="filter-group">
-                    <label>Type</label>
+                    <label>Type de recette</label>
                     <select id="filtreType" onchange="appliquerFiltres()">
                         <option value="tous">Tous les types</option>
-                        <option value="bureau privatif">Bureau privatif</option>
                         <option value="coworking">Coworking</option>
-                        <option value="rocket pass">Rocket Pass</option>
                         <option value="flex">Flex</option>
+                        <option value="rocket pass">Rocket Pass</option>
                         <option value="coworking +">Coworking +</option>
-                        <option value="rocket pass +">Rocket Pass +</option>
                         <option value="flex +">Flex +</option>
-                        <option value="salle de reunion">Salle de réunion</option>
-                        <option value="domiciliation">Domiciliation</option>
-                        <option value="autre">Autre</option>
+                        <option value="rocket pass +">Rocket Pass +</option>
+                        <option value="bureau privatif">Bureau privatif</option>
+                        <option value="flex nomade">Flex Nomade</option>
                     </select>
                 </div>
 
@@ -606,7 +526,6 @@
                         <option value="tous">Tous les statuts</option>
                         <option value="ACTIF">Actif</option>
                         <option value="INACTIF">Inactif</option>
-                        <option value="STANDBY">Stand-by</option>
                     </select>
                 </div>
 
@@ -622,13 +541,6 @@
                     </select>
                 </div>
             </div>
-
-            <div class="controls-right">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Rechercher une recette..." onkeyup="appliquerFiltres()">
-                    <span class="search-icon">🔍</span>
-                </div>
-            </div>
         </div>
 
         <!-- Statistiques -->
@@ -640,11 +552,11 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalMontantHT">0€</div>
-                    <div class="stat-label">Total HT</div>
+                    <div class="stat-label">Montant Total HT</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalMontantLisse">0€</div>
-                    <div class="stat-label">Total Lissé/Mois</div>
+                    <div class="stat-label">Montant Lissé Mensuel</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalActifs">0</div>
@@ -658,7 +570,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>⋮⋮</th>
                         <th>Client</th>
                         <th>Type</th>
                         <th>Élément</th>
@@ -667,67 +578,66 @@
                         <th>Périodicité</th>
                         <th>Lissé/Mois</th>
                         <th>Statut</th>
+                        <th>Sortant</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="recettesTableBody">
-                    <tr>
-                        <td colspan="10" class="no-data">Aucune recette enregistrée</td>
-                    </tr>
+                    <tr><td colspan="10" class="no-data">Chargement...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Modal Ajout/Modification -->
+    <!-- Modal Nouvelle/Edition Recette -->
     <div id="recetteModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Nouvelle Recette</h2>
-                <span class="close" onclick="fermerModal()">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="recetteForm">
                     <div class="form-group">
-                        <label>Client *</label>
+                        <label for="client">Client *</label>
                         <input type="text" id="client" required>
                     </div>
 
-                    <div class="form-group">
-                        <label>Type *</label>
-                        <select id="type" required>
-                            <option value="bureau privatif">Bureau privatif</option>
-                            <option value="coworking">Coworking</option>
-                            <option value="rocket pass">Rocket Pass</option>
-                            <option value="flex">Flex</option>
-                            <option value="coworking +">Coworking +</option>
-                            <option value="rocket pass +">Rocket Pass +</option>
-                            <option value="flex +">Flex +</option>
-                            <option value="salle de reunion">Salle de réunion</option>
-                            <option value="domiciliation">Domiciliation</option>
-                            <option value="autre">Autre</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Élément *</label>
-                        <input type="text" id="element" required placeholder="Ex: Bureau 12, Domiciliation simple, etc.">
-                    </div>
-
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Montant HT (€) *</label>
-                            <input type="number" id="montantHT" step="0.01" required oninput="calculerTTC(); calculerLisse();">
+                            <label for="type">Type de recette *</label>
+                            <select id="type" required>
+                                <option value="coworking">Coworking</option>
+                                <option value="flex">Flex</option>
+                                <option value="rocket pass">Rocket Pass</option>
+                                <option value="coworking +">Coworking +</option>
+                                <option value="flex +">Flex +</option>
+                                <option value="rocket pass +">Rocket Pass +</option>
+                                <option value="bureau privatif">Bureau privatif</option>
+                                <option value="flex nomade">Flex Nomade</option>
+                            </select>
                         </div>
+
                         <div class="form-group">
-                            <label>Montant TTC (€)</label>
-                            <input type="number" id="montantTTC" step="0.01" class="readonly-field" readonly>
+                            <label for="element">Élément *</label>
+                            <input type="text" id="element" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Périodicité *</label>
+                            <label for="montantHT">Montant HT (€) *</label>
+                            <input type="number" id="montantHT" step="0.01" required oninput="calculerTTC(); calculerLisse()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="montantTTC">Montant TTC (€)</label>
+                            <input type="number" id="montantTTC" step="0.01" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="periodicite">Périodicité *</label>
                             <select id="periodicite" required onchange="calculerLisse()">
                                 <option value="MENSUEL">Mensuel</option>
                                 <option value="BIMESTRIEL">Bimestriel</option>
@@ -736,86 +646,79 @@
                                 <option value="ANNUEL">Annuel</option>
                             </select>
                         </div>
+
                         <div class="form-group">
-                            <label>Montant Lissé/Mois (€)</label>
-                            <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; font-weight: 600; color: #27ae60;">
-                                <span id="montantLisse">0.00€</span>
-                            </div>
+                            <label for="statut">Statut *</label>
+                            <select id="statut" required>
+                                <option value="ACTIF">Actif</option>
+                                <option value="INACTIF">Inactif</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Statut *</label>
-                        <select id="statut" required>
-                            <option value="ACTIF">Actif</option>
-                            <option value="INACTIF">Inactif</option>
-                            <option value="STANDBY">Stand-by</option>
-                        </select>
+                    <!-- NOUVEAU : Case à cocher Sortant -->
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="sortant" name="sortant">
+                        <label for="sortant">🔜 Client Sortant (préavis donné)</label>
+                    </div>
+
+                    <div class="lisse-result">
+                        <span>Montant Lissé Mensuel :</span>
+                        <strong id="montantLisse">0.00€</strong>
                     </div>
 
                     <div class="form-group">
-                        <label>Commentaire</label>
-                        <textarea id="commentaire" placeholder="Notes supplémentaires..."></textarea>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="fermerModal()">Annuler</button>
-                        <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+                        <label for="commentaire">Commentaire</label>
+                        <textarea id="commentaire"></textarea>
                     </div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="fermerModal()">Annuler</button>
+                <button type="submit" form="recetteForm" class="btn btn-primary">💾 Enregistrer</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Variables globales
         let recettes = [];
         let recetteEnEdition = null;
-        let draggedElement = null;
 
-        // Chargement initial
-        window.addEventListener('DOMContentLoaded', function() {
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
             chargerRecettes();
             afficherRecettes();
             mettreAJourStats();
         });
 
+        // Fonctions localStorage
         function chargerRecettes() {
-            const stored = localStorage.getItem('recettesRT');
-            if (stored) {
-                recettes = JSON.parse(stored);
-                
-                // Migration : ajouter l'ordre aux recettes existantes si nécessaire
-                let needsSave = false;
-                recettes.forEach((recette, index) => {
-                    if (recette.ordre === undefined) {
-                        recette.ordre = index;
-                        needsSave = true;
-                    }
-                });
-                
-                if (needsSave) {
-                    sauvegarderRecettes();
-                }
-                
-                // Trier par ordre personnalisé
-                recettes.sort((a, b) => a.ordre - b.ordre);
+            const recettesJSON = localStorage.getItem('recettesRT');
+            if (recettesJSON) {
+                recettes = JSON.parse(recettesJSON);
+                console.log(`✅ ${recettes.length} recettes chargées depuis localStorage`);
+            } else {
+                recettes = [];
+                console.log('ℹ️ Aucune recette existante, liste vide initialisée');
             }
         }
 
         function sauvegarderRecettes() {
             localStorage.setItem('recettesRT', JSON.stringify(recettes));
+            console.log(`💾 ${recettes.length} recettes sauvegardées dans localStorage`);
         }
 
+        // Affichage
         function afficherRecettes() {
             const tbody = document.getElementById('recettesTableBody');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const filtreType = document.getElementById('filtreType').value;
             const filtreStatut = document.getElementById('filtreStatut').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
+
             let recettesFiltrees = [...recettes];
             
-            // Appliquer les filtres
             if (filtreType !== 'tous') {
                 recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
             }
@@ -837,33 +740,6 @@
                 );
             }
 
-            // Tri par type dans l'ordre défini, puis par ordre personnalisé
-            const ordreTypes = {
-                'bureau privatif': 1,
-                'coworking': 2,
-                'rocket pass': 3,
-                'flex': 4,
-                'coworking +': 5,
-                'rocket pass +': 6,
-                'flex +': 7,
-                'salle de reunion': 8,
-                'domiciliation': 9,
-                'autre': 10
-            };
-            
-            recettesFiltrees.sort((a, b) => {
-                const typeA = ordreTypes[a.type] || 999;
-                const typeB = ordreTypes[b.type] || 999;
-                
-                // Si même type, trier par ordre personnalisé
-                if (typeA === typeB) {
-                    return a.ordre - b.ordre;
-                }
-                
-                // Sinon trier par type
-                return typeA - typeB;
-            });
-
             if (recettesFiltrees.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="10" class="no-data">Aucune recette trouvée</td></tr>';
                 return;
@@ -871,19 +747,20 @@
 
             tbody.innerHTML = recettesFiltrees.map((recette, index) => {
                 const montantLisse = calculerMontantLisse(recette);
+                // Générer la classe CSS pour le badge type
                 let typeCssClass = recette.type.toLowerCase();
                 
-                // Mapping spécifique pour les types
-                if (recette.type === "coworking +") typeCssClass = "coworking-plus";
+                // Mapping spécifique pour les types avec "+"
+                if (recette.type === "flex +") typeCssClass = "flex-plus";
                 else if (recette.type === "rocket pass +") typeCssClass = "rocket-pass-plus";
-                else if (recette.type === "flex +") typeCssClass = "flex-plus";
-                else if (recette.type === "rocket pass") typeCssClass = "rocket-pass";
-                else if (recette.type === "salle de reunion") typeCssClass = "salle-de-reunion";
+                else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
                 else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
                 
+                // Badge sortant
+                const badgeSortant = recette.sortant ? '<span class="badge badge-sortant">🔜 Sortant</span>' : '';
+                
                 return `
-                    <tr draggable="true" data-id="${recette.id}" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
-                        <td>⋮⋮</td>
+                    <tr>
                         <td><strong>${recette.client}</strong></td>
                         <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
                         <td>${recette.element}</td>
@@ -892,81 +769,14 @@
                         <td><span class="badge badge-periodicite-${recette.periodicite.toLowerCase()}">${recette.periodicite}</span></td>
                         <td class="montant positif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
                         <td><span class="badge badge-${recette.statut.toLowerCase()}">${recette.statut}</span></td>
+                        <td>${badgeSortant}</td>
                         <td class="actions">
-                            <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id})">✏️</button>
-                            <button class="btn-action btn-delete" onclick="supprimerRecette(${recette.id})">🗑️</button>
+                            <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id || index})">✏️</button>
+                            <button class="btn-action btn-delete" onclick="supprimerRecette(${recette.id || index})">🗑️</button>
                         </td>
                     </tr>
                 `;
             }).join('');
-        }
-
-        // Fonctions de drag & drop
-        function handleDragStart(e) {
-            draggedElement = e.target;
-            e.target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', e.target.innerHTML);
-        }
-
-        function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
-            
-            // Nettoyer toutes les classes drag-over
-            document.querySelectorAll('.drag-over').forEach(el => {
-                el.classList.remove('drag-over');
-            });
-        }
-
-        function handleDragOver(e) {
-            if (e.preventDefault) {
-                e.preventDefault();
-            }
-            
-            e.dataTransfer.dropEffect = 'move';
-            
-            const target = e.target.closest('tr');
-            if (target && target !== draggedElement && target.hasAttribute('draggable')) {
-                target.classList.add('drag-over');
-            }
-            
-            return false;
-        }
-
-        function handleDrop(e) {
-            if (e.stopPropagation) {
-                e.stopPropagation();
-            }
-            
-            const target = e.target.closest('tr');
-            
-            if (draggedElement !== target && target && target.hasAttribute('draggable')) {
-                // Récupérer les IDs
-                const draggedId = parseInt(draggedElement.getAttribute('data-id'));
-                const targetId = parseInt(target.getAttribute('data-id'));
-                
-                // Trouver les indices dans le tableau
-                const draggedIndex = recettes.findIndex(r => r.id === draggedId);
-                const targetIndex = recettes.findIndex(r => r.id === targetId);
-                
-                // Réorganiser le tableau
-                const [draggedRecette] = recettes.splice(draggedIndex, 1);
-                recettes.splice(targetIndex, 0, draggedRecette);
-                
-                // Mettre à jour les ordres
-                recettes.forEach((recette, index) => {
-                    recette.ordre = index;
-                });
-                
-                // Sauvegarder et rafraîchir
-                sauvegarderRecettes();
-                afficherRecettes();
-                mettreAJourStats();
-            }
-            
-            target.classList.remove('drag-over');
-            
-            return false;
         }
 
         function appliquerFiltres() {
@@ -1010,6 +820,7 @@
 
         // Statistiques
         function mettreAJourStats() {
+            // Application des mêmes filtres que l'affichage
             const filtreType = document.getElementById('filtreType').value;
             const filtreStatut = document.getElementById('filtreStatut').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
@@ -1055,14 +866,15 @@
             document.getElementById('modalTitle').textContent = 'Nouvelle Recette';
             document.getElementById('recetteForm').reset();
             document.getElementById('montantLisse').textContent = '0.00€';
+            document.getElementById('sortant').checked = false;
             document.getElementById('recetteModal').style.display = 'block';
         }
 
-        function modifierRecette(id) {
-            const recette = recettes.find(r => r.id === id);
+        function modifierRecette(index) {
+            const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
             if (!recette) return;
 
-            recetteEnEdition = id;
+            recetteEnEdition = index;
             document.getElementById('modalTitle').textContent = 'Modifier Recette';
             
             document.getElementById('client').value = recette.client;
@@ -1073,23 +885,18 @@
             document.getElementById('periodicite').value = recette.periodicite;
             document.getElementById('statut').value = recette.statut;
             document.getElementById('commentaire').value = recette.commentaire || '';
+            document.getElementById('sortant').checked = recette.sortant || false;
             
             calculerLisse();
             document.getElementById('recetteModal').style.display = 'block';
         }
 
-        function supprimerRecette(id) {
-            const recette = recettes.find(r => r.id === id);
+        function supprimerRecette(index) {
+            const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
             if (!recette) return;
 
             if (confirm(`Êtes-vous sûr de vouloir supprimer la recette "${recette.client} - ${recette.element}" ?`)) {
-                recettes = recettes.filter(r => r.id !== id);
-                
-                // Réorganiser les ordres
-                recettes.forEach((r, index) => {
-                    r.ordre = index;
-                });
-                
+                recettes = recettes.filter(r => (r.id || recettes.indexOf(r)) !== index);
                 sauvegarderRecettes();
                 afficherRecettes();
                 mettreAJourStats();
@@ -1112,19 +919,19 @@
                 montantTTC: parseFloat(document.getElementById('montantTTC').value),
                 periodicite: document.getElementById('periodicite').value,
                 statut: document.getElementById('statut').value,
-                commentaire: document.getElementById('commentaire').value
+                commentaire: document.getElementById('commentaire').value,
+                sortant: document.getElementById('sortant').checked  // NOUVEAU
             };
 
             if (recetteEnEdition !== null) {
                 // Modification
-                const index = recettes.findIndex(r => r.id === recetteEnEdition);
+                const index = recettes.findIndex(r => (r.id || recettes.indexOf(r)) === recetteEnEdition);
                 if (index !== -1) {
                     recettes[index] = { ...recettes[index], ...nouvelleRecette };
                 }
             } else {
-                // Nouvelle recette - ajout à la fin
+                // Nouvelle recette
                 nouvelleRecette.id = Date.now();
-                nouvelleRecette.ordre = recettes.length;
                 recettes.push(nouvelleRecette);
             }
 
