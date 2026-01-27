@@ -246,6 +246,8 @@
         .badge-type-rocket-pass-plus { background: #ffe0b2; color: #ef6c00; }
         .badge-type-bureau-privatif { background: #e8eaf6; color: #283593; }
         .badge-type-flex-nomade { background: #fce4ec; color: #c2185b; }
+        .badge-type-mixte { background: #e0f2f1; color: #00695c; }
+        .badge-type-autres { background: #f1f8e9; color: #689f38; }
 
         /* Badges Périodicité */
         .badge-periodicite-mensuel { background: #c8e6c9; color: #2e7d32; }
@@ -724,261 +726,336 @@
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
-            chargerRecettes();
-            afficherRecettes();
-            mettreAJourStats();
+            console.log('🚀 Initialisation Module 2');
+            try {
+                chargerRecettes();
+                afficherRecettes();
+                mettreAJourStats();
+                console.log('✅ Initialisation terminée');
+            } catch (error) {
+                console.error('❌ Erreur initialisation:', error);
+            }
         });
 
         // Afficher/Masquer la date de départ
         function toggleDateDepart() {
-            const sortantChecked = document.getElementById('sortant').checked;
-            const dateDepartGroup = document.getElementById('dateDepartGroup');
-            const dateInput = document.getElementById('dateDepart');
-            
-            if (sortantChecked) {
-                dateDepartGroup.style.display = 'block';
-                dateInput.required = true;
-            } else {
-                dateDepartGroup.style.display = 'none';
-                dateInput.required = false;
-                dateInput.value = '';
+            try {
+                const sortantChecked = document.getElementById('sortant').checked;
+                const dateDepartGroup = document.getElementById('dateDepartGroup');
+                const dateInput = document.getElementById('dateDepart');
+                
+                if (sortantChecked) {
+                    dateDepartGroup.style.display = 'block';
+                    dateInput.required = true;
+                } else {
+                    dateDepartGroup.style.display = 'none';
+                    dateInput.required = false;
+                    dateInput.value = '';
+                }
+            } catch (error) {
+                console.error('Erreur toggleDateDepart:', error);
             }
         }
 
         // Fonctions localStorage
         function chargerRecettes() {
-            const recettesJSON = localStorage.getItem('recettesRT');
-            if (recettesJSON) {
-                recettes = JSON.parse(recettesJSON);
-                console.log(`✅ ${recettes.length} recettes chargées depuis localStorage`);
-            } else {
+            try {
+                const recettesJSON = localStorage.getItem('recettesRT');
+                if (recettesJSON) {
+                    recettes = JSON.parse(recettesJSON);
+                    console.log(`✅ ${recettes.length} recettes chargées`);
+                } else {
+                    recettes = [];
+                    console.log('ℹ️ Aucune recette, liste vide');
+                }
+            } catch (error) {
+                console.error('❌ Erreur chargement recettes:', error);
                 recettes = [];
-                console.log('ℹ️ Aucune recette existante, liste vide initialisée');
             }
         }
 
         function sauvegarderRecettes() {
-            localStorage.setItem('recettesRT', JSON.stringify(recettes));
-            console.log(`💾 ${recettes.length} recettes sauvegardées dans localStorage`);
+            try {
+                localStorage.setItem('recettesRT', JSON.stringify(recettes));
+                console.log(`💾 ${recettes.length} recettes sauvegardées`);
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde:', error);
+            }
         }
 
         // Calculer si un client part dans les 3 prochains mois
         function estSortantProche(dateDepart) {
-            if (!dateDepart) return false;
-            
-            const maintenant = new Date();
-            const dateSortie = new Date(dateDepart);
-            const diffTemps = dateSortie - maintenant;
-            const diffJours = diffTemps / (1000 * 60 * 60 * 24);
-            
-            return diffJours >= 0 && diffJours <= 90; // 3 mois = ~90 jours
+            try {
+                if (!dateDepart) return false;
+                
+                const maintenant = new Date();
+                const dateSortie = new Date(dateDepart);
+                
+                // Vérifier que la date est valide
+                if (isNaN(dateSortie.getTime())) return false;
+                
+                const diffTemps = dateSortie - maintenant;
+                const diffJours = diffTemps / (1000 * 60 * 60 * 24);
+                
+                return diffJours >= 0 && diffJours <= 90;
+            } catch (e) {
+                console.error('Erreur estSortantProche:', e);
+                return false;
+            }
         }
 
         // Affichage
         function afficherRecettes() {
-            const tbody = document.getElementById('recettesTableBody');
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filtreType = document.getElementById('filtreType').value;
-            const filtreStatut = document.getElementById('filtreStatut').value;
-            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
+            try {
+                const tbody = document.getElementById('recettesTableBody');
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const filtreType = document.getElementById('filtreType').value;
+                const filtreStatut = document.getElementById('filtreStatut').value;
+                const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
 
-            let recettesFiltrees = [...recettes];
-            
-            if (filtreType !== 'tous') {
-                recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
-            }
-            
-            if (filtreStatut !== 'tous') {
-                recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
-            }
-            
-            if (filtrePeriodicite !== 'toutes') {
-                recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
-            }
-            
-            if (searchTerm) {
-                recettesFiltrees = recettesFiltrees.filter(r => 
-                    r.client.toLowerCase().includes(searchTerm) ||
-                    r.element.toLowerCase().includes(searchTerm) ||
-                    r.type.toLowerCase().includes(searchTerm) ||
-                    (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
-                );
-            }
-
-            if (recettesFiltrees.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="no-data">Aucune recette trouvée</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = recettesFiltrees.map((recette, index) => {
-                const montantLisse = calculerMontantLisse(recette);
-                // Générer la classe CSS pour le badge type
-                let typeCssClass = recette.type.toLowerCase();
+                let recettesFiltrees = [...recettes];
                 
-                // Mapping spécifique pour les types avec "+"
-                if (recette.type === "flex +") typeCssClass = "flex-plus";
-                else if (recette.type === "rocket pass +") typeCssClass = "rocket-pass-plus";
-                else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
-                else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
-                
-                // Badge sortant avec distinction 3 mois
-                let badgeSortant = '';
-                if (recette.sortant && recette.dateDepart) {
-                    const proche = estSortantProche(recette.dateDepart);
-                    const dateFormatee = new Date(recette.dateDepart).toLocaleDateString('fr-FR');
-                    if (proche) {
-                        badgeSortant = `<span class="badge badge-sortant-3mois" title="Départ: ${dateFormatee}">⚠️ Départ proche</span>`;
-                    } else {
-                        badgeSortant = `<span class="badge badge-sortant" title="Départ: ${dateFormatee}">🔜 Sortant</span>`;
-                    }
-                } else if (recette.sortant) {
-                    badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>';
+                if (filtreType !== 'tous') {
+                    recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
                 }
                 
-                return `
-                    <tr>
-                        <td><strong>${recette.client}</strong></td>
-                        <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
-                        <td>${recette.element}</td>
-                        <td class="montant positif">${recette.montantHT.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                        <td class="montant positif">${recette.montantTTC.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                        <td><span class="badge badge-periodicite-${recette.periodicite.toLowerCase()}">${recette.periodicite}</span></td>
-                        <td class="montant positif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                        <td><span class="badge badge-${recette.statut.toLowerCase()}">${recette.statut}</span></td>
-                        <td>${badgeSortant}</td>
-                        <td class="actions">
-                            <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id || index})">✏️</button>
-                            <button class="btn-action btn-delete" onclick="supprimerRecette(${recette.id || index})">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+                if (filtreStatut !== 'tous') {
+                    recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+                }
+                
+                if (filtrePeriodicite !== 'toutes') {
+                    recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
+                }
+                
+                if (searchTerm) {
+                    recettesFiltrees = recettesFiltrees.filter(r => 
+                        r.client.toLowerCase().includes(searchTerm) ||
+                        r.element.toLowerCase().includes(searchTerm) ||
+                        r.type.toLowerCase().includes(searchTerm) ||
+                        (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
+                    );
+                }
+
+                if (recettesFiltrees.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="no-data">Aucune recette trouvée</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = recettesFiltrees.map((recette, index) => {
+                    const montantLisse = calculerMontantLisse(recette);
+                    let typeCssClass = recette.type.toLowerCase();
+                    
+                    if (recette.type === "flex +") typeCssClass = "flex-plus";
+                    else if (recette.type === "rocket pass +") typeCssClass = "rocket-pass-plus";
+                    else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
+                    else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
+                    
+                    // Badge sortant avec distinction 3 mois
+                    let badgeSortant = '';
+                    if (recette.sortant && recette.dateDepart) {
+                        try {
+                            const proche = estSortantProche(recette.dateDepart);
+                            const dateFormatee = new Date(recette.dateDepart).toLocaleDateString('fr-FR');
+                            if (proche) {
+                                badgeSortant = `<span class="badge badge-sortant-3mois" title="Départ: ${dateFormatee}">⚠️ Départ proche</span>`;
+                            } else {
+                                badgeSortant = `<span class="badge badge-sortant" title="Départ: ${dateFormatee}">🔜 Sortant</span>`;
+                            }
+                        } catch (e) {
+                            badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>';
+                        }
+                    } else if (recette.sortant) {
+                        badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>';
+                    }
+                    
+                    return `
+                        <tr>
+                            <td><strong>${recette.client}</strong></td>
+                            <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
+                            <td>${recette.element}</td>
+                            <td class="montant positif">${recette.montantHT.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                            <td class="montant positif">${recette.montantTTC.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                            <td><span class="badge badge-periodicite-${recette.periodicite.toLowerCase()}">${recette.periodicite}</span></td>
+                            <td class="montant positif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                            <td><span class="badge badge-${recette.statut.toLowerCase()}">${recette.statut}</span></td>
+                            <td>${badgeSortant}</td>
+                            <td class="actions">
+                                <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id || index})">✏️</button>
+                                <button class="btn-action btn-delete" onclick="supprimerRecette(${recette.id || index})">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                console.log(`📊 ${recettesFiltrees.length} recettes affichées`);
+            } catch (error) {
+                console.error('❌ Erreur affichage:', error);
+            }
         }
 
         function appliquerFiltres() {
-            afficherRecettes();
-            mettreAJourStats();
+            try {
+                afficherRecettes();
+                mettreAJourStats();
+            } catch (error) {
+                console.error('❌ Erreur filtres:', error);
+            }
         }
 
         function calculerMontantLisse(recette) {
-            const facteurs = {
-                'MENSUEL': 1,
-                'BIMESTRIEL': 2,
-                'TRIMESTRIEL': 3,
-                'SEMESTRIEL': 6,
-                'ANNUEL': 12
-            };
-            
-            return recette.montantHT / (facteurs[recette.periodicite] || 1);
+            try {
+                const facteurs = {
+                    'MENSUEL': 1,
+                    'BIMESTRIEL': 2,
+                    'TRIMESTRIEL': 3,
+                    'SEMESTRIEL': 6,
+                    'ANNUEL': 12
+                };
+                
+                return recette.montantHT / (facteurs[recette.periodicite] || 1);
+            } catch (error) {
+                console.error('❌ Erreur calcul lissé:', error);
+                return 0;
+            }
         }
 
         function calculerTTC() {
-            const montantHT = parseFloat(document.getElementById('montantHT').value) || 0;
-            const montantTTC = montantHT * 1.2; // TVA 20%
-            document.getElementById('montantTTC').value = montantTTC.toFixed(2);
+            try {
+                const montantHT = parseFloat(document.getElementById('montantHT').value) || 0;
+                const montantTTC = montantHT * 1.2;
+                document.getElementById('montantTTC').value = montantTTC.toFixed(2);
+            } catch (error) {
+                console.error('❌ Erreur calcul TTC:', error);
+            }
         }
 
         function calculerLisse() {
-            const montantHT = parseFloat(document.getElementById('montantHT').value) || 0;
-            const periodicite = document.getElementById('periodicite').value;
-            
-            const facteurs = {
-                'MENSUEL': 1,
-                'BIMESTRIEL': 2,
-                'TRIMESTRIEL': 3,
-                'SEMESTRIEL': 6,
-                'ANNUEL': 12
-            };
-            
-            const montantLisse = montantHT / (facteurs[periodicite] || 1);
-            document.getElementById('montantLisse').textContent = montantLisse.toFixed(2) + '€';
+            try {
+                const montantHT = parseFloat(document.getElementById('montantHT').value) || 0;
+                const periodicite = document.getElementById('periodicite').value;
+                
+                const facteurs = {
+                    'MENSUEL': 1,
+                    'BIMESTRIEL': 2,
+                    'TRIMESTRIEL': 3,
+                    'SEMESTRIEL': 6,
+                    'ANNUEL': 12
+                };
+                
+                const montantLisse = montantHT / (facteurs[periodicite] || 1);
+                document.getElementById('montantLisse').textContent = montantLisse.toFixed(2) + '€';
+            } catch (error) {
+                console.error('❌ Erreur calcul lissé modal:', error);
+            }
         }
 
         // Statistiques
         function mettreAJourStats() {
-            const filtreType = document.getElementById('filtreType').value;
-            const filtreStatut = document.getElementById('filtreStatut').value;
-            const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            let recettesFiltrees = [...recettes];
-            
-            if (filtreType !== 'tous') {
-                recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
-            }
-            
-            if (filtreStatut !== 'tous') {
-                recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
-            }
-            
-            if (filtrePeriodicite !== 'toutes') {
-                recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
-            }
-            
-            if (searchTerm) {
-                recettesFiltrees = recettesFiltrees.filter(r => 
-                    r.client.toLowerCase().includes(searchTerm) ||
-                    r.element.toLowerCase().includes(searchTerm) ||
-                    r.type.toLowerCase().includes(searchTerm) ||
-                    (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
-                );
-            }
+            try {
+                console.log('📊 Mise à jour des stats...');
+                
+                const filtreType = document.getElementById('filtreType').value;
+                const filtreStatut = document.getElementById('filtreStatut').value;
+                const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                
+                let recettesFiltrees = [...recettes];
+                
+                if (filtreType !== 'tous') {
+                    recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
+                }
+                
+                if (filtreStatut !== 'tous') {
+                    recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+                }
+                
+                if (filtrePeriodicite !== 'toutes') {
+                    recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
+                }
+                
+                if (searchTerm) {
+                    recettesFiltrees = recettesFiltrees.filter(r => 
+                        r.client.toLowerCase().includes(searchTerm) ||
+                        r.element.toLowerCase().includes(searchTerm) ||
+                        r.type.toLowerCase().includes(searchTerm) ||
+                        (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
+                    );
+                }
 
-            const totalRecettes = recettesFiltrees.length;
-            const totalMontantHT = recettesFiltrees.reduce((sum, r) => sum + r.montantHT, 0);
-            const totalMontantLisse = recettesFiltrees.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
-            const totalActifs = recettesFiltrees.filter(r => r.statut === 'ACTIF').length;
+                const totalRecettes = recettesFiltrees.length;
+                const totalMontantHT = recettesFiltrees.reduce((sum, r) => sum + (r.montantHT || 0), 0);
+                const totalMontantLisse = recettesFiltrees.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
+                const totalActifs = recettesFiltrees.filter(r => r.statut === 'ACTIF').length;
 
-            document.getElementById('totalRecettes').textContent = totalRecettes;
-            document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
-            document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
-            document.getElementById('totalActifs').textContent = totalActifs;
+                console.log(`Stats: ${totalRecettes} recettes, ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé, ${totalActifs} actifs`);
+
+                document.getElementById('totalRecettes').textContent = totalRecettes;
+                document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
+                document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
+                document.getElementById('totalActifs').textContent = totalActifs;
+                
+                console.log('✅ Stats mises à jour');
+            } catch (error) {
+                console.error('❌ Erreur mise à jour stats:', error);
+            }
         }
 
         // Gestion Modal
         function nouvelleRecette() {
-            recetteEnEdition = null;
-            document.getElementById('modalTitle').textContent = 'Nouvelle Recette';
-            document.getElementById('recetteForm').reset();
-            document.getElementById('montantLisse').textContent = '0.00€';
-            document.getElementById('sortant').checked = false;
-            document.getElementById('dateDepartGroup').style.display = 'none';
-            document.getElementById('dateDepart').required = false;
-            document.getElementById('recetteModal').style.display = 'block';
+            try {
+                recetteEnEdition = null;
+                document.getElementById('modalTitle').textContent = 'Nouvelle Recette';
+                document.getElementById('recetteForm').reset();
+                document.getElementById('montantLisse').textContent = '0.00€';
+                document.getElementById('sortant').checked = false;
+                document.getElementById('dateDepartGroup').style.display = 'none';
+                document.getElementById('dateDepart').required = false;
+                document.getElementById('recetteModal').style.display = 'block';
+            } catch (error) {
+                console.error('❌ Erreur nouvelle recette:', error);
+            }
         }
 
         function modifierRecette(index) {
-            const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
-            if (!recette) return;
+            try {
+                const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
+                if (!recette) return;
 
-            recetteEnEdition = index;
-            document.getElementById('modalTitle').textContent = 'Modifier Recette';
-            
-            document.getElementById('client').value = recette.client;
-            document.getElementById('type').value = recette.type || 'bureau privatif';
-            document.getElementById('element').value = recette.element;
-            document.getElementById('montantHT').value = recette.montantHT;
-            document.getElementById('montantTTC').value = recette.montantTTC;
-            document.getElementById('periodicite').value = recette.periodicite;
-            document.getElementById('statut').value = recette.statut;
-            document.getElementById('commentaire').value = recette.commentaire || '';
-            document.getElementById('sortant').checked = recette.sortant || false;
-            document.getElementById('dateDepart').value = recette.dateDepart || '';
-            
-            toggleDateDepart();
-            calculerLisse();
-            document.getElementById('recetteModal').style.display = 'block';
+                recetteEnEdition = index;
+                document.getElementById('modalTitle').textContent = 'Modifier Recette';
+                
+                document.getElementById('client').value = recette.client;
+                document.getElementById('type').value = recette.type || 'bureau privatif';
+                document.getElementById('element').value = recette.element;
+                document.getElementById('montantHT').value = recette.montantHT;
+                document.getElementById('montantTTC').value = recette.montantTTC;
+                document.getElementById('periodicite').value = recette.periodicite;
+                document.getElementById('statut').value = recette.statut;
+                document.getElementById('commentaire').value = recette.commentaire || '';
+                document.getElementById('sortant').checked = recette.sortant || false;
+                document.getElementById('dateDepart').value = recette.dateDepart || '';
+                
+                toggleDateDepart();
+                calculerLisse();
+                document.getElementById('recetteModal').style.display = 'block';
+            } catch (error) {
+                console.error('❌ Erreur modification:', error);
+            }
         }
 
         function supprimerRecette(index) {
-            const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
-            if (!recette) return;
+            try {
+                const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
+                if (!recette) return;
 
-            if (confirm(`Êtes-vous sûr de vouloir supprimer la recette "${recette.client} - ${recette.element}" ?`)) {
-                recettes = recettes.filter(r => (r.id || recettes.indexOf(r)) !== index);
-                sauvegarderRecettes();
-                afficherRecettes();
-                mettreAJourStats();
+                if (confirm(`Êtes-vous sûr de vouloir supprimer la recette "${recette.client} - ${recette.element}" ?`)) {
+                    recettes = recettes.filter(r => (r.id || recettes.indexOf(r)) !== index);
+                    sauvegarderRecettes();
+                    afficherRecettes();
+                    mettreAJourStats();
+                }
+            } catch (error) {
+                console.error('❌ Erreur suppression:', error);
             }
         }
 
@@ -990,45 +1067,46 @@
         document.getElementById('recetteForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const nouvelleRecette = {
-                client: document.getElementById('client').value,
-                type: document.getElementById('type').value,
-                element: document.getElementById('element').value,
-                montantHT: parseFloat(document.getElementById('montantHT').value),
-                montantTTC: parseFloat(document.getElementById('montantTTC').value),
-                periodicite: document.getElementById('periodicite').value,
-                statut: document.getElementById('statut').value,
-                commentaire: document.getElementById('commentaire').value,
-                sortant: document.getElementById('sortant').checked,
-                dateDepart: document.getElementById('sortant').checked ? document.getElementById('dateDepart').value : null
-            };
+            try {
+                const nouvelleRecette = {
+                    client: document.getElementById('client').value,
+                    type: document.getElementById('type').value,
+                    element: document.getElementById('element').value,
+                    montantHT: parseFloat(document.getElementById('montantHT').value),
+                    montantTTC: parseFloat(document.getElementById('montantTTC').value),
+                    periodicite: document.getElementById('periodicite').value,
+                    statut: document.getElementById('statut').value,
+                    commentaire: document.getElementById('commentaire').value,
+                    sortant: document.getElementById('sortant').checked,
+                    dateDepart: document.getElementById('sortant').checked ? document.getElementById('dateDepart').value : null
+                };
 
-            if (recetteEnEdition !== null) {
-                // Modification
-                const index = recettes.findIndex(r => (r.id || recettes.indexOf(r)) === recetteEnEdition);
-                if (index !== -1) {
-                    recettes[index] = { ...recettes[index], ...nouvelleRecette };
+                if (recetteEnEdition !== null) {
+                    const index = recettes.findIndex(r => (r.id || recettes.indexOf(r)) === recetteEnEdition);
+                    if (index !== -1) {
+                        recettes[index] = { ...recettes[index], ...nouvelleRecette };
+                    }
+                } else {
+                    nouvelleRecette.id = Date.now();
+                    recettes.push(nouvelleRecette);
                 }
-            } else {
-                // Nouvelle recette
-                nouvelleRecette.id = Date.now();
-                recettes.push(nouvelleRecette);
-            }
 
-            sauvegarderRecettes();
-            fermerModal();
-            afficherRecettes();
-            mettreAJourStats();
+                sauvegarderRecettes();
+                fermerModal();
+                afficherRecettes();
+                mettreAJourStats();
+            } catch (error) {
+                console.error('❌ Erreur soumission:', error);
+            }
         });
 
-        // Fermeture modal avec Escape
+        // Fermeture modal
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 fermerModal();
             }
         });
 
-        // Fermeture modal en cliquant à l'extérieur
         window.addEventListener('click', function(e) {
             if (e.target === document.getElementById('recetteModal')) {
                 fermerModal();
