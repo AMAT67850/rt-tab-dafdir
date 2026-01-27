@@ -264,6 +264,13 @@
             color: #e65100;
             border: 1px solid #ffb74d;
         }
+        
+        .badge-sortant-3mois { 
+            background: #ffebee; 
+            color: #c62828;
+            border: 1px solid #ef5350;
+            font-weight: 700;
+        }
 
         .montant {
             font-weight: 700;
@@ -431,6 +438,30 @@
             color: #e65100;
             cursor: pointer;
             margin: 0;
+        }
+
+        /* Date de départ */
+        .date-depart-group {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ef5350;
+            margin-bottom: 20px;
+        }
+
+        .date-depart-group label {
+            font-weight: 600;
+            color: #c62828;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .date-depart-group input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ef5350;
+            border-radius: 8px;
+            font-size: 14px;
         }
 
         .lisse-result {
@@ -658,8 +689,14 @@
 
                     <!-- NOUVEAU : Case à cocher Sortant -->
                     <div class="checkbox-group">
-                        <input type="checkbox" id="sortant" name="sortant">
+                        <input type="checkbox" id="sortant" name="sortant" onchange="toggleDateDepart()">
                         <label for="sortant">🔜 Client Sortant (préavis donné)</label>
+                    </div>
+
+                    <!-- NOUVEAU : Date de départ prévue -->
+                    <div class="date-depart-group" id="dateDepartGroup" style="display: none;">
+                        <label for="dateDepart">📅 Date de départ prévue *</label>
+                        <input type="date" id="dateDepart" name="dateDepart">
                     </div>
 
                     <div class="lisse-result">
@@ -692,6 +729,22 @@
             mettreAJourStats();
         });
 
+        // Afficher/Masquer la date de départ
+        function toggleDateDepart() {
+            const sortantChecked = document.getElementById('sortant').checked;
+            const dateDepartGroup = document.getElementById('dateDepartGroup');
+            const dateInput = document.getElementById('dateDepart');
+            
+            if (sortantChecked) {
+                dateDepartGroup.style.display = 'block';
+                dateInput.required = true;
+            } else {
+                dateDepartGroup.style.display = 'none';
+                dateInput.required = false;
+                dateInput.value = '';
+            }
+        }
+
         // Fonctions localStorage
         function chargerRecettes() {
             const recettesJSON = localStorage.getItem('recettesRT');
@@ -707,6 +760,18 @@
         function sauvegarderRecettes() {
             localStorage.setItem('recettesRT', JSON.stringify(recettes));
             console.log(`💾 ${recettes.length} recettes sauvegardées dans localStorage`);
+        }
+
+        // Calculer si un client part dans les 3 prochains mois
+        function estSortantProche(dateDepart) {
+            if (!dateDepart) return false;
+            
+            const maintenant = new Date();
+            const dateSortie = new Date(dateDepart);
+            const diffTemps = dateSortie - maintenant;
+            const diffJours = diffTemps / (1000 * 60 * 60 * 24);
+            
+            return diffJours >= 0 && diffJours <= 90; // 3 mois = ~90 jours
         }
 
         // Affichage
@@ -756,8 +821,19 @@
                 else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
                 else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
                 
-                // Badge sortant
-                const badgeSortant = recette.sortant ? '<span class="badge badge-sortant">🔜 Sortant</span>' : '';
+                // Badge sortant avec distinction 3 mois
+                let badgeSortant = '';
+                if (recette.sortant && recette.dateDepart) {
+                    const proche = estSortantProche(recette.dateDepart);
+                    const dateFormatee = new Date(recette.dateDepart).toLocaleDateString('fr-FR');
+                    if (proche) {
+                        badgeSortant = `<span class="badge badge-sortant-3mois" title="Départ: ${dateFormatee}">⚠️ Départ proche</span>`;
+                    } else {
+                        badgeSortant = `<span class="badge badge-sortant" title="Départ: ${dateFormatee}">🔜 Sortant</span>`;
+                    }
+                } else if (recette.sortant) {
+                    badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>';
+                }
                 
                 return `
                     <tr>
@@ -820,7 +896,6 @@
 
         // Statistiques
         function mettreAJourStats() {
-            // Application des mêmes filtres que l'affichage
             const filtreType = document.getElementById('filtreType').value;
             const filtreStatut = document.getElementById('filtreStatut').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
@@ -867,6 +942,8 @@
             document.getElementById('recetteForm').reset();
             document.getElementById('montantLisse').textContent = '0.00€';
             document.getElementById('sortant').checked = false;
+            document.getElementById('dateDepartGroup').style.display = 'none';
+            document.getElementById('dateDepart').required = false;
             document.getElementById('recetteModal').style.display = 'block';
         }
 
@@ -886,7 +963,9 @@
             document.getElementById('statut').value = recette.statut;
             document.getElementById('commentaire').value = recette.commentaire || '';
             document.getElementById('sortant').checked = recette.sortant || false;
+            document.getElementById('dateDepart').value = recette.dateDepart || '';
             
+            toggleDateDepart();
             calculerLisse();
             document.getElementById('recetteModal').style.display = 'block';
         }
@@ -920,7 +999,8 @@
                 periodicite: document.getElementById('periodicite').value,
                 statut: document.getElementById('statut').value,
                 commentaire: document.getElementById('commentaire').value,
-                sortant: document.getElementById('sortant').checked  // NOUVEAU
+                sortant: document.getElementById('sortant').checked,
+                dateDepart: document.getElementById('sortant').checked ? document.getElementById('dateDepart').value : null
             };
 
             if (recetteEnEdition !== null) {
