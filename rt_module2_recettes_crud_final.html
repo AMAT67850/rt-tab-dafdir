@@ -318,6 +318,29 @@
             transform: scale(1.1);
         }
 
+        /* Drag & Drop */
+        .drag-handle {
+            cursor: move;
+            color: #6c757d;
+            font-size: 18px;
+            padding: 8px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .drag-handle:hover {
+            color: #495057;
+        }
+
+        tr.dragging {
+            opacity: 0.5;
+            background: #f8f9fa;
+        }
+
+        tr.drag-over {
+            border-top: 3px solid #27ae60;
+        }
+
         .no-data {
             text-align: center;
             padding: 40px;
@@ -603,6 +626,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th style="width: 40px;">⋮⋮</th>
                         <th>Client</th>
                         <th>Type</th>
                         <th>Élément</th>
@@ -616,7 +640,7 @@
                     </tr>
                 </thead>
                 <tbody id="recettesTableBody">
-                    <tr><td colspan="10" class="no-data">Chargement...</td></tr>
+                    <tr><td colspan="11" class="no-data">Chargement...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -837,7 +861,7 @@
                 }
 
                 if (recettesFiltrees.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="no-data">Aucune recette trouvée</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" class="no-data">Aucune recette trouvée</td></tr>';
                     return;
                 }
 
@@ -869,7 +893,8 @@
                     }
                     
                     return `
-                        <tr>
+                        <tr draggable="true" data-index="${index}">
+                            <td class="drag-handle">⋮⋮</td>
                             <td><strong>${recette.client}</strong></td>
                             <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
                             <td>${recette.element}</td>
@@ -888,9 +913,69 @@
                 }).join('');
                 
                 console.log(`📊 ${recettesFiltrees.length} recettes affichées`);
+                
+                // Initialiser le drag & drop
+                initialiserDragDrop();
             } catch (error) {
                 console.error('❌ Erreur affichage:', error);
             }
+        }
+
+        function initialiserDragDrop() {
+            const tbody = document.getElementById('recettesTableBody');
+            const rows = tbody.querySelectorAll('tr[draggable="true"]');
+            
+            let draggedElement = null;
+            let draggedIndex = null;
+
+            rows.forEach(row => {
+                row.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    draggedIndex = parseInt(this.getAttribute('data-index'));
+                    this.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', this.innerHTML);
+                });
+
+                row.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    
+                    if (draggedElement !== this) {
+                        this.classList.add('drag-over');
+                    }
+                });
+
+                row.addEventListener('dragleave', function(e) {
+                    this.classList.remove('drag-over');
+                });
+
+                row.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
+                    
+                    if (draggedElement !== this) {
+                        const targetIndex = parseInt(this.getAttribute('data-index'));
+                        
+                        // Échanger les positions dans le tableau
+                        const temp = recettes[draggedIndex];
+                        recettes.splice(draggedIndex, 1);
+                        recettes.splice(targetIndex, 0, temp);
+                        
+                        // Sauvegarder et réafficher
+                        sauvegarderRecettes();
+                        afficherRecettes();
+                        mettreAJourStats();
+                        
+                        console.log(`🔄 Recette déplacée de ${draggedIndex} vers ${targetIndex}`);
+                    }
+                });
+
+                row.addEventListener('dragend', function(e) {
+                    this.classList.remove('dragging');
+                    rows.forEach(r => r.classList.remove('drag-over'));
+                });
+            });
         }
 
         function appliquerFiltres() {
