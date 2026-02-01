@@ -853,16 +853,26 @@
                     else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
                     else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
                     
-                    // Badge sortant avec distinction 3 mois
+                    // Badge sortant avec distinction 3 mois ET date visible
                     let badgeSortant = '';
                     if (recette.sortant && recette.dateDepart) {
                         try {
                             const proche = estSortantProche(recette.dateDepart);
                             const dateFormatee = new Date(recette.dateDepart).toLocaleDateString('fr-FR');
                             if (proche) {
-                                badgeSortant = `<span class="badge badge-sortant-3mois" title="Départ: ${dateFormatee}">⚠️ Départ proche</span>`;
+                                badgeSortant = `
+                                    <div style="text-align: center;">
+                                        <span class="badge badge-sortant-3mois">⚠️ Départ proche</span>
+                                        <div style="margin-top: 5px; font-size: 12px; font-weight: 600; color: #dc3545;">📅 ${dateFormatee}</div>
+                                    </div>
+                                `;
                             } else {
-                                badgeSortant = `<span class="badge badge-sortant" title="Départ: ${dateFormatee}">🔜 Sortant</span>`;
+                                badgeSortant = `
+                                    <div style="text-align: center;">
+                                        <span class="badge badge-sortant">🔜 Sortant</span>
+                                        <div style="margin-top: 5px; font-size: 12px; font-weight: 600; color: #6c757d;">📅 ${dateFormatee}</div>
+                                    </div>
+                                `;
                             }
                         } catch (e) {
                             badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>';
