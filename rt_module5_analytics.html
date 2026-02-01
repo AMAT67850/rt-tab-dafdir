@@ -702,16 +702,6 @@
             
             document.getElementById('resultatMensuel').textContent = 
                 Math.round(analytics.resultatMensuel).toLocaleString() + '€';
-
-            document.getElementById('ratioChargesRecettes').textContent = 
-                Math.round(analytics.ratioChargesRecettes) + '%';
-
-            document.getElementById('margeOperationnelle').textContent = 
-                Math.round(analytics.margeOperationnelle) + '%';
-
-            const equilibreBadge = document.getElementById('equilibreFinancier');
-            const statusClass = 'status-' + analytics.equilibreFinancier.toLowerCase();
-            equilibreBadge.innerHTML = `<span class="status-badge ${statusClass}">${analytics.equilibreFinancier}</span>`;
         }
 
         // ============================================
