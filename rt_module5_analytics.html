@@ -491,6 +491,31 @@
             genererRepartitions();
         });
 
+        // ============================================
+        // FONCTION UTILITAIRE - CALCUL PROXIMITÉ DÉPART
+        // ============================================
+        
+        // Calculer si un client part dans les 3 prochains mois (90 jours)
+        function estSortantProche(dateDepart) {
+            try {
+                if (!dateDepart) return false;
+                
+                const maintenant = new Date();
+                const dateSortie = new Date(dateDepart);
+                
+                // Vérifier que la date est valide
+                if (isNaN(dateSortie.getTime())) return false;
+                
+                const diffTemps = dateSortie - maintenant;
+                const diffJours = diffTemps / (1000 * 60 * 60 * 24);
+                
+                return diffJours >= 0 && diffJours <= 90;
+            } catch (e) {
+                console.error('Erreur estSortantProche:', e);
+                return false;
+            }
+        }
+
         function chargerDonneesLocalStorage() {
             console.log('📊 === CHARGEMENT DONNÉES ANALYTICS (AVEC PROJECTIONS) ===');
             
@@ -501,8 +526,8 @@
                     const toutesRecettes = JSON.parse(recettesJSON);
                     recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF');
                     
-                    const nbSortantsProches = recettesData.filter(r => r.sortantProche === true).length;
-                    const nbSortantsLongTerme = recettesData.filter(r => r.sortant === true && !r.sortantProche).length;
+                    const nbSortantsProches = recettesData.filter(r => r.sortant && r.dateDepart && estSortantProche(r.dateDepart)).length;
+                    const nbSortantsLongTerme = recettesData.filter(r => r.sortant && r.dateDepart && !estSortantProche(r.dateDepart)).length;
                     const nbPerennes = recettesData.filter(r => !r.sortant).length;
                     
                     console.log(`✅ Recettes chargées: ${recettesData.length} actives`);
@@ -526,8 +551,8 @@
                 }
 
                 // Mise à jour info sources
-                const nbSortantsProches = recettesData.filter(r => r.sortantProche === true).length;
-                const nbSortantsLongTerme = recettesData.filter(r => r.sortant === true && !r.sortantProche).length;
+                const nbSortantsProches = recettesData.filter(r => r.sortant && r.dateDepart && estSortantProche(r.dateDepart)).length;
+                const nbSortantsLongTerme = recettesData.filter(r => r.sortant && r.dateDepart && !estSortantProche(r.dateDepart)).length;
                 const nbPerennes = recettesData.filter(r => !r.sortant).length;
                 
                 document.getElementById('infoSources').textContent = 
@@ -589,20 +614,23 @@
         function calculerFuture3mAnalytics() {
             console.log('⏰ Calcul Projection 3 mois (sans sortants proches)...');
             
-            // Vérifier si le champ departProche existe dans les données
-            const champDepartProcheExiste = recettesData.some(r => r.hasOwnProperty('departProche'));
+            // Filtrer pour exclure uniquement les départs proches (≤ 3 mois)
+            // On garde les pérennes ET les sortants long terme (> 3 mois)
+            const recettesFuture3m = recettesData.filter(r => {
+                // Si le client n'est pas sortant, on le garde
+                if (!r.sortant) return true;
+                
+                // Si le client est sortant mais sans date, on le considère comme long terme (on le garde)
+                if (!r.dateDepart) return true;
+                
+                // Si le client est sortant avec date, on garde seulement si ce n'est PAS proche
+                return !estSortantProche(r.dateDepart);
+            });
             
-            let recettesFuture3m;
-            if (champDepartProcheExiste) {
-                // Si le champ existe, filtrer pour exclure les départs proches uniquement
-                // On garde les pérennes ET les sortants long terme
-                recettesFuture3m = recettesData.filter(r => r.departProche !== true);
-                console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois (avec distinction départs proches)`);
-            } else {
-                // Si le champ n'existe pas encore, utiliser l'ancienne logique : exclure tous les sortants
-                recettesFuture3m = recettesData.filter(r => !r.sortant);
-                console.log(`   ⚠️ Champ 'departProche' non trouvé - utilisation fallback`);
-                console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois (sans tous les sortants)`);
+            console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois`);
+            const nbExclus = recettesData.length - recettesFuture3m.length;
+            if (nbExclus > 0) {
+                console.log(`   ${nbExclus} clients exclus (départs ≤ 3 mois)`);
             }
 
             future3mAnalytics.totalRecettesLissees = recettesFuture3m.reduce((sum, item) => {
