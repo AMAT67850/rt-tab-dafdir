@@ -589,11 +589,21 @@
         function calculerFuture3mAnalytics() {
             console.log('⏰ Calcul Projection 3 mois (sans sortants proches)...');
             
-            // Filtrer les recettes pour exclure les sortants proches uniquement
-            // On garde les pérennes ET les sortants long terme
-            const recettesFuture3m = recettesData.filter(r => !r.sortantProche);
+            // Vérifier si le champ departProche existe dans les données
+            const champDepartProcheExiste = recettesData.some(r => r.hasOwnProperty('departProche'));
             
-            console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois sur ${recettesData.length} actifs`);
+            let recettesFuture3m;
+            if (champDepartProcheExiste) {
+                // Si le champ existe, filtrer pour exclure les départs proches uniquement
+                // On garde les pérennes ET les sortants long terme
+                recettesFuture3m = recettesData.filter(r => r.departProche !== true);
+                console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois (avec distinction départs proches)`);
+            } else {
+                // Si le champ n'existe pas encore, utiliser l'ancienne logique : exclure tous les sortants
+                recettesFuture3m = recettesData.filter(r => !r.sortant);
+                console.log(`   ⚠️ Champ 'departProche' non trouvé - utilisation fallback`);
+                console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois (sans tous les sortants)`);
+            }
 
             future3mAnalytics.totalRecettesLissees = recettesFuture3m.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
