@@ -122,44 +122,37 @@
             margin: 0;
         }
 
-        .section-title.a3mois {
+        .section-title.future-3m {
             border-left-color: #ffc107;
         }
 
-        .section-title.a3mois h2 {
+        .section-title.future-3m h2 {
             color: #ffc107;
         }
 
-        .section-title.future {
+        .section-title.future-long {
             border-left-color: #28a745;
         }
 
-        .section-title.future h2 {
+        .section-title.future-long h2 {
             color: #28a745;
         }
 
-        /* Stats Grid - Simplifié à 3 colonnes */
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
 
-        @media (max-width: 968px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .stat-card {
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-left: 4px solid #ddd;
             transition: transform 0.3s ease;
-            text-align: center;
         }
 
         .stat-card:hover {
@@ -180,21 +173,43 @@
         }
 
         .stat-card h3 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            margin-bottom: 8px;
             font-weight: 700;
         }
 
         .stat-card p {
             color: #6c757d;
             font-weight: 500;
-            font-size: 1.1rem;
         }
 
         .stat-card .sub-info {
             font-size: 0.85rem;
             color: #999;
-            margin-top: 8px;
+            margin-top: 5px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-atteint {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-alerte {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-critique {
+            background: #f8d7da;
+            color: #721c24;
         }
 
         /* Sections */
@@ -266,6 +281,26 @@
             margin-top: 20px;
         }
 
+        .info-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info-note h4 {
+            color: #856404;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .info-note p {
+            color: #856404;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
         /* Divider */
         .divider {
             height: 40px;
@@ -277,14 +312,14 @@
         <!-- Header -->
         <div class="header">
             <h1>📊 Analytics Dashboard</h1>
-            <p class="subtitle">Analyse financière en temps réel - Vision à 3 horizons</p>
+            <p class="subtitle">Analyse financière en temps réel avec projections</p>
         </div>
 
         <!-- Controls -->
         <div class="header-controls">
             <div class="nav-links">
                 <a href="index.html" class="btn btn-secondary">🏠 Accueil</a>
-                <a href="rt_module2_receettes_crud_final.html" class="btn btn-secondary">💵 Recettes</a>
+                <a href="rt_module2_recettes_crud_final.html" class="btn btn-secondary">💵 Recettes</a>
                 <a href="rt_module3_charges_crud.html" class="btn btn-secondary">💰 Charges</a>
             </div>
             <div class="nav-links">
@@ -293,8 +328,16 @@
             </div>
         </div>
 
+        <!-- Note explicative -->
+        <div class="info-note">
+            <h4>ℹ️ À propos des "sortants proches"</h4>
+            <p>Les <strong>sortants proches</strong> sont les clients qui quitteront votre portefeuille <strong>dans les 3 prochains mois</strong>. 
+            Les <strong>sortants long terme</strong> sont ceux dont le départ est prévu <strong>au-delà de 3 mois</strong>. 
+            Cette distinction permet d'avoir une vision plus précise de l'évolution de votre activité à court et moyen terme.</p>
+        </div>
+
         <!-- ============================================ -->
-        <!-- VUE 1 : SITUATION ACTUELLE -->
+        <!-- SITUATION ACTUELLE (TOUS LES CLIENTS ACTIFS) -->
         <!-- ============================================ -->
         <div class="section-title">
             <h2>📸 Situation Actuelle (Tous les clients actifs)</h2>
@@ -304,13 +347,11 @@
             <div class="stat-card positive">
                 <h3 id="totalRecettesLissees">0€</h3>
                 <p>Recettes Récurrentes HT Lissées</p>
-                <p class="sub-info">charges inactives exclues</p>
             </div>
 
             <div class="stat-card negative">
                 <h3 id="totalChargesLissees">0€</h3>
                 <p>Charges Récurrentes HT Lissées</p>
-                <p class="sub-info">charges inactives exclues</p>
             </div>
 
             <div class="stat-card highlight">
@@ -323,28 +364,29 @@
         <div class="divider"></div>
 
         <!-- ============================================ -->
-        <!-- VUE 2 : PROJECTION À 3 MOIS -->
+        <!-- PROJECTION À 3 MOIS (SANS SORTANTS PROCHES) -->
         <!-- ============================================ -->
-        <div class="section-title a3mois">
-            <h2>⏱️ Projection à 3 Mois (Sortants proches exclus)</h2>
+        <div class="section-title future-3m">
+            <h2>⏰ Projection à 3 mois (Sans sortants proches)</h2>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card positive">
-                <h3 id="a3moisRecettesLissees">0€</h3>
+                <h3 id="future3mRecettesLissees">0€</h3>
                 <p>Recettes Récurrentes HT Lissées</p>
                 <p class="sub-info">clients partant dans 3 mois exclus</p>
             </div>
 
             <div class="stat-card negative">
-                <h3 id="a3moisChargesLissees">0€</h3>
+                <h3 id="future3mChargesLissees">0€</h3>
                 <p>Charges Récurrentes HT Lissées</p>
                 <p class="sub-info">charges inactives exclues</p>
             </div>
 
             <div class="stat-card highlight">
-                <h3 id="a3moisResultatMensuel">0€</h3>
+                <h3 id="future3mResultatMensuel">0€</h3>
                 <p>Résultat Mensuel HT</p>
+                <p class="sub-info" id="diff3mResultat" style="color: #721c24; font-weight: 600;">différence / situation actuelle</p>
             </div>
         </div>
 
@@ -352,28 +394,29 @@
         <div class="divider"></div>
 
         <!-- ============================================ -->
-        <!-- VUE 3 : SITUATION FUTURE LONG TERME -->
+        <!-- SITUATION FUTURE LONG TERME (CLIENTS PÉRENNES UNIQUEMENT) -->
         <!-- ============================================ -->
-        <div class="section-title future">
-            <h2>🔮 Situation Future Long Terme (Tous sortants exclus)</h2>
+        <div class="section-title future-long">
+            <h2>🔮 Situation Future Long terme (Clients pérennes uniquement)</h2>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card positive">
-                <h3 id="futureRecettesLissees">0€</h3>
+                <h3 id="futureLongRecettesLissees">0€</h3>
                 <p>Recettes Récurrentes HT Lissées</p>
                 <p class="sub-info">tous clients sortants exclus</p>
             </div>
 
             <div class="stat-card negative">
-                <h3 id="futureChargesLissees">0€</h3>
+                <h3 id="futureLongChargesLissees">0€</h3>
                 <p>Charges Récurrentes HT Lissées</p>
                 <p class="sub-info">charges inactives exclues</p>
             </div>
 
             <div class="stat-card highlight">
-                <h3 id="futureResultatMensuel">0€</h3>
+                <h3 id="futureLongResultatMensuel">0€</h3>
                 <p>Résultat Mensuel HT</p>
+                <p class="sub-info" id="diffLongResultat" style="color: #721c24; font-weight: 600;">différence / projection à 3 mois</p>
             </div>
         </div>
 
@@ -432,24 +475,24 @@
         // Variables globales
         let recettesData = [];
         let chargesData = [];
-        let analytics = {};
-        let analytics3Mois = {};
-        let futureAnalytics = {};
+        let analytics = {};          // Situation actuelle
+        let future3mAnalytics = {};  // Projection 3 mois
+        let futureLongAnalytics = {}; // Future long terme
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
             chargerDonneesLocalStorage();
             calculerAnalytics();
-            calculerAnalytics3Mois();
-            calculerAnalyticsFuture();
+            calculerFuture3mAnalytics();
+            calculerFutureLongAnalytics();
             afficherAnalytics();
-            afficherAnalytics3Mois();
-            afficherAnalyticsFuture();
+            afficherFuture3mAnalytics();
+            afficherFutureLongAnalytics();
             genererRepartitions();
         });
 
         function chargerDonneesLocalStorage() {
-            console.log('📊 === CHARGEMENT DONNÉES ANALYTICS V2 (3 VUES) ===');
+            console.log('📊 === CHARGEMENT DONNÉES ANALYTICS (AVEC PROJECTIONS) ===');
             
             try {
                 // Lecture Module 2 (Recettes)
@@ -458,9 +501,14 @@
                     const toutesRecettes = JSON.parse(recettesJSON);
                     recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF');
                     
-                    const nbSortants = recettesData.filter(r => r.sortant === true).length;
-                    const nbSortantsProches = recettesData.filter(r => r.sortant && estSortantProche(r.dateDepart)).length;
-                    console.log(`✅ Recettes: ${recettesData.length} actives (${nbSortantsProches} sortants <3 mois, ${nbSortants - nbSortantsProches} sortants >3 mois)`);
+                    const nbSortantsProches = recettesData.filter(r => r.sortantProche === true).length;
+                    const nbSortantsLongTerme = recettesData.filter(r => r.sortant === true && !r.sortantProche).length;
+                    const nbPerennes = recettesData.filter(r => !r.sortant).length;
+                    
+                    console.log(`✅ Recettes chargées: ${recettesData.length} actives`);
+                    console.log(`   • ${nbPerennes} pérennes`);
+                    console.log(`   • ${nbSortantsProches} sortants proches (≤3 mois)`);
+                    console.log(`   • ${nbSortantsLongTerme} sortants long terme (>3 mois)`);
                 } else {
                     recettesData = [];
                     console.warn('⚠️ Aucune donnée recettes trouvée');
@@ -471,18 +519,19 @@
                 if (chargesJSON) {
                     const toutesCharges = JSON.parse(chargesJSON);
                     chargesData = toutesCharges.filter(c => c.statut === 'ACTIF');
-                    console.log(`✅ Charges: ${chargesData.length} actives`);
+                    console.log(`✅ Charges chargées: ${chargesData.length} actives`);
                 } else {
                     chargesData = [];
                     console.warn('⚠️ Aucune donnée charges trouvée');
                 }
 
                 // Mise à jour info sources
-                const nbSortants = recettesData.filter(r => r.sortant === true).length;
-                const nbSortantsProches = recettesData.filter(r => r.sortant && estSortantProche(r.dateDepart)).length;
-                const nbPerennes = recettesData.length - nbSortants;
+                const nbSortantsProches = recettesData.filter(r => r.sortantProche === true).length;
+                const nbSortantsLongTerme = recettesData.filter(r => r.sortant === true && !r.sortantProche).length;
+                const nbPerennes = recettesData.filter(r => !r.sortant).length;
+                
                 document.getElementById('infoSources').textContent = 
-                    `Sources : ${recettesData.length} recettes actives (${nbPerennes} pérennes + ${nbSortantsProches} sortants <3 mois + ${nbSortants - nbSortantsProches} sortants >3 mois) • ${chargesData.length} charges actives`;
+                    `Sources : ${recettesData.length} recettes actives (${nbPerennes} pérennes + ${nbSortantsProches} sortants proches + ${nbSortantsLongTerme} sortants long terme) • ${chargesData.length} charges actives`;
 
             } catch (error) {
                 console.error('❌ Erreur chargement localStorage:', error);
@@ -505,23 +554,13 @@
             return Math.abs(item.montantHT) / facteurLissage;
         }
 
-        // Calculer si un client part dans les 3 prochains mois
-        function estSortantProche(dateDepart) {
-            if (!dateDepart) return false;
-            
-            const maintenant = new Date();
-            const dateSortie = new Date(dateDepart);
-            const diffTemps = dateSortie - maintenant;
-            const diffJours = diffTemps / (1000 * 60 * 60 * 24);
-            
-            return diffJours >= 0 && diffJours <= 90; // 3 mois = ~90 jours
-        }
-
         // ============================================
-        // CALCULS VUE 1 : SITUATION ACTUELLE
+        // CALCULS SITUATION ACTUELLE (TOUS LES CLIENTS)
         // ============================================
         function calculerAnalytics() {
-            // Tous les clients actifs (y compris sortants)
+            console.log('📸 Calcul Situation Actuelle (tous clients)...');
+            
+            // Tous les clients actifs (y compris tous les sortants)
             analytics.totalRecettesLissees = recettesData.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
@@ -531,56 +570,90 @@
             }, 0);
 
             analytics.resultatMensuel = analytics.totalRecettesLissees - analytics.totalChargesLissees;
+
+            if (analytics.totalRecettesLissees > 0) {
+                analytics.ratioChargesRecettes = (analytics.totalChargesLissees / analytics.totalRecettesLissees) * 100;
+                analytics.margeOperationnelle = (analytics.resultatMensuel / analytics.totalRecettesLissees) * 100;
+            } else {
+                analytics.ratioChargesRecettes = 0;
+                analytics.margeOperationnelle = 0;
+            }
+
+            analytics.equilibreFinancier = analytics.resultatMensuel >= 0 ? 'ATTEINT' : 
+                (Math.abs(analytics.resultatMensuel) / analytics.totalRecettesLissees > 0.1 ? 'CRITIQUE' : 'ALERTE');
         }
 
         // ============================================
-        // CALCULS VUE 2 : PROJECTION À 3 MOIS
+        // CALCULS PROJECTION 3 MOIS (SANS SORTANTS PROCHES)
         // ============================================
-        function calculerAnalytics3Mois() {
-            // Exclure uniquement les sortants dans les 3 prochains mois
-            const recettes3Mois = recettesData.filter(r => {
-                if (!r.sortant) return true; // Garder tous les non-sortants
-                if (!r.dateDepart) return true; // Garder si pas de date
-                return !estSortantProche(r.dateDepart); // Exclure seulement si sortant proche
-            });
+        function calculerFuture3mAnalytics() {
+            console.log('⏰ Calcul Projection 3 mois (sans sortants proches)...');
             
-            console.log(`⏱️ À 3 mois: ${recettes3Mois.length} recettes (${recettesData.length - recettes3Mois.length} sortants proches exclus)`);
+            // Filtrer les recettes pour exclure les sortants proches uniquement
+            // On garde les pérennes ET les sortants long terme
+            const recettesFuture3m = recettesData.filter(r => !r.sortantProche);
+            
+            console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois sur ${recettesData.length} actifs`);
 
-            analytics3Mois.totalRecettesLissees = recettes3Mois.reduce((sum, item) => {
+            future3mAnalytics.totalRecettesLissees = recettesFuture3m.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
 
             // Les charges restent les mêmes
-            analytics3Mois.totalChargesLissees = chargesData.reduce((sum, item) => {
+            future3mAnalytics.totalChargesLissees = chargesData.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
 
-            analytics3Mois.resultatMensuel = analytics3Mois.totalRecettesLissees - analytics3Mois.totalChargesLissees;
+            future3mAnalytics.resultatMensuel = future3mAnalytics.totalRecettesLissees - future3mAnalytics.totalChargesLissees;
+
+            if (future3mAnalytics.totalRecettesLissees > 0) {
+                future3mAnalytics.ratioChargesRecettes = (future3mAnalytics.totalChargesLissees / future3mAnalytics.totalRecettesLissees) * 100;
+                future3mAnalytics.margeOperationnelle = (future3mAnalytics.resultatMensuel / future3mAnalytics.totalRecettesLissees) * 100;
+            } else {
+                future3mAnalytics.ratioChargesRecettes = 0;
+                future3mAnalytics.margeOperationnelle = 0;
+            }
+
+            future3mAnalytics.equilibreFinancier = future3mAnalytics.resultatMensuel >= 0 ? 'ATTEINT' : 
+                (Math.abs(future3mAnalytics.resultatMensuel) / future3mAnalytics.totalRecettesLissees > 0.1 ? 'CRITIQUE' : 'ALERTE');
         }
 
         // ============================================
-        // CALCULS VUE 3 : FUTURE LONG TERME
+        // CALCULS FUTURE LONG TERME (SANS TOUS LES SORTANTS)
         // ============================================
-        function calculerAnalyticsFuture() {
+        function calculerFutureLongAnalytics() {
+            console.log('🔮 Calcul Future Long terme (clients pérennes uniquement)...');
+            
             // Filtrer les recettes pour exclure TOUS les sortants
             const recettesPerennes = recettesData.filter(r => !r.sortant);
             
-            console.log(`🔮 Future: ${recettesPerennes.length} clients pérennes (${recettesData.length - recettesPerennes.length} sortants exclus)`);
+            console.log(`   ${recettesPerennes.length} clients pérennes sur ${recettesData.length} actifs`);
 
-            futureAnalytics.totalRecettesLissees = recettesPerennes.reduce((sum, item) => {
+            futureLongAnalytics.totalRecettesLissees = recettesPerennes.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
 
             // Les charges restent les mêmes
-            futureAnalytics.totalChargesLissees = chargesData.reduce((sum, item) => {
+            futureLongAnalytics.totalChargesLissees = chargesData.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
 
-            futureAnalytics.resultatMensuel = futureAnalytics.totalRecettesLissees - futureAnalytics.totalChargesLissees;
+            futureLongAnalytics.resultatMensuel = futureLongAnalytics.totalRecettesLissees - futureLongAnalytics.totalChargesLissees;
+
+            if (futureLongAnalytics.totalRecettesLissees > 0) {
+                futureLongAnalytics.ratioChargesRecettes = (futureLongAnalytics.totalChargesLissees / futureLongAnalytics.totalRecettesLissees) * 100;
+                futureLongAnalytics.margeOperationnelle = (futureLongAnalytics.resultatMensuel / futureLongAnalytics.totalRecettesLissees) * 100;
+            } else {
+                futureLongAnalytics.ratioChargesRecettes = 0;
+                futureLongAnalytics.margeOperationnelle = 0;
+            }
+
+            futureLongAnalytics.equilibreFinancier = futureLongAnalytics.resultatMensuel >= 0 ? 'ATTEINT' : 
+                (Math.abs(futureLongAnalytics.resultatMensuel) / futureLongAnalytics.totalRecettesLissees > 0.1 ? 'CRITIQUE' : 'ALERTE');
         }
 
         // ============================================
-        // AFFICHAGE VUE 1 : SITUATION ACTUELLE
+        // AFFICHAGE SITUATION ACTUELLE
         // ============================================
         function afficherAnalytics() {
             document.getElementById('totalRecettesLissees').textContent = 
@@ -591,34 +664,77 @@
             
             document.getElementById('resultatMensuel').textContent = 
                 Math.round(analytics.resultatMensuel).toLocaleString() + '€';
+
+            document.getElementById('ratioChargesRecettes').textContent = 
+                Math.round(analytics.ratioChargesRecettes) + '%';
+
+            document.getElementById('margeOperationnelle').textContent = 
+                Math.round(analytics.margeOperationnelle) + '%';
+
+            const equilibreBadge = document.getElementById('equilibreFinancier');
+            const statusClass = 'status-' + analytics.equilibreFinancier.toLowerCase();
+            equilibreBadge.innerHTML = `<span class="status-badge ${statusClass}">${analytics.equilibreFinancier}</span>`;
         }
 
         // ============================================
-        // AFFICHAGE VUE 2 : PROJECTION À 3 MOIS
+        // AFFICHAGE PROJECTION 3 MOIS (AVEC DIFFÉRENCE)
         // ============================================
-        function afficherAnalytics3Mois() {
-            document.getElementById('a3moisRecettesLissees').textContent = 
-                Math.round(analytics3Mois.totalRecettesLissees).toLocaleString() + '€';
+        function afficherFuture3mAnalytics() {
+            document.getElementById('future3mRecettesLissees').textContent = 
+                Math.round(future3mAnalytics.totalRecettesLissees).toLocaleString() + '€';
             
-            document.getElementById('a3moisChargesLissees').textContent = 
-                Math.round(analytics3Mois.totalChargesLissees).toLocaleString() + '€';
+            document.getElementById('future3mChargesLissees').textContent = 
+                Math.round(future3mAnalytics.totalChargesLissees).toLocaleString() + '€';
             
-            document.getElementById('a3moisResultatMensuel').textContent = 
-                Math.round(analytics3Mois.resultatMensuel).toLocaleString() + '€';
+            document.getElementById('future3mResultatMensuel').textContent = 
+                Math.round(future3mAnalytics.resultatMensuel).toLocaleString() + '€';
+
+            // AFFICHAGE DE LA DIFFÉRENCE vs Situation Actuelle
+            const diff = Math.round(future3mAnalytics.resultatMensuel - analytics.resultatMensuel);
+            const diffElement = document.getElementById('diff3mResultat');
+            diffElement.textContent = `différence / situation actuelle\n${diff.toLocaleString()} €`;
+            
+            if (diff < 0) {
+                diffElement.style.color = '#721c24';
+            } else if (diff > 0) {
+                diffElement.style.color = '#155724';
+            } else {
+                diffElement.style.color = '#383d41';
+            }
         }
 
         // ============================================
-        // AFFICHAGE VUE 3 : FUTURE LONG TERME
+        // AFFICHAGE FUTURE LONG TERME (AVEC DIFFÉRENCE)
         // ============================================
-        function afficherAnalyticsFuture() {
-            document.getElementById('futureRecettesLissees').textContent = 
-                Math.round(futureAnalytics.totalRecettesLissees).toLocaleString() + '€';
+        function afficherFutureLongAnalytics() {
+            document.getElementById('futureLongRecettesLissees').textContent = 
+                Math.round(futureLongAnalytics.totalRecettesLissees).toLocaleString() + '€';
             
-            document.getElementById('futureChargesLissees').textContent = 
-                Math.round(futureAnalytics.totalChargesLissees).toLocaleString() + '€';
+            document.getElementById('futureLongChargesLissees').textContent = 
+                Math.round(futureLongAnalytics.totalChargesLissees).toLocaleString() + '€';
             
-            document.getElementById('futureResultatMensuel').textContent = 
-                Math.round(futureAnalytics.resultatMensuel).toLocaleString() + '€';
+            document.getElementById('futureLongResultatMensuel').textContent = 
+                Math.round(futureLongAnalytics.resultatMensuel).toLocaleString() + '€';
+
+            // AFFICHAGE DE LA DIFFÉRENCE vs Projection 3 mois
+            const diff = Math.round(futureLongAnalytics.resultatMensuel - future3mAnalytics.resultatMensuel);
+            const diffElement = document.getElementById('diffLongResultat');
+            diffElement.textContent = `différence / projection à 3 mois\n${diff.toLocaleString()} €`;
+            
+            if (diff < 0) {
+                diffElement.style.color = '#721c24';
+            } else if (diff > 0) {
+                diffElement.style.color = '#155724';
+            } else {
+                diffElement.style.color = '#383d41';
+            }
+        }
+
+        // ============================================
+        // FONCTION UTILITAIRE : AFFICHAGE DIFFÉRENCE (DEPRECATED - kept for compatibility)
+        // ============================================
+        function afficherDifference(elementId, difference) {
+            // Cette fonction n'est plus utilisée mais conservée pour compatibilité
         }
 
         function genererRepartitions() {
@@ -688,11 +804,11 @@
         function actualiserDonnees() {
             chargerDonneesLocalStorage();
             calculerAnalytics();
-            calculerAnalytics3Mois();
-            calculerAnalyticsFuture();
+            calculerFuture3mAnalytics();
+            calculerFutureLongAnalytics();
             afficherAnalytics();
-            afficherAnalytics3Mois();
-            afficherAnalyticsFuture();
+            afficherFuture3mAnalytics();
+            afficherFutureLongAnalytics();
             genererRepartitions();
             
             // Feedback visuel
