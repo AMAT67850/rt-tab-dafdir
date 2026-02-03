@@ -568,15 +568,7 @@
                     <label>Type de recette</label>
                     <select id="filtreType" onchange="appliquerFiltres()">
                         <option value="tous">Tous les types</option>
-                        <option value="coworking">Coworking</option>
-                        <option value="flex">Flex</option>
-                        <option value="rocket pass">Rocket Pass</option>
-                        <option value="coworking +">Coworking +</option>
-                        <option value="flex +">Flex +</option>
-                        <option value="rocket pass +">Rocket Pass +</option>
-                        <option value="bureau privatif">Bureau privatif</option>
-                        <option value="flex nomade">Flex Nomade</option>
-                        <option value="domiciliation">Domiciliation</option>
+                        <!-- Options générées dynamiquement depuis localStorage -->
                     </select>
                 </div>
 
@@ -666,15 +658,7 @@
                         <div class="form-group">
                             <label for="type">Type de recette *</label>
                             <select id="type" required>
-                                <option value="coworking">Coworking</option>
-                                <option value="flex">Flex</option>
-                                <option value="rocket pass">Rocket Pass</option>
-                                <option value="coworking +">Coworking +</option>
-                                <option value="flex +">Flex +</option>
-                                <option value="rocket pass +">Rocket Pass +</option>
-                                <option value="bureau privatif">Bureau privatif</option>
-                                <option value="flex nomade">Flex Nomade</option>
-                                <option value="domiciliation">Domiciliation</option>
+                                <!-- Options générées dynamiquement depuis localStorage -->
                             </select>
                         </div>
 
@@ -756,6 +740,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Initialisation Module 2');
             try {
+                initialiserSelectsTypes(); // Charger les types dynamiquement
                 chargerRecettes();
                 afficherRecettes();
                 mettreAJourStats();
@@ -782,6 +767,79 @@
                 }
             } catch (error) {
                 console.error('Erreur toggleDateDepart:', error);
+            }
+        }
+
+        // ========== GESTION DYNAMIQUE DES TYPES DE RECETTES ==========
+        
+        // Types par défaut (fallback si pas de types dans localStorage)
+        const TYPES_RECETTES_DEFAUT = [
+            "bureau privatif",
+            "flex",
+            "flex +",
+            "rocket pass",
+            "rocket pass +",
+            "coworking",
+            "coworking +",
+            "location évènementielle",
+            "location sous-traitance",
+            "domiciliation",
+            "autre"
+        ];
+
+        function chargerTypesRecettes() {
+            try {
+                const types = localStorage.getItem('typesRecettesRT');
+                if (types) {
+                    const typesArray = JSON.parse(types);
+                    console.log(`✅ ${typesArray.length} types de recettes chargés depuis localStorage`);
+                    return typesArray;
+                }
+                console.log('ℹ️ Pas de types personnalisés, utilisation des types par défaut');
+                return TYPES_RECETTES_DEFAUT;
+            } catch (error) {
+                console.error('❌ Erreur chargement types:', error);
+                return TYPES_RECETTES_DEFAUT;
+            }
+        }
+
+        function initialiserSelectsTypes() {
+            try {
+                const types = chargerTypesRecettes();
+                
+                // Initialiser le filtre
+                const filtreType = document.getElementById('filtreType');
+                if (filtreType) {
+                    const currentValue = filtreType.value || 'tous';
+                    filtreType.innerHTML = '<option value="tous">Tous les types</option>';
+                    types.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type;
+                        option.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+                        filtreType.appendChild(option);
+                    });
+                    filtreType.value = currentValue;
+                }
+
+                // Initialiser le formulaire modal
+                const typeSelect = document.getElementById('type');
+                if (typeSelect) {
+                    const currentValue = typeSelect.value;
+                    typeSelect.innerHTML = '';
+                    types.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type;
+                        option.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+                        typeSelect.appendChild(option);
+                    });
+                    if (currentValue && types.includes(currentValue)) {
+                        typeSelect.value = currentValue;
+                    }
+                }
+
+                console.log('✅ Selects types initialisés');
+            } catch (error) {
+                console.error('❌ Erreur initialisation selects types:', error);
             }
         }
 
