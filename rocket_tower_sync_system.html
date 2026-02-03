@@ -227,6 +227,28 @@
             border-radius: 10px;
             border-left: 4px solid #667eea;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: move;
+            transition: all 0.2s;
+        }
+
+        .type-item.dragging {
+            opacity: 0.5;
+            background: #e3f2fd;
+        }
+
+        .type-item.drag-over {
+            border-top: 3px solid #667eea;
+        }
+
+        .type-drag-handle {
+            cursor: grab;
+            font-size: 18px;
+            color: #6c757d;
+            margin-right: 12px;
+        }
+
+        .type-drag-handle:active {
+            cursor: grabbing;
         }
 
         .type-badge {
@@ -835,7 +857,8 @@ CLOUD (SeaTable) :
                 }
 
                 typesList.innerHTML = types.map((type, index) => `
-                    <div class="type-item">
+                    <div class="type-item" draggable="true" data-index="${index}">
+                        <span class="type-drag-handle">☰</span>
                         <div class="type-badge">${type}</div>
                         <div class="type-actions">
                             <button class="btn-small btn-edit-type" onclick="modifierType(${index})">
@@ -847,6 +870,9 @@ CLOUD (SeaTable) :
                         </div>
                     </div>
                 `).join('');
+                
+                // Initialiser le drag & drop après affichage
+                initDragAndDropTypes();
                 
             } catch (error) {
                 console.error('Erreur affichage types:', error);
@@ -955,6 +981,91 @@ CLOUD (SeaTable) :
                 console.error('Erreur restauration types:', error);
                 addLog(`❌ Erreur restauration types : ${error.message}`, 'error');
             }
+        }
+
+        // ========== DRAG & DROP DES TYPES ==========
+        let draggedTypeItem = null;
+        let draggedTypeIndex = null;
+
+        function initDragAndDropTypes() {
+            try {
+                const items = document.querySelectorAll('.type-item[draggable="true"]');
+                
+                items.forEach(item => {
+                    item.addEventListener('dragstart', handleTypeDragStart);
+                    item.addEventListener('dragover', handleTypeDragOver);
+                    item.addEventListener('drop', handleTypeDrop);
+                    item.addEventListener('dragend', handleTypeDragEnd);
+                    item.addEventListener('dragleave', handleTypeDragLeave);
+                });
+                
+                console.log(`🎯 Drag & Drop initialisé sur ${items.length} types`);
+            } catch (error) {
+                console.error('❌ Erreur init drag & drop types:', error);
+            }
+        }
+
+        function handleTypeDragStart(e) {
+            draggedTypeItem = this;
+            draggedTypeIndex = parseInt(this.dataset.index);
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function handleTypeDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            if (this !== draggedTypeItem) {
+                this.classList.add('drag-over');
+            }
+            return false;
+        }
+
+        function handleTypeDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleTypeDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            try {
+                if (draggedTypeItem !== this) {
+                    const targetIndex = parseInt(this.dataset.index);
+                    const types = chargerTypesRecettes();
+                    
+                    // Déplacer l'élément dans le tableau
+                    const draggedType = types[draggedTypeIndex];
+                    types.splice(draggedTypeIndex, 1);
+                    types.splice(targetIndex, 0, draggedType);
+                    
+                    // Sauvegarder et rafraîchir
+                    sauvegarderTypesRecettes(types);
+                    afficherTypesRecettes();
+                    
+                    addLog(`✅ Type déplacé : "${draggedType}"`, 'success');
+                }
+            } catch (error) {
+                console.error('❌ Erreur drop type:', error);
+                addLog(`❌ Erreur déplacement : ${error.message}`, 'error');
+            }
+            
+            this.classList.remove('drag-over');
+            return false;
+        }
+
+        function handleTypeDragEnd(e) {
+            this.classList.remove('dragging');
+            
+            // Nettoyer toutes les classes drag-over
+            document.querySelectorAll('.type-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            
+            draggedTypeItem = null;
+            draggedTypeIndex = null;
         }
 
         // Gestion de la touche Enter pour ajouter un type
