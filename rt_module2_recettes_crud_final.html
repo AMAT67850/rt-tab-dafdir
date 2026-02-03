@@ -229,6 +229,31 @@
             background: #f8f9fa;
         }
 
+        /* Drag and Drop */
+        tbody tr {
+            cursor: move;
+        }
+
+        tbody tr.dragging {
+            opacity: 0.5;
+            background: #e3f2fd;
+        }
+
+        tbody tr.drag-over {
+            border-top: 3px solid #27ae60;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            font-size: 18px;
+            color: #6c757d;
+            margin-right: 8px;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
         .badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -882,8 +907,8 @@
                     }
                     
                     return `
-                        <tr>
-                            <td><strong>${recette.client}</strong></td>
+                        <tr draggable="true" data-index="${index}">
+                            <td><span class="drag-handle">☰</span><strong>${recette.client}</strong></td>
                             <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
                             <td>${recette.element}</td>
                             <td class="montant positif">${recette.montantHT.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
@@ -899,6 +924,9 @@
                         </tr>
                     `;
                 }).join('');
+                
+                // Ajouter les événements drag and drop après avoir créé les lignes
+                initDragAndDrop();
                 
                 console.log(`📊 ${recettesFiltrees.length} recettes affichées`);
             } catch (error) {
@@ -1112,6 +1140,126 @@
                 console.error('❌ Erreur soumission:', error);
             }
         });
+
+        // Drag and Drop
+        let draggedRow = null;
+        let draggedIndex = null;
+
+        function initDragAndDrop() {
+            try {
+                const rows = document.querySelectorAll('#recettesTableBody tr[draggable="true"]');
+                
+                rows.forEach(row => {
+                    row.addEventListener('dragstart', handleDragStart);
+                    row.addEventListener('dragover', handleDragOver);
+                    row.addEventListener('drop', handleDrop);
+                    row.addEventListener('dragend', handleDragEnd);
+                    row.addEventListener('dragleave', handleDragLeave);
+                });
+                
+                console.log(`🎯 Drag & Drop initialisé sur ${rows.length} lignes`);
+            } catch (error) {
+                console.error('❌ Erreur init drag & drop:', error);
+            }
+        }
+
+        function handleDragStart(e) {
+            draggedRow = this;
+            draggedIndex = parseInt(this.dataset.index);
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            if (this !== draggedRow) {
+                this.classList.add('drag-over');
+            }
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            try {
+                if (draggedRow !== this) {
+                    const targetIndex = parseInt(this.dataset.index);
+                    
+                    // Réorganiser le tableau recettes
+                    const filtreType = document.getElementById('filtreType').value;
+                    const filtreStatut = document.getElementById('filtreStatut').value;
+                    const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
+                    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                    
+                    // Obtenir les indices réels dans le tableau complet
+                    let recettesFiltrees = [...recettes];
+                    
+                    if (filtreType !== 'tous') {
+                        recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
+                    }
+                    
+                    if (filtreStatut !== 'tous') {
+                        recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+                    }
+                    
+                    if (filtrePeriodicite !== 'toutes') {
+                        recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
+                    }
+                    
+                    if (searchTerm) {
+                        recettesFiltrees = recettesFiltrees.filter(r => 
+                            r.client.toLowerCase().includes(searchTerm) ||
+                            r.element.toLowerCase().includes(searchTerm) ||
+                            r.type.toLowerCase().includes(searchTerm) ||
+                            (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
+                        );
+                    }
+                    
+                    // Si des filtres sont actifs, on ne peut pas réorganiser
+                    if (recettesFiltrees.length !== recettes.length) {
+                        alert('⚠️ Veuillez désactiver les filtres pour réorganiser les recettes');
+                        this.classList.remove('drag-over');
+                        return;
+                    }
+                    
+                    // Déplacer l'élément dans le tableau
+                    const draggedItem = recettes[draggedIndex];
+                    recettes.splice(draggedIndex, 1);
+                    recettes.splice(targetIndex, 0, draggedItem);
+                    
+                    // Sauvegarder et rafraîchir
+                    sauvegarderRecettes();
+                    afficherRecettes();
+                    
+                    console.log(`✅ Ligne déplacée de ${draggedIndex} vers ${targetIndex}`);
+                }
+            } catch (error) {
+                console.error('❌ Erreur drop:', error);
+            }
+            
+            this.classList.remove('drag-over');
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            
+            // Nettoyer toutes les classes drag-over
+            document.querySelectorAll('#recettesTableBody tr').forEach(row => {
+                row.classList.remove('drag-over');
+            });
+            
+            draggedRow = null;
+            draggedIndex = null;
+        }
 
         // Fermeture modal
         document.addEventListener('keydown', function(e) {
