@@ -209,6 +209,119 @@
             opacity: 0.7;
             float: right;
         }
+
+        /* Section Gestion Types Recettes */
+        .types-management {
+            padding: 2rem;
+            border-bottom: 1px solid #eee;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .type-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .type-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-grow: 1;
+        }
+
+        .type-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-edit-type {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+        }
+
+        .btn-delete-type {
+            background: linear-gradient(135deg, #ff7675, #d63031);
+            color: white;
+        }
+
+        .btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .add-type-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .add-type-form input {
+            flex-grow: 1;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .add-type-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-add-type {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add-type:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.3);
+        }
+
+        .default-types-btn {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #2d3436;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .default-types-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(253, 203, 110, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -271,6 +384,26 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Gestion des Types de Recettes -->
+                    <div class="types-management">
+                        <h4 class="mb-4">🏷️ Gestion des Types de Recettes</h4>
+                        
+                        <div class="add-type-form">
+                            <input type="text" id="newTypeName" placeholder="Nom du nouveau type (ex: Bureau privatif)" maxlength="50">
+                            <button class="btn-add-type" onclick="ajouterType()">
+                                ➕ Ajouter
+                            </button>
+                        </div>
+
+                        <div id="typesList">
+                            <!-- Liste des types générée dynamiquement -->
+                        </div>
+
+                        <button class="default-types-btn" onclick="restaurerTypesParDefaut()">
+                            🔄 Restaurer les types par défaut
+                        </button>
                     </div>
 
                     <!-- Journal -->
@@ -648,12 +781,201 @@ CLOUD (SeaTable) :
             }
         }
 
+        // ========== GESTION DES TYPES DE RECETTES ==========
+        
+        // Types par défaut
+        const TYPES_RECETTES_DEFAUT = [
+            "bureau privatif",
+            "flex",
+            "flex +",
+            "rocket pass",
+            "rocket pass +",
+            "coworking",
+            "coworking +",
+            "location évènementielle",
+            "location sous-traitance",
+            "domiciliation",
+            "autre"
+        ];
+
+        function chargerTypesRecettes() {
+            try {
+                const types = localStorage.getItem('typesRecettesRT');
+                if (types) {
+                    return JSON.parse(types);
+                }
+                // Si aucun type n'existe, utiliser les types par défaut
+                sauvegarderTypesRecettes(TYPES_RECETTES_DEFAUT);
+                return TYPES_RECETTES_DEFAUT;
+            } catch (error) {
+                console.error('Erreur chargement types:', error);
+                addLog(`❌ Erreur chargement types : ${error.message}`, 'error');
+                return TYPES_RECETTES_DEFAUT;
+            }
+        }
+
+        function sauvegarderTypesRecettes(types) {
+            try {
+                localStorage.setItem('typesRecettesRT', JSON.stringify(types));
+                addLog(`✅ Types de recettes sauvegardés (${types.length} types)`, 'success');
+            } catch (error) {
+                console.error('Erreur sauvegarde types:', error);
+                addLog(`❌ Erreur sauvegarde types : ${error.message}`, 'error');
+            }
+        }
+
+        function afficherTypesRecettes() {
+            try {
+                const types = chargerTypesRecettes();
+                const typesList = document.getElementById('typesList');
+                
+                if (types.length === 0) {
+                    typesList.innerHTML = '<p class="text-muted text-center">Aucun type défini. Ajoutez-en ou restaurez les types par défaut.</p>';
+                    return;
+                }
+
+                typesList.innerHTML = types.map((type, index) => `
+                    <div class="type-item">
+                        <div class="type-badge">${type}</div>
+                        <div class="type-actions">
+                            <button class="btn-small btn-edit-type" onclick="modifierType(${index})">
+                                ✏️ Modifier
+                            </button>
+                            <button class="btn-small btn-delete-type" onclick="supprimerType(${index})">
+                                🗑️ Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Erreur affichage types:', error);
+                addLog(`❌ Erreur affichage types : ${error.message}`, 'error');
+            }
+        }
+
+        function ajouterType() {
+            try {
+                const input = document.getElementById('newTypeName');
+                const nouveauType = input.value.trim().toLowerCase();
+                
+                if (!nouveauType) {
+                    alert('⚠️ Veuillez entrer un nom de type');
+                    return;
+                }
+
+                const types = chargerTypesRecettes();
+                
+                // Vérifier si le type existe déjà
+                if (types.includes(nouveauType)) {
+                    alert('⚠️ Ce type existe déjà');
+                    return;
+                }
+
+                types.push(nouveauType);
+                sauvegarderTypesRecettes(types);
+                afficherTypesRecettes();
+                
+                input.value = '';
+                addLog(`✅ Type ajouté : "${nouveauType}"`, 'success');
+                
+            } catch (error) {
+                console.error('Erreur ajout type:', error);
+                addLog(`❌ Erreur ajout type : ${error.message}`, 'error');
+            }
+        }
+
+        function modifierType(index) {
+            try {
+                const types = chargerTypesRecettes();
+                const typeActuel = types[index];
+                
+                const nouveauNom = prompt('Modifier le type :', typeActuel);
+                
+                if (nouveauNom === null) return; // Annulation
+                
+                const nouveauNomTrim = nouveauNom.trim().toLowerCase();
+                
+                if (!nouveauNomTrim) {
+                    alert('⚠️ Le nom ne peut pas être vide');
+                    return;
+                }
+
+                // Vérifier si le nouveau nom existe déjà (sauf si c'est le même)
+                if (nouveauNomTrim !== typeActuel && types.includes(nouveauNomTrim)) {
+                    alert('⚠️ Ce type existe déjà');
+                    return;
+                }
+
+                types[index] = nouveauNomTrim;
+                sauvegarderTypesRecettes(types);
+                afficherTypesRecettes();
+                
+                addLog(`✅ Type modifié : "${typeActuel}" → "${nouveauNomTrim}"`, 'success');
+                
+            } catch (error) {
+                console.error('Erreur modification type:', error);
+                addLog(`❌ Erreur modification type : ${error.message}`, 'error');
+            }
+        }
+
+        function supprimerType(index) {
+            try {
+                const types = chargerTypesRecettes();
+                const type = types[index];
+                
+                if (!confirm(`Êtes-vous sûr de vouloir supprimer le type "${type}" ?\n\n⚠️ Attention : Les recettes existantes avec ce type ne seront pas modifiées, mais ce type ne sera plus disponible dans les nouveaux formulaires.`)) {
+                    return;
+                }
+
+                types.splice(index, 1);
+                sauvegarderTypesRecettes(types);
+                afficherTypesRecettes();
+                
+                addLog(`🗑️ Type supprimé : "${type}"`, 'warning');
+                
+            } catch (error) {
+                console.error('Erreur suppression type:', error);
+                addLog(`❌ Erreur suppression type : ${error.message}`, 'error');
+            }
+        }
+
+        function restaurerTypesParDefaut() {
+            try {
+                if (!confirm('⚠️ Cette action va restaurer la liste des types par défaut.\n\nVoulez-vous continuer ?')) {
+                    return;
+                }
+
+                sauvegarderTypesRecettes(TYPES_RECETTES_DEFAUT);
+                afficherTypesRecettes();
+                
+                addLog('🔄 Types par défaut restaurés', 'info');
+                
+            } catch (error) {
+                console.error('Erreur restauration types:', error);
+                addLog(`❌ Erreur restauration types : ${error.message}`, 'error');
+            }
+        }
+
+        // Gestion de la touche Enter pour ajouter un type
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('newTypeName');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        ajouterType();
+                    }
+                });
+            }
+        });
+
         // ========== INITIALISATION ==========
         document.addEventListener('DOMContentLoaded', function() {
             addLog('🚀 Interface de synchronisation initialisée', 'success');
             addLog('💡 Export/Import automatique activé !', 'info');
             chargerDonneesLocales();
             mettreAJourInterface();
+            afficherTypesRecettes();
         });
     </script>
 </body>
