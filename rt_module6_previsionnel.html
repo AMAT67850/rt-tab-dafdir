@@ -60,6 +60,31 @@
             margin-bottom: 30px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
+
+        .note-solde {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            border-radius: 0 8px 8px 0;
+            padding: 18px 20px;
+            margin-bottom: 30px;
+            font-size: 0.92em;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .note-solde > strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .note-solde p {
+            margin: 0 0 8px 0;
+        }
+
+        .note-solde p:last-child {
+            margin-bottom: 0;
+        }
         
         .config-section h2 {
             color: #2c3e50;
@@ -199,6 +224,16 @@
             color: #6c757d;
             font-size: 0.95em;
             font-weight: 500;
+        }
+
+        .stat-note {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.78em;
+            color: #adb5bd;
+            font-style: italic;
+            font-weight: 400;
+            line-height: 1.4;
         }
         
         /* Chart Section */
@@ -560,29 +595,37 @@
                 </div>
             </div>
 
+            <!-- Note solde initial -->
+            <div class="note-solde">
+                <strong>ℹ️ Note sur le Solde Initial</strong>
+                <p>Le solde cumulé est calculé à partir du solde initial renseigné ci-dessus.</p>
+                <p>⚠️ Le solde bancaire au 1er du mois peut déjà inclure des recettes du mois en cours (paiements anticipés, prélèvements automatiques avancés avant WE/férié) — recettes par ailleurs déjà comptées dans le prévisionnel. Le saisir entraînerait un double comptage : <strong>utiliser 0 reste l'approche la plus fiable.</strong></p>
+                <p>Avec un solde initial à 0, le solde cumulé reflète le <strong>cash-flow structurel sur 12 mois glissants</strong> : la richesse générée si le portefeuille clients reste stable.</p>
+            </div>
+
             <!-- Stats Résumé -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3 id="totalRecettes">0€</h3>
-                    <p>Total Recettes HT Annuel</p>
+                    <p>Recettes HT · 12 mois glissants</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="totalCharges">0€</h3>
-                    <p>Total Charges HT Annuel</p>
+                    <p>Charges HT · 12 mois glissants</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="resultatAnnuel">0€</h3>
-                    <p>Résultat Prévisionnel HT</p>
+                    <p>Cash-flow net prévisionnel</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="soldeFinal">0€</h3>
-                    <p>Solde Final Prévu</p>
+                    <p>Solde cumulé sur 12 mois<span class="stat-note">Équivaut au cash-flow net si le solde initial est à 0. N'a de valeur propre que si un solde initial est renseigné.</span></p>
                 </div>
             </div>
 
             <!-- Graphique -->
             <div class="chart-section">
-                <h2>📈 Évolution Solde Cumulé</h2>
+                <h2>📈 Projection de trésorerie · 12 mois glissants</h2>
                 <div class="chart-container">
                     <canvas id="prevChart"></canvas>
                 </div>
@@ -791,6 +834,17 @@
                 
                 // Recettes récurrentes
                 recettesData.forEach((recette, recetteIndex) => {
+                    // Exclure les entrants dont la date d'entrée est postérieure au mois calculé
+                    if (recette.entrant && recette.dateEntree) {
+                        const dateEntree = new Date(recette.dateEntree);
+                        dateEntree.setDate(1);
+                        dateEntree.setHours(0, 0, 0, 0);
+                        const debutMois = new Date(dateMois);
+                        debutMois.setDate(1);
+                        debutMois.setHours(0, 0, 0, 0);
+                        if (dateEntree > debutMois) return; // pas encore actif ce mois
+                    }
+
                     if (doitApparaitreCeMois(recette, dateMois)) {
                         // Vérifier si supprimée temporairement
                         const suppressions = window.suppressionsTemporaires?.[moisCle]?.recettes || [];
