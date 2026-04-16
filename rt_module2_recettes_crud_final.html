@@ -950,7 +950,7 @@
             debut.setHours(0, 0, 0, 0);
             if (horizon === 'tous') return { debut, fin: null };
             const fin = new Date(debut);
-            fin.setMonth(fin.getMonth() + parseInt(horizon));
+            fin.setMonth(fin.getMonth() + parseInt(horizon) + 1); // +1 pour inclure tout le dernier mois
             return { debut, fin };
         }
 
