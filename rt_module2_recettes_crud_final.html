@@ -1291,22 +1291,48 @@
                 // Option A : totaux sur les recettes affichées
                 // Sauf en vue "Tous" sans filtre mouvement : exclure entrants futurs des totaux
                 let recettesPourTotaux;
-                if (filtreMouvements === 'tous') {
+                let totalMontantHT, totalMontantLisse;
+
+                if (filtreMouvements === 'avec-mouvements') {
+                    // Solde net : entrants − sortants
+                    const entrants = recettesFiltrees.filter(r => r.entrant && r.dateEntree);
+                    const sortants = recettesFiltrees.filter(r => r.sortant && r.dateDepart);
+                    const htEntrants = entrants.reduce((sum, r) => sum + (r.montantHT || 0), 0);
+                    const htSortants = sortants.reduce((sum, r) => sum + (r.montantHT || 0), 0);
+                    const lisseEntrants = entrants.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
+                    const lisseSortants = sortants.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
+                    totalMontantHT = htEntrants - htSortants;
+                    totalMontantLisse = lisseEntrants - lisseSortants;
+                    document.querySelector('.stat-card:nth-child(2) .stat-label').textContent = 'Impact HT net';
+                    document.querySelector('.stat-card:nth-child(3) .stat-label').textContent = 'Impact Lissé/Mois net';
+                } else if (filtreMouvements === 'tous') {
                     recettesPourTotaux = recettesFiltrees.filter(r => !estEntrantFutur(r.dateEntree));
+                    totalMontantHT = recettesPourTotaux.reduce((sum, r) => sum + (r.montantHT || 0), 0);
+                    totalMontantLisse = recettesPourTotaux.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
+                    document.querySelector('.stat-card:nth-child(2) .stat-label').textContent = 'Montant Total HT';
+                    document.querySelector('.stat-card:nth-child(3) .stat-label').textContent = 'Montant Lissé Mensuel';
                 } else {
                     recettesPourTotaux = recettesFiltrees;
+                    totalMontantHT = recettesPourTotaux.reduce((sum, r) => sum + (r.montantHT || 0), 0);
+                    totalMontantLisse = recettesPourTotaux.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
+                    document.querySelector('.stat-card:nth-child(2) .stat-label').textContent = 'Montant Total HT';
+                    document.querySelector('.stat-card:nth-child(3) .stat-label').textContent = 'Montant Lissé Mensuel';
                 }
 
                 const totalEntrants = recettesFiltrees.filter(r => estEntrantFutur(r.dateEntree)).length;
                 const totalRecettes = recettesFiltrees.length;
-                const totalMontantHT = recettesPourTotaux.reduce((sum, r) => sum + (r.montantHT || 0), 0);
-                const totalMontantLisse = recettesPourTotaux.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
 
-                console.log(`Stats: ${totalRecettes} recettes (${totalEntrants} entrants futurs exclus des totaux), ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé`);
+                // Formatage avec signe pour les soldes nets
+                const formatMontant = (val) => {
+                    const signe = filtreMouvements === 'avec-mouvements' && val > 0 ? '+' : '';
+                    return signe + val.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '€';
+                };
+
+                console.log(`Stats: ${totalRecettes} recettes, ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé`);
 
                 document.getElementById('totalRecettes').textContent = totalRecettes;
-                document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
-                document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
+                document.getElementById('totalMontantHT').textContent = formatMontant(totalMontantHT);
+                document.getElementById('totalMontantLisse').textContent = formatMontant(totalMontantLisse);
                 document.getElementById('totalEntrants').textContent = totalEntrants;
                 
                 console.log('✅ Stats mises à jour');
