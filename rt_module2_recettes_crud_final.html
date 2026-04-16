@@ -282,9 +282,71 @@
         .badge-periodicite-semestriel { background: #d1c4e9; color: #4527a0; }
         .badge-periodicite-annuel { background: #ffccbc; color: #d84315; }
 
-        /* Badges Statut */
-        .badge-actif { background: #c8e6c9; color: #2e7d32; }
-        .badge-inactif { background: #ffcdd2; color: #c62828; }
+        /* Badge Entrant */
+        .badge-entrant {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #81c784;
+        }
+
+        .badge-entrant-proche {
+            background: #c8e6c9;
+            color: #1b5e20;
+            border: 1px solid #4caf50;
+            font-weight: 700;
+        }
+
+        /* Badge Centre */
+        .badge-centre { background: #e3f2fd; color: #1565c0; }
+
+        /* Checkbox pour Entrant */
+        .checkbox-group-entrant {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border: 2px solid #81c784;
+        }
+
+        .checkbox-group-entrant input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group-entrant label {
+            font-weight: 600;
+            color: #2e7d32;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* Date d'entrée */
+        .date-entree-group {
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #aed581;
+            margin-bottom: 20px;
+        }
+
+        .date-entree-group label {
+            font-weight: 600;
+            color: #33691e;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .date-entree-group input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #aed581;
+            border-radius: 8px;
+            font-size: 14px;
+        }
 
         /* Badge Sortant */
         .badge-sortant { 
@@ -573,11 +635,15 @@
                 </div>
 
                 <div class="filter-group">
-                    <label>Statut</label>
-                    <select id="filtreStatut" onchange="appliquerFiltres()">
-                        <option value="tous">Tous les statuts</option>
-                        <option value="ACTIF">Actif</option>
-                        <option value="INACTIF">Inactif</option>
+                    <label>Centre</label>
+                    <select id="filtreCentre" onchange="appliquerFiltres()">
+                        <option value="tous">Tous les centres</option>
+                        <option value="GARE">GARE (tous)</option>
+                        <option value="GARE 1">GARE 1</option>
+                        <option value="GARE 2">GARE 2</option>
+                        <option value="WISSEMBOURG">WISSEMBOURG (tous)</option>
+                        <option value="WISSEMBOURG 1">WISSEMBOURG 1</option>
+                        <option value="WISSEMBOURG 2">WISSEMBOURG 2</option>
                     </select>
                 </div>
 
@@ -611,8 +677,8 @@
                     <div class="stat-label">Montant Lissé Mensuel</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="totalActifs">0</div>
-                    <div class="stat-label">Contrats Actifs</div>
+                    <div class="stat-value" id="totalEntrants">0</div>
+                    <div class="stat-label">Entrants à venir</div>
                 </div>
             </div>
         </div>
@@ -625,17 +691,18 @@
                         <th>Client</th>
                         <th>Type</th>
                         <th>Élément</th>
+                        <th>Centre</th>
                         <th>Montant HT</th>
                         <th>Montant TTC</th>
                         <th>Périodicité</th>
                         <th>Lissé/Mois</th>
-                        <th>Statut</th>
+                        <th>Entrant</th>
                         <th>Sortant</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="recettesTableBody">
-                    <tr><td colspan="10" class="no-data">Chargement...</td></tr>
+                    <tr><td colspan="11" class="no-data">Chargement...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -693,12 +760,29 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="statut">Statut *</label>
-                            <select id="statut" required>
-                                <option value="ACTIF">Actif</option>
-                                <option value="INACTIF">Inactif</option>
+                            <label for="centre">Centre</label>
+                            <select id="centre">
+                                <option value="">— Non défini —</option>
+                                <option value="GARE">GARE</option>
+                                <option value="GARE 1">GARE 1</option>
+                                <option value="GARE 2">GARE 2</option>
+                                <option value="WISSEMBOURG">WISSEMBOURG</option>
+                                <option value="WISSEMBOURG 1">WISSEMBOURG 1</option>
+                                <option value="WISSEMBOURG 2">WISSEMBOURG 2</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- Entrant : date d'entrée différée -->
+                    <div class="checkbox-group-entrant">
+                        <input type="checkbox" id="entrant" name="entrant" onchange="toggleDateEntree()">
+                        <label for="entrant">🟢 Client Entrant (arrivée différée)</label>
+                    </div>
+
+                    <!-- Date d'entrée prévue -->
+                    <div class="date-entree-group" id="dateEntreeGroup" style="display: none;">
+                        <label for="dateEntree">📅 Date d'entrée prévue *</label>
+                        <input type="date" id="dateEntree" name="dateEntree">
                     </div>
 
                     <!-- NOUVEAU : Case à cocher Sortant -->
@@ -770,7 +854,56 @@
             }
         }
 
-        // ========== GESTION DYNAMIQUE DES TYPES DE RECETTES ==========
+        // Afficher/Masquer la date d'entrée
+        function toggleDateEntree() {
+            try {
+                const entrantChecked = document.getElementById('entrant').checked;
+                const dateEntreeGroup = document.getElementById('dateEntreeGroup');
+                const dateInput = document.getElementById('dateEntree');
+
+                if (entrantChecked) {
+                    dateEntreeGroup.style.display = 'block';
+                    dateInput.required = true;
+                } else {
+                    dateEntreeGroup.style.display = 'none';
+                    dateInput.required = false;
+                    dateInput.value = '';
+                }
+            } catch (error) {
+                console.error('Erreur toggleDateEntree:', error);
+            }
+        }
+
+        // Vérifier si un client n'est pas encore arrivé (date d'entrée dans le futur)
+        function estEntrantFutur(dateEntree) {
+            try {
+                if (!dateEntree) return false;
+                const maintenant = new Date();
+                maintenant.setHours(0, 0, 0, 0);
+                const dateArr = new Date(dateEntree);
+                if (isNaN(dateArr.getTime())) return false;
+                return dateArr > maintenant;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Vérifier si un client arrive dans les 90 prochains jours
+        function estEntrantProche(dateEntree) {
+            try {
+                if (!dateEntree) return false;
+                const maintenant = new Date();
+                maintenant.setHours(0, 0, 0, 0);
+                const dateArr = new Date(dateEntree);
+                if (isNaN(dateArr.getTime())) return false;
+                const diffJours = (dateArr - maintenant) / (1000 * 60 * 60 * 24);
+                return diffJours >= 0 && diffJours <= 90;
+            } catch (e) {
+                return false;
+            }
+        }
+
+
         
         // Types par défaut (fallback si pas de types dans localStorage)
         const TYPES_RECETTES_DEFAUT = [
@@ -890,13 +1023,12 @@
             }
         }
 
-        // Affichage
         function afficherRecettes() {
             try {
                 const tbody = document.getElementById('recettesTableBody');
                 const searchTerm = document.getElementById('searchInput').value.toLowerCase();
                 const filtreType = document.getElementById('filtreType').value;
-                const filtreStatut = document.getElementById('filtreStatut').value;
+                const filtreCentre = document.getElementById('filtreCentre').value;
                 const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
 
                 let recettesFiltrees = [...recettes];
@@ -905,8 +1037,13 @@
                     recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
                 }
                 
-                if (filtreStatut !== 'tous') {
-                    recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+                if (filtreCentre !== 'tous') {
+                    recettesFiltrees = recettesFiltrees.filter(r => {
+                        const c = (r.centre || '').toUpperCase();
+                        if (filtreCentre === 'GARE') return c === 'GARE' || c === 'GARE 1' || c === 'GARE 2';
+                        if (filtreCentre === 'WISSEMBOURG') return c === 'WISSEMBOURG' || c === 'WISSEMBOURG 1' || c === 'WISSEMBOURG 2';
+                        return c === filtreCentre;
+                    });
                 }
                 
                 if (filtrePeriodicite !== 'toutes') {
@@ -923,7 +1060,7 @@
                 }
 
                 if (recettesFiltrees.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="no-data">Aucune recette trouvée</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" class="no-data">Aucune recette trouvée</td></tr>';
                     return;
                 }
 
@@ -935,6 +1072,44 @@
                     else if (recette.type === "rocket pass +") typeCssClass = "rocket-pass-plus";
                     else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
                     else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
+
+                    // Badge centre
+                    const badgeCentre = recette.centre
+                        ? `<span class="badge badge-centre">${recette.centre}</span>`
+                        : '<span style="color:#aaa;font-size:12px;">—</span>';
+
+                    // Badge entrant
+                    let badgeEntrant = '';
+                    if (recette.entrant && recette.dateEntree) {
+                        try {
+                            const futur = estEntrantFutur(recette.dateEntree);
+                            const proche = estEntrantProche(recette.dateEntree);
+                            const dateFormatee = new Date(recette.dateEntree).toLocaleDateString('fr-FR');
+                            if (futur && proche) {
+                                badgeEntrant = `
+                                    <div style="text-align: center;">
+                                        <span class="badge badge-entrant-proche">🟢 Arrivée proche</span>
+                                        <div style="margin-top: 5px; font-size: 12px; font-weight: 600; color: #2e7d32;">📅 ${dateFormatee}</div>
+                                    </div>`;
+                            } else if (futur) {
+                                badgeEntrant = `
+                                    <div style="text-align: center;">
+                                        <span class="badge badge-entrant">🕐 Entrant</span>
+                                        <div style="margin-top: 5px; font-size: 12px; font-weight: 600; color: #6c757d;">📅 ${dateFormatee}</div>
+                                    </div>`;
+                            } else {
+                                badgeEntrant = `
+                                    <div style="text-align: center;">
+                                        <span class="badge badge-entrant">✅ Arrivé le</span>
+                                        <div style="margin-top: 5px; font-size: 12px; font-weight: 600; color: #6c757d;">📅 ${dateFormatee}</div>
+                                    </div>`;
+                            }
+                        } catch (e) {
+                            badgeEntrant = '<span class="badge badge-entrant">🟢 Entrant</span>';
+                        }
+                    } else if (recette.entrant) {
+                        badgeEntrant = '<span class="badge badge-entrant">🟢 Entrant</span>';
+                    }
                     
                     // Badge sortant avec distinction 3 mois ET date visible
                     let badgeSortant = '';
@@ -947,15 +1122,13 @@
                                     <div style="text-align: center;">
                                         <span class="badge badge-sortant-3mois">⚠️ Départ proche</span>
                                         <div style="margin-top: 5px; font-size: 12px; font-weight: 600; color: #dc3545;">📅 ${dateFormatee}</div>
-                                    </div>
-                                `;
+                                    </div>`;
                             } else {
                                 badgeSortant = `
                                     <div style="text-align: center;">
                                         <span class="badge badge-sortant">🔜 Sortant</span>
                                         <div style="margin-top: 5px; font-size: 12px; font-weight: 600; color: #6c757d;">📅 ${dateFormatee}</div>
-                                    </div>
-                                `;
+                                    </div>`;
                             }
                         } catch (e) {
                             badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>';
@@ -969,11 +1142,12 @@
                             <td><span class="drag-handle">☰</span><strong>${recette.client}</strong></td>
                             <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
                             <td>${recette.element}</td>
+                            <td>${badgeCentre}</td>
                             <td class="montant positif">${recette.montantHT.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
                             <td class="montant positif">${recette.montantTTC.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
                             <td><span class="badge badge-periodicite-${recette.periodicite.toLowerCase()}">${recette.periodicite}</span></td>
                             <td class="montant positif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                            <td><span class="badge badge-${recette.statut.toLowerCase()}">${recette.statut}</span></td>
+                            <td>${badgeEntrant}</td>
                             <td>${badgeSortant}</td>
                             <td class="actions">
                                 <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id || index})">✏️</button>
@@ -1054,7 +1228,7 @@
                 console.log('📊 Mise à jour des stats...');
                 
                 const filtreType = document.getElementById('filtreType').value;
-                const filtreStatut = document.getElementById('filtreStatut').value;
+                const filtreCentre = document.getElementById('filtreCentre').value;
                 const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
                 const searchTerm = document.getElementById('searchInput').value.toLowerCase();
                 
@@ -1064,8 +1238,13 @@
                     recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
                 }
                 
-                if (filtreStatut !== 'tous') {
-                    recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+                if (filtreCentre !== 'tous') {
+                    recettesFiltrees = recettesFiltrees.filter(r => {
+                        const c = (r.centre || '').toUpperCase();
+                        if (filtreCentre === 'GARE') return c === 'GARE' || c === 'GARE 1' || c === 'GARE 2';
+                        if (filtreCentre === 'WISSEMBOURG') return c === 'WISSEMBOURG' || c === 'WISSEMBOURG 1' || c === 'WISSEMBOURG 2';
+                        return c === filtreCentre;
+                    });
                 }
                 
                 if (filtrePeriodicite !== 'toutes') {
@@ -1081,17 +1260,21 @@
                     );
                 }
 
-                const totalRecettes = recettesFiltrees.length;
-                const totalMontantHT = recettesFiltrees.reduce((sum, r) => sum + (r.montantHT || 0), 0);
-                const totalMontantLisse = recettesFiltrees.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
-                const totalActifs = recettesFiltrees.filter(r => r.statut === 'ACTIF').length;
+                // Recettes dont l'entrée est déjà effective (pas futures)
+                const recettesActives = recettesFiltrees.filter(r => !estEntrantFutur(r.dateEntree));
+                // Entrants à venir (date d'entrée dans le futur)
+                const totalEntrants = recettesFiltrees.filter(r => estEntrantFutur(r.dateEntree)).length;
 
-                console.log(`Stats: ${totalRecettes} recettes, ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé, ${totalActifs} actifs`);
+                const totalRecettes = recettesFiltrees.length;
+                const totalMontantHT = recettesActives.reduce((sum, r) => sum + (r.montantHT || 0), 0);
+                const totalMontantLisse = recettesActives.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
+
+                console.log(`Stats: ${totalRecettes} recettes (${totalEntrants} entrants futurs exclus des totaux), ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé`);
 
                 document.getElementById('totalRecettes').textContent = totalRecettes;
                 document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
                 document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
-                document.getElementById('totalActifs').textContent = totalActifs;
+                document.getElementById('totalEntrants').textContent = totalEntrants;
                 
                 console.log('✅ Stats mises à jour');
             } catch (error) {
@@ -1106,6 +1289,10 @@
                 document.getElementById('modalTitle').textContent = 'Nouvelle Recette';
                 document.getElementById('recetteForm').reset();
                 document.getElementById('montantLisse').textContent = '0.00€';
+                document.getElementById('centre').value = '';
+                document.getElementById('entrant').checked = false;
+                document.getElementById('dateEntreeGroup').style.display = 'none';
+                document.getElementById('dateEntree').required = false;
                 document.getElementById('sortant').checked = false;
                 document.getElementById('dateDepartGroup').style.display = 'none';
                 document.getElementById('dateDepart').required = false;
@@ -1129,11 +1316,14 @@
                 document.getElementById('montantHT').value = recette.montantHT;
                 document.getElementById('montantTTC').value = recette.montantTTC;
                 document.getElementById('periodicite').value = recette.periodicite;
-                document.getElementById('statut').value = recette.statut;
+                document.getElementById('centre').value = recette.centre || '';
                 document.getElementById('commentaire').value = recette.commentaire || '';
+                document.getElementById('entrant').checked = recette.entrant || false;
+                document.getElementById('dateEntree').value = recette.dateEntree || '';
                 document.getElementById('sortant').checked = recette.sortant || false;
                 document.getElementById('dateDepart').value = recette.dateDepart || '';
                 
+                toggleDateEntree();
                 toggleDateDepart();
                 calculerLisse();
                 document.getElementById('recetteModal').style.display = 'block';
@@ -1174,8 +1364,11 @@
                     montantHT: parseFloat(document.getElementById('montantHT').value),
                     montantTTC: parseFloat(document.getElementById('montantTTC').value),
                     periodicite: document.getElementById('periodicite').value,
-                    statut: document.getElementById('statut').value,
+                    centre: document.getElementById('centre').value,
+                    statut: 'ACTIF', // conservé pour compatibilité avec les autres modules
                     commentaire: document.getElementById('commentaire').value,
+                    entrant: document.getElementById('entrant').checked,
+                    dateEntree: document.getElementById('entrant').checked ? document.getElementById('dateEntree').value : null,
                     sortant: document.getElementById('sortant').checked,
                     dateDepart: document.getElementById('sortant').checked ? document.getElementById('dateDepart').value : null
                 };
@@ -1253,7 +1446,7 @@
                     
                     // Réorganiser le tableau recettes
                     const filtreType = document.getElementById('filtreType').value;
-                    const filtreStatut = document.getElementById('filtreStatut').value;
+                    const filtreCentre = document.getElementById('filtreCentre').value;
                     const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
                     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
                     
@@ -1264,8 +1457,13 @@
                         recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
                     }
                     
-                    if (filtreStatut !== 'tous') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.statut === filtreStatut);
+                    if (filtreCentre !== 'tous') {
+                        recettesFiltrees = recettesFiltrees.filter(r => {
+                            const c = (r.centre || '').toUpperCase();
+                            if (filtreCentre === 'GARE') return c === 'GARE' || c === 'GARE 1' || c === 'GARE 2';
+                            if (filtreCentre === 'WISSEMBOURG') return c === 'WISSEMBOURG' || c === 'WISSEMBOURG 1' || c === 'WISSEMBOURG 2';
+                            return c === filtreCentre;
+                        });
                     }
                     
                     if (filtrePeriodicite !== 'toutes') {
