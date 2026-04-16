@@ -161,6 +161,13 @@
             border-color: #27ae60;
         }
 
+        .filter-group select:disabled {
+            background: #f8f9fa;
+            color: #adb5bd;
+            cursor: not-allowed;
+            border-color: #e9ecef;
+        }
+
         .stats {
             background: white;
             padding: 25px;
@@ -661,11 +668,22 @@
 
                 <div class="filter-group">
                     <label>Mouvements</label>
-                    <select id="filtreMouvements" onchange="appliquerFiltres()">
+                    <select id="filtreMouvements" onchange="toggleHorizon(); appliquerFiltres();">
                         <option value="tous">Tous</option>
                         <option value="entrants">Entrants</option>
                         <option value="sortants">Sortants</option>
                         <option value="avec-mouvements">Avec mouvements</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Horizon</label>
+                    <select id="filtreHorizon" onchange="appliquerFiltres()" disabled>
+                        <option value="tous">Sans limite</option>
+                        <option value="1">1 mois</option>
+                        <option value="3">3 mois</option>
+                        <option value="6">6 mois</option>
+                        <option value="12">12 mois</option>
                     </select>
                 </div>
             </div>
@@ -913,8 +931,44 @@
             }
         }
 
+        // Activer/désactiver le select Horizon selon le filtre Mouvements
+        function toggleHorizon() {
+            const filtreMouvements = document.getElementById('filtreMouvements').value;
+            const filtreHorizon = document.getElementById('filtreHorizon');
+            if (filtreMouvements === 'tous') {
+                filtreHorizon.disabled = true;
+                filtreHorizon.value = 'tous';
+            } else {
+                filtreHorizon.disabled = false;
+            }
+        }
 
-        
+        // Retourne les bornes de la fenêtre temporelle
+        function getFenetreHorizon(horizon) {
+            const debut = new Date();
+            debut.setDate(1);
+            debut.setHours(0, 0, 0, 0);
+            if (horizon === 'tous') return { debut, fin: null };
+            const fin = new Date(debut);
+            fin.setMonth(fin.getMonth() + parseInt(horizon));
+            return { debut, fin };
+        }
+
+        // Teste si une date de mouvement est dans la fenêtre
+        function estDansFenetre(dateStr, typeMouvement, fenetre) {
+            if (!dateStr) return false;
+            const d = new Date(dateStr);
+            d.setHours(0, 0, 0, 0);
+            if (typeMouvement === 'entrant') {
+                if (fenetre.fin === null) return true;
+                return d >= fenetre.debut && d < fenetre.fin;
+            } else { // sortant
+                if (fenetre.fin === null) return true;
+                return d < fenetre.fin;
+            }
+        }
+
+
         // Types par défaut (fallback si pas de types dans localStorage)
         const TYPES_RECETTES_DEFAUT = [
             "bureau privatif",
@@ -1061,12 +1115,19 @@
                     recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
                 }
 
-                if (filtreMouvements === 'entrants') {
-                    recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree);
-                } else if (filtreMouvements === 'sortants') {
-                    recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart);
-                } else if (filtreMouvements === 'avec-mouvements') {
-                    recettesFiltrees = recettesFiltrees.filter(r => (r.entrant && r.dateEntree) || (r.sortant && r.dateDepart));
+                if (filtreMouvements !== 'tous') {
+                    const horizon = document.getElementById('filtreHorizon').value;
+                    const fenetre = getFenetreHorizon(horizon);
+                    if (filtreMouvements === 'entrants') {
+                        recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre));
+                    } else if (filtreMouvements === 'sortants') {
+                        recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre));
+                    } else if (filtreMouvements === 'avec-mouvements') {
+                        recettesFiltrees = recettesFiltrees.filter(r =>
+                            (r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre)) ||
+                            (r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre))
+                        );
+                    }
                 }
                 
                 if (searchTerm) {
@@ -1271,12 +1332,19 @@
                     recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
                 }
 
-                if (filtreMouvements === 'entrants') {
-                    recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree);
-                } else if (filtreMouvements === 'sortants') {
-                    recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart);
-                } else if (filtreMouvements === 'avec-mouvements') {
-                    recettesFiltrees = recettesFiltrees.filter(r => (r.entrant && r.dateEntree) || (r.sortant && r.dateDepart));
+                if (filtreMouvements !== 'tous') {
+                    const horizon = document.getElementById('filtreHorizon').value;
+                    const fenetre = getFenetreHorizon(horizon);
+                    if (filtreMouvements === 'entrants') {
+                        recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre));
+                    } else if (filtreMouvements === 'sortants') {
+                        recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre));
+                    } else if (filtreMouvements === 'avec-mouvements') {
+                        recettesFiltrees = recettesFiltrees.filter(r =>
+                            (r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre)) ||
+                            (r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre))
+                        );
+                    }
                 }
                 
                 if (searchTerm) {
@@ -1294,9 +1362,9 @@
                 let totalMontantHT, totalMontantLisse;
 
                 if (filtreMouvements === 'avec-mouvements') {
-                    // Solde net : entrants − sortants
+                    // Solde net : entrants − sortants (recettesFiltrees déjà filtrées par fenêtre)
                     const entrants = recettesFiltrees.filter(r => r.entrant && r.dateEntree);
-                    const sortants = recettesFiltrees.filter(r => r.sortant && r.dateDepart);
+                    const sortants = recettesFiltrees.filter(r => r.sortant && r.dateDepart && !(r.entrant && r.dateEntree));
                     const htEntrants = entrants.reduce((sum, r) => sum + (r.montantHT || 0), 0);
                     const htSortants = sortants.reduce((sum, r) => sum + (r.montantHT || 0), 0);
                     const lisseEntrants = entrants.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
@@ -1530,12 +1598,19 @@
                         recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
                     }
 
-                    if (filtreMouvements === 'entrants') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree);
-                    } else if (filtreMouvements === 'sortants') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart);
-                    } else if (filtreMouvements === 'avec-mouvements') {
-                        recettesFiltrees = recettesFiltrees.filter(r => (r.entrant && r.dateEntree) || (r.sortant && r.dateDepart));
+                    if (filtreMouvements !== 'tous') {
+                        const horizon = document.getElementById('filtreHorizon').value;
+                        const fenetre = getFenetreHorizon(horizon);
+                        if (filtreMouvements === 'entrants') {
+                            recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre));
+                        } else if (filtreMouvements === 'sortants') {
+                            recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre));
+                        } else if (filtreMouvements === 'avec-mouvements') {
+                            recettesFiltrees = recettesFiltrees.filter(r =>
+                                (r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre)) ||
+                                (r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre))
+                            );
+                        }
                     }
                     
                     if (searchTerm) {
