@@ -856,10 +856,10 @@
                         <td><strong>${charge.fournisseur}</strong></td>
                         <td>${typeBadge}</td>
                         <td>${charge.element}</td>
-                        <td class="montant negatif">${Math.abs(charge.montantHT).toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                        <td class="montant negatif">${Math.abs(charge.montantTTC).toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                        <td class="montant negatif">${Math.abs(charge.montantHT).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
+                        <td class="montant negatif">${Math.abs(charge.montantTTC).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
                         <td><span class="badge badge-periodicite-${charge.periodicite.toLowerCase()}">${charge.periodicite}</span></td>
-                        <td class="montant negatif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                        <td class="montant negatif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
                         <td><span class="badge badge-${charge.statut.toLowerCase()}">${charge.statut}</span></td>
                         <td class="actions">
                             <button class="btn-action btn-edit" onclick="modifierCharge(${charge.id || index})">✏️</button>
@@ -884,7 +884,7 @@
                 'ANNUEL': 12
             };
             
-            return Math.abs(charge.montantHT) / (facteurs[charge.periodicite] || 1);
+            return Math.round(Math.abs(charge.montantHT) / (facteurs[charge.periodicite] || 1) * 100) / 100;
         }
 
         function calculerTTC() {
