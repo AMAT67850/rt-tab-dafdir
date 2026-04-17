@@ -280,6 +280,81 @@
             text-transform: uppercase;
         }
 
+        /* Badge Entrant */
+        .badge-entrant {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #81c784;
+        }
+        .badge-entrant-proche {
+            background: #c8e6c9;
+            color: #1b5e20;
+            border: 1px solid #4caf50;
+            font-weight: 700;
+        }
+        /* Badge Sortant */
+        .badge-sortant {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffb74d;
+        }
+        .badge-sortant-3mois {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef5350;
+            font-weight: 700;
+        }
+
+        /* Checkbox Entrant */
+        .checkbox-group-entrant {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border: 2px solid #81c784;
+        }
+        .checkbox-group-entrant input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+        .checkbox-group-entrant label { font-weight: 600; color: #2e7d32; cursor: pointer; margin: 0; }
+
+        /* Checkbox Sortant */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff3e0;
+            border-radius: 8px;
+            border: 2px solid #ffb74d;
+        }
+        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+        .checkbox-group label { font-weight: 600; color: #e65100; cursor: pointer; margin: 0; }
+
+        /* Date d'entrée */
+        .date-entree-group {
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #aed581;
+            margin-bottom: 20px;
+        }
+        .date-entree-group label { font-weight: 600; color: #33691e; display: block; margin-bottom: 8px; }
+        .date-entree-group input[type="date"] { width: 100%; padding: 12px; border: 2px solid #aed581; border-radius: 8px; font-size: 14px; }
+
+        /* Date de départ */
+        .date-depart-group {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ef5350;
+            margin-bottom: 20px;
+        }
+        .date-depart-group label { font-weight: 600; color: #c62828; display: block; margin-bottom: 8px; }
+        .date-depart-group input[type="date"] { width: 100%; padding: 12px; border: 2px solid #ef5350; border-radius: 8px; font-size: 14px; }
+
         .badge-actif {
             background: #d4edda;
             color: #155724;
@@ -584,11 +659,12 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label for="filtreStatut">Statut :</label>
-                    <select id="filtreStatut" onchange="appliquerFiltres()">
+                    <label for="filtreMouvements">Mouvements :</label>
+                    <select id="filtreMouvements" onchange="appliquerFiltres()">
                         <option value="tous">Tous</option>
-                        <option value="ACTIF">Actif</option>
-                        <option value="INACTIF">Inactif</option>
+                        <option value="entrants">Entrants</option>
+                        <option value="sortants">Sortants</option>
+                        <option value="avec-mouvements">Avec mouvement</option>
                     </select>
                 </div>
 
@@ -629,8 +705,8 @@
                     <div class="stat-label">Total Lissé/Mois</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="totalActifs">0</div>
-                    <div class="stat-label">Charges Actives</div>
+                    <div class="stat-value" id="totalEntrants">0</div>
+                    <div class="stat-label">Entrants à venir</div>
                 </div>
             </div>
         </div>
@@ -642,19 +718,20 @@
                     <tr>
                         <th>⋮⋮</th>
                         <th>Fournisseur</th>
-                        <th>Type</th> <!-- NOUVELLE COLONNE TYPE -->
+                        <th>Type</th>
                         <th>Élément</th>
                         <th>Montant HT</th>
                         <th>Montant TTC</th>
                         <th>Périodicité</th>
                         <th>Lissé/Mois</th>
-                        <th>Statut</th>
+                        <th>Entrant</th>
+                        <th>Sortant</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="chargesTableBody">
                     <tr>
-                        <td colspan="10" class="loading">Chargement des données...</td>
+                        <td colspan="11" class="loading">Chargement des données...</td>
                     </tr>
                 </tbody>
             </table>
@@ -709,25 +786,36 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="periodicite">Périodicité *</label>
-                            <select id="periodicite" required onchange="calculerLisse()">
-                                <option value="">Choisir</option>
-                                <option value="MENSUEL">Mensuel</option>
-                                <option value="BIMESTRIEL">Bimestriel</option>
-                                <option value="TRIMESTRIEL">Trimestriel</option>
-                                <option value="SEMESTRIEL">Semestriel</option>
-                                <option value="ANNUEL">Annuel</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="statut">Statut *</label>
-                            <select id="statut" required>
-                                <option value="ACTIF">Actif</option>
-                                <option value="INACTIF">Inactif</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label for="periodicite">Périodicité *</label>
+                        <select id="periodicite" required onchange="calculerLisse()">
+                            <option value="">Choisir</option>
+                            <option value="MENSUEL">Mensuel</option>
+                            <option value="BIMESTRIEL">Bimestriel</option>
+                            <option value="TRIMESTRIEL">Trimestriel</option>
+                            <option value="SEMESTRIEL">Semestriel</option>
+                            <option value="ANNUEL">Annuel</option>
+                        </select>
+                    </div>
+
+                    <!-- Charge Entrante : démarrage différé -->
+                    <div class="checkbox-group-entrant">
+                        <input type="checkbox" id="entrant" name="entrant" onchange="toggleDateEntree()">
+                        <label for="entrant">🟢 Charge Entrante (démarrage différé)</label>
+                    </div>
+                    <div class="date-entree-group" id="dateEntreeGroup" style="display: none;">
+                        <label for="dateEntree">📅 Date de démarrage prévue *</label>
+                        <input type="date" id="dateEntree" name="dateEntree">
+                    </div>
+
+                    <!-- Charge Sortante : résiliation prévue -->
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="sortant" name="sortant" onchange="toggleDateDepart()">
+                        <label for="sortant">🔜 Charge Sortante (résiliation prévue)</label>
+                    </div>
+                    <div class="date-depart-group" id="dateDepartGroup" style="display: none;">
+                        <label for="dateDepart">📅 Date de fin prévue *</label>
+                        <input type="date" id="dateDepart" name="dateDepart">
                     </div>
 
                     <div class="form-group">
@@ -808,31 +896,100 @@
             }
         }
 
+        function estEntrantFutur(dateEntree) {
+            try {
+                if (!dateEntree) return false;
+                const maintenant = new Date();
+                maintenant.setHours(0, 0, 0, 0);
+                const dateArr = new Date(dateEntree);
+                if (isNaN(dateArr.getTime())) return false;
+                return dateArr > maintenant;
+            } catch (e) { return false; }
+        }
+
+        function estEntrantProche(dateEntree) {
+            try {
+                if (!dateEntree) return false;
+                const maintenant = new Date();
+                maintenant.setHours(0, 0, 0, 0);
+                const dateArr = new Date(dateEntree);
+                if (isNaN(dateArr.getTime())) return false;
+                const diffJours = (dateArr - maintenant) / (1000 * 60 * 60 * 24);
+                return diffJours >= 0 && diffJours <= 90;
+            } catch (e) { return false; }
+        }
+
+        function estSortantProche(dateDepart) {
+            try {
+                if (!dateDepart) return false;
+                const maintenant = new Date();
+                const dateSortie = new Date(dateDepart);
+                if (isNaN(dateSortie.getTime())) return false;
+                const diffJours = (dateSortie - maintenant) / (1000 * 60 * 60 * 24);
+                return diffJours >= 0 && diffJours <= 90;
+            } catch (e) { return false; }
+        }
+
+        function toggleDateEntree() {
+            try {
+                const entrantChecked = document.getElementById('entrant').checked;
+                const dateEntreeGroup = document.getElementById('dateEntreeGroup');
+                const dateInput = document.getElementById('dateEntree');
+                if (entrantChecked) {
+                    dateEntreeGroup.style.display = 'block';
+                    dateInput.required = true;
+                } else {
+                    dateEntreeGroup.style.display = 'none';
+                    dateInput.required = false;
+                    dateInput.value = '';
+                }
+            } catch (e) { console.error('Erreur toggleDateEntree:', e); }
+        }
+
+        function toggleDateDepart() {
+            try {
+                const sortantChecked = document.getElementById('sortant').checked;
+                const dateDepartGroup = document.getElementById('dateDepartGroup');
+                const dateInput = document.getElementById('dateDepart');
+                if (sortantChecked) {
+                    dateDepartGroup.style.display = 'block';
+                    dateInput.required = true;
+                } else {
+                    dateDepartGroup.style.display = 'none';
+                    dateInput.required = false;
+                    dateInput.value = '';
+                }
+            } catch (e) { console.error('Erreur toggleDateDepart:', e); }
+        }
+
         // Affichage et filtrage
         function afficherCharges() {
             const tbody = document.getElementById('chargesTableBody');
             let chargesFiltrees = [...charges];
 
-            // Application des filtres
             const filtreType = document.getElementById('filtreType').value;
-            const filtreStatut = document.getElementById('filtreStatut').value;
+            const filtreMouvements = document.getElementById('filtreMouvements').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
+
             if (filtreType !== 'tous') {
                 chargesFiltrees = chargesFiltrees.filter(c => c.type === filtreType);
             }
-            
-            if (filtreStatut !== 'tous') {
-                chargesFiltrees = chargesFiltrees.filter(c => c.statut === filtreStatut);
-            }
-            
+
             if (filtrePeriodicite !== 'toutes') {
                 chargesFiltrees = chargesFiltrees.filter(c => c.periodicite === filtrePeriodicite);
             }
-            
+
+            if (filtreMouvements === 'entrants') {
+                chargesFiltrees = chargesFiltrees.filter(c => c.entrant && c.dateEntree);
+            } else if (filtreMouvements === 'sortants') {
+                chargesFiltrees = chargesFiltrees.filter(c => c.sortant && c.dateDepart);
+            } else if (filtreMouvements === 'avec-mouvements') {
+                chargesFiltrees = chargesFiltrees.filter(c => (c.entrant && c.dateEntree) || (c.sortant && c.dateDepart));
+            }
+
             if (searchTerm) {
-                chargesFiltrees = chargesFiltrees.filter(c => 
+                chargesFiltrees = chargesFiltrees.filter(c =>
                     c.fournisseur.toLowerCase().includes(searchTerm) ||
                     c.element.toLowerCase().includes(searchTerm) ||
                     (c.type && c.type.toLowerCase().includes(searchTerm)) ||
@@ -841,15 +998,52 @@
             }
 
             if (chargesFiltrees.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="no-data">Aucune charge trouvée</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" class="no-data">Aucune charge trouvée</td></tr>';
                 return;
             }
 
             tbody.innerHTML = chargesFiltrees.map((charge, index) => {
                 const montantLisse = calculerMontantLisse(charge);
                 const typeFormatted = charge.type ? charge.type.replace(' ', '-').replace('.', '').toLowerCase() : 'non-defini';
-                const typeBadge = charge.type ? `<span class="badge badge-type-${typeFormatted}">${charge.type}</span>` : '<span class="badge" style="background:#f8f9fa;color:#6c757d;">Non défini</span>';
-                
+                const typeBadge = charge.type
+                    ? `<span class="badge badge-type-${typeFormatted}">${charge.type}</span>`
+                    : '<span class="badge" style="background:#f8f9fa;color:#6c757d;">Non défini</span>';
+
+                // Badge entrant
+                let badgeEntrant = '';
+                if (charge.entrant && charge.dateEntree) {
+                    try {
+                        const futur = estEntrantFutur(charge.dateEntree);
+                        const proche = estEntrantProche(charge.dateEntree);
+                        const dateFormatee = new Date(charge.dateEntree).toLocaleDateString('fr-FR');
+                        if (futur && proche) {
+                            badgeEntrant = `<div style="text-align:center;"><span class="badge badge-entrant-proche">🟢 Démarrage proche</span><div style="margin-top:5px;font-size:12px;font-weight:600;color:#2e7d32;">📅 ${dateFormatee}</div></div>`;
+                        } else if (futur) {
+                            badgeEntrant = `<div style="text-align:center;"><span class="badge badge-entrant">🕐 Entrant</span><div style="margin-top:5px;font-size:12px;font-weight:600;color:#6c757d;">📅 ${dateFormatee}</div></div>`;
+                        } else {
+                            badgeEntrant = `<div style="text-align:center;"><span class="badge badge-entrant">✅ Démarré le</span><div style="margin-top:5px;font-size:12px;font-weight:600;color:#6c757d;">📅 ${dateFormatee}</div></div>`;
+                        }
+                    } catch (e) { badgeEntrant = '<span class="badge badge-entrant">🟢 Entrant</span>'; }
+                } else if (charge.entrant) {
+                    badgeEntrant = '<span class="badge badge-entrant">🟢 Entrant</span>';
+                }
+
+                // Badge sortant
+                let badgeSortant = '';
+                if (charge.sortant && charge.dateDepart) {
+                    try {
+                        const proche = estSortantProche(charge.dateDepart);
+                        const dateFormatee = new Date(charge.dateDepart).toLocaleDateString('fr-FR');
+                        if (proche) {
+                            badgeSortant = `<div style="text-align:center;"><span class="badge badge-sortant-3mois">⚠️ Fin proche</span><div style="margin-top:5px;font-size:12px;font-weight:600;color:#dc3545;">📅 ${dateFormatee}</div></div>`;
+                        } else {
+                            badgeSortant = `<div style="text-align:center;"><span class="badge badge-sortant">🔜 Sortant</span><div style="margin-top:5px;font-size:12px;font-weight:600;color:#6c757d;">📅 ${dateFormatee}</div></div>`;
+                        }
+                    } catch (e) { badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>'; }
+                } else if (charge.sortant) {
+                    badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>';
+                }
+
                 return `
                     <tr draggable="true" data-id="${charge.id}" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
                         <td>⋮⋮</td>
@@ -860,7 +1054,8 @@
                         <td class="montant negatif">${Math.abs(charge.montantTTC).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
                         <td><span class="badge badge-periodicite-${charge.periodicite.toLowerCase()}">${charge.periodicite}</span></td>
                         <td class="montant negatif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
-                        <td><span class="badge badge-${charge.statut.toLowerCase()}">${charge.statut}</span></td>
+                        <td>${badgeEntrant}</td>
+                        <td>${badgeSortant}</td>
                         <td class="actions">
                             <button class="btn-action btn-edit" onclick="modifierCharge(${charge.id || index})">✏️</button>
                             <button class="btn-action btn-delete" onclick="supprimerCharge(${charge.id || index})">🗑️</button>
@@ -911,28 +1106,28 @@
 
         // Statistiques
         function mettreAJourStats() {
-            // Application des mÃªmes filtres que l'affichage
             const filtreType = document.getElementById('filtreType').value;
-            const filtreStatut = document.getElementById('filtreStatut').value;
+            const filtreMouvements = document.getElementById('filtreMouvements').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
+
             let chargesFiltrees = [...charges];
-            
+
             if (filtreType !== 'tous') {
                 chargesFiltrees = chargesFiltrees.filter(c => c.type === filtreType);
             }
-            
-            if (filtreStatut !== 'tous') {
-                chargesFiltrees = chargesFiltrees.filter(c => c.statut === filtreStatut);
-            }
-            
             if (filtrePeriodicite !== 'toutes') {
                 chargesFiltrees = chargesFiltrees.filter(c => c.periodicite === filtrePeriodicite);
             }
-            
+            if (filtreMouvements === 'entrants') {
+                chargesFiltrees = chargesFiltrees.filter(c => c.entrant && c.dateEntree);
+            } else if (filtreMouvements === 'sortants') {
+                chargesFiltrees = chargesFiltrees.filter(c => c.sortant && c.dateDepart);
+            } else if (filtreMouvements === 'avec-mouvements') {
+                chargesFiltrees = chargesFiltrees.filter(c => (c.entrant && c.dateEntree) || (c.sortant && c.dateDepart));
+            }
             if (searchTerm) {
-                chargesFiltrees = chargesFiltrees.filter(c => 
+                chargesFiltrees = chargesFiltrees.filter(c =>
                     c.fournisseur.toLowerCase().includes(searchTerm) ||
                     c.element.toLowerCase().includes(searchTerm) ||
                     (c.type && c.type.toLowerCase().includes(searchTerm)) ||
@@ -940,15 +1135,20 @@
                 );
             }
 
+            // Charges dont le démarrage est déjà effectif (pas entrants futurs)
+            const chargesActives = chargesFiltrees.filter(c => !estEntrantFutur(c.dateEntree));
+            const totalEntrants = chargesFiltrees.filter(c => estEntrantFutur(c.dateEntree)).length;
+
             const totalCharges = chargesFiltrees.length;
-            const totalMontantHT = chargesFiltrees.reduce((sum, c) => sum + Math.abs(c.montantHT), 0);
-            const totalMontantLisse = chargesFiltrees.reduce((sum, c) => sum + calculerMontantLisse(c), 0);
-            const totalActifs = chargesFiltrees.filter(c => c.statut === 'ACTIF').length;
+            const totalMontantHT = chargesActives.reduce((sum, c) => sum + Math.abs(c.montantHT), 0);
+            const totalMontantLisse = chargesActives.reduce((sum, c) => sum + calculerMontantLisse(c), 0);
+
+            console.log(`Stats charges: ${totalCharges} (${totalEntrants} entrants futurs exclus), HT=${totalMontantHT}€, lissé=${totalMontantLisse}€`);
 
             document.getElementById('totalCharges').textContent = totalCharges;
             document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
             document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
-            document.getElementById('totalActifs').textContent = totalActifs;
+            document.getElementById('totalEntrants').textContent = totalEntrants;
         }
 
         // Gestion Modal
@@ -957,6 +1157,12 @@
             document.getElementById('modalTitle').textContent = 'Nouvelle Charge';
             document.getElementById('chargeForm').reset();
             document.getElementById('montantLisse').textContent = '0.00€';
+            document.getElementById('entrant').checked = false;
+            document.getElementById('dateEntreeGroup').style.display = 'none';
+            document.getElementById('dateEntree').required = false;
+            document.getElementById('sortant').checked = false;
+            document.getElementById('dateDepartGroup').style.display = 'none';
+            document.getElementById('dateDepart').required = false;
             document.getElementById('chargeModal').style.display = 'block';
         }
 
@@ -966,16 +1172,29 @@
 
             chargeEnEdition = index;
             document.getElementById('modalTitle').textContent = 'Modifier Charge';
-            
+
             document.getElementById('fournisseur').value = charge.fournisseur;
-            document.getElementById('type').value = charge.type || ''; // Peut Ãªtre vide si pas encore défini
+            document.getElementById('type').value = charge.type || '';
             document.getElementById('element').value = charge.element;
             document.getElementById('montantHT').value = charge.montantHT;
             document.getElementById('montantTTC').value = charge.montantTTC;
             document.getElementById('periodicite').value = charge.periodicite;
-            document.getElementById('statut').value = charge.statut;
             document.getElementById('commentaire').value = charge.commentaire || '';
-            
+
+            // Entrant
+            const entrantChecked = !!(charge.entrant && charge.dateEntree);
+            document.getElementById('entrant').checked = entrantChecked;
+            document.getElementById('dateEntreeGroup').style.display = entrantChecked ? 'block' : 'none';
+            document.getElementById('dateEntree').value = charge.dateEntree || '';
+            document.getElementById('dateEntree').required = entrantChecked;
+
+            // Sortant
+            const sortantChecked = !!(charge.sortant && charge.dateDepart);
+            document.getElementById('sortant').checked = sortantChecked;
+            document.getElementById('dateDepartGroup').style.display = sortantChecked ? 'block' : 'none';
+            document.getElementById('dateDepart').value = charge.dateDepart || '';
+            document.getElementById('dateDepart').required = sortantChecked;
+
             calculerLisse();
             document.getElementById('chargeModal').style.display = 'block';
         }
@@ -999,26 +1218,28 @@
         // Soumission du formulaire
         document.getElementById('chargeForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const nouvelleCharge = {
                 fournisseur: document.getElementById('fournisseur').value,
-                type: document.getElementById('type').value, // NOUVEAU CHAMP
+                type: document.getElementById('type').value,
                 element: document.getElementById('element').value,
                 montantHT: parseFloat(document.getElementById('montantHT').value),
                 montantTTC: parseFloat(document.getElementById('montantTTC').value),
                 periodicite: document.getElementById('periodicite').value,
-                statut: document.getElementById('statut').value,
-                commentaire: document.getElementById('commentaire').value
+                statut: 'ACTIF', // conservé pour compatibilité avec les autres modules
+                commentaire: document.getElementById('commentaire').value,
+                entrant: document.getElementById('entrant').checked,
+                dateEntree: document.getElementById('entrant').checked ? document.getElementById('dateEntree').value : null,
+                sortant: document.getElementById('sortant').checked,
+                dateDepart: document.getElementById('sortant').checked ? document.getElementById('dateDepart').value : null
             };
 
             if (chargeEnEdition !== null) {
-                // Modification
                 const index = charges.findIndex(c => (c.id || charges.indexOf(c)) === chargeEnEdition);
                 if (index !== -1) {
                     charges[index] = { ...charges[index], ...nouvelleCharge };
                 }
             } else {
-                // Nouvelle charge
                 nouvelleCharge.id = Date.now();
                 charges.push(nouvelleCharge);
             }
