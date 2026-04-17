@@ -125,18 +125,22 @@
         .section-title.future-3m {
             border-left-color: #ffc107;
         }
+        .section-title.future-3m h2 { color: #ffc107; }
 
-        .section-title.future-3m h2 {
-            color: #ffc107;
+        .section-title.future-6m {
+            border-left-color: #fd7e14;
         }
+        .section-title.future-6m h2 { color: #fd7e14; }
+
+        .section-title.future-12m {
+            border-left-color: #e83e8c;
+        }
+        .section-title.future-12m h2 { color: #e83e8c; }
 
         .section-title.future-long {
             border-left-color: #28a745;
         }
-
-        .section-title.future-long h2 {
-            color: #28a745;
-        }
+        .section-title.future-long h2 { color: #28a745; }
 
         /* Stats Grid */
         .stats-grid {
@@ -302,20 +306,26 @@
         }
 
         /* Divider */
-        .divider {
-            height: 40px;
-        }
+        .divider { height: 40px; }
+
+        /* Couleurs des sections */
+        .section-title.future-3m  { border-left-color: #ffc107; }
+        .section-title.future-3m h2  { color: #ffc107; }
+        .section-title.future-6m  { border-left-color: #fd7e14; }
+        .section-title.future-6m h2  { color: #fd7e14; }
+        .section-title.future-12m { border-left-color: #6f42c1; }
+        .section-title.future-12m h2 { color: #6f42c1; }
+        .section-title.future-long { border-left-color: #28a745; }
+        .section-title.future-long h2 { color: #28a745; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>📊 Analytics Dashboard</h1>
             <p class="subtitle">Analyse financière en temps réel avec projections</p>
         </div>
 
-        <!-- Controls -->
         <div class="header-controls">
             <div class="nav-links">
                 <a href="index.html" class="btn btn-secondary">🏠 Accueil</a>
@@ -328,96 +338,59 @@
             </div>
         </div>
 
-        <!-- Note explicative -->
         <div class="info-note">
-            <h4>ℹ️ À propos des "sortants proches"</h4>
-            <p>Les <strong>sortants proches</strong> sont les clients qui quitteront votre portefeuille <strong>dans les 3 prochains mois</strong>. 
-            Les <strong>sortants long terme</strong> sont ceux dont le départ est prévu <strong>au-delà de 3 mois</strong>. 
-            Cette distinction permet d'avoir une vision plus précise de l'évolution de votre activité à court et moyen terme.</p>
+            <h4>ℹ️ Logique des projections</h4>
+            <p>
+                <strong>Situation actuelle</strong> : tous les contrats effectifs aujourd'hui (entrants futurs exclus).<br>
+                <strong>3 mois</strong> : − sortants partant ≤ 3 mois / + entrants arrivant ≤ 3 mois.<br>
+                <strong>6 mois</strong> : − sortants partant ≤ 6 mois / + entrants arrivant ≤ 6 mois.<br>
+                <strong>12 mois</strong> : − sortants partant ≤ 12 mois / + entrants arrivant ≤ 12 mois.<br>
+                <strong>Long terme</strong> : uniquement les contrats sans date de départ ni d'entrée différée (base structurelle stable).
+            </p>
         </div>
 
-        <!-- ============================================ -->
-        <!-- SITUATION ACTUELLE (TOUS LES CLIENTS ACTIFS) -->
-        <!-- ============================================ -->
-        <div class="section-title">
-            <h2>📸 Situation Actuelle (Tous les clients actifs)</h2>
-        </div>
-
+        <!-- SITUATION ACTUELLE -->
+        <div class="section-title"><h2>📸 Situation Actuelle</h2></div>
         <div class="stats-grid">
-            <div class="stat-card positive">
-                <h3 id="totalRecettesLissees">0€</h3>
-                <p>Recettes Récurrentes HT Lissées</p>
-            </div>
-
-            <div class="stat-card negative">
-                <h3 id="totalChargesLissees">0€</h3>
-                <p>Charges Récurrentes HT Lissées</p>
-            </div>
-
-            <div class="stat-card highlight">
-                <h3 id="resultatMensuel">0€</h3>
-                <p>Résultat Mensuel HT</p>
-            </div>
+            <div class="stat-card positive"><h3 id="totalRecettesLissees">0€</h3><p>Recettes Récurrentes HT Lissées</p></div>
+            <div class="stat-card negative"><h3 id="totalChargesLissees">0€</h3><p>Charges Récurrentes HT Lissées</p></div>
+            <div class="stat-card highlight"><h3 id="resultatMensuel">0€</h3><p>Résultat Mensuel HT</p></div>
         </div>
-
-        <!-- Divider -->
         <div class="divider"></div>
 
-        <!-- ============================================ -->
-        <!-- PROJECTION À 3 MOIS (SANS SORTANTS PROCHES) -->
-        <!-- ============================================ -->
-        <div class="section-title future-3m">
-            <h2>⏰ Projection à 3 mois (Sans sortants proches)</h2>
-        </div>
-
+        <!-- PROJECTION 3 MOIS -->
+        <div class="section-title future-3m"><h2>⏰ Projection à 3 mois</h2></div>
         <div class="stats-grid">
-            <div class="stat-card positive">
-                <h3 id="future3mRecettesLissees">0€</h3>
-                <p>Recettes Récurrentes HT Lissées</p>
-                <p class="sub-info">clients partant dans 3 mois exclus</p>
-            </div>
-
-            <div class="stat-card negative">
-                <h3 id="future3mChargesLissees">0€</h3>
-                <p>Charges Récurrentes HT Lissées</p>
-                <p class="sub-info">charges inactives exclues</p>
-            </div>
-
-            <div class="stat-card highlight">
-                <h3 id="future3mResultatMensuel">0€</h3>
-                <p>Résultat Mensuel HT</p>
-                <p class="sub-info" id="diff3mResultat" style="color: #721c24; font-weight: 600;">différence / situation actuelle</p>
-            </div>
+            <div class="stat-card positive"><h3 id="future3mRecettesLissees">0€</h3><p>Recettes Récurrentes HT Lissées</p><p class="sub-info" id="diff3mRecettes" style="font-weight:600;">—</p></div>
+            <div class="stat-card negative"><h3 id="future3mChargesLissees">0€</h3><p>Charges Récurrentes HT Lissées</p><p class="sub-info" id="diff3mCharges" style="font-weight:600;">—</p></div>
+            <div class="stat-card highlight"><h3 id="future3mResultatMensuel">0€</h3><p>Résultat Mensuel HT</p><p class="sub-info" id="diff3mResultat" style="font-weight:600;">—</p></div>
         </div>
-
-        <!-- Divider -->
         <div class="divider"></div>
 
-        <!-- ============================================ -->
-        <!-- SITUATION FUTURE LONG TERME (CLIENTS PÉRENNES UNIQUEMENT) -->
-        <!-- ============================================ -->
-        <div class="section-title future-long">
-            <h2>🔮 Situation Future Long terme (Clients pérennes uniquement)</h2>
-        </div>
-
+        <!-- PROJECTION 6 MOIS -->
+        <div class="section-title future-6m"><h2>📆 Projection à 6 mois</h2></div>
         <div class="stats-grid">
-            <div class="stat-card positive">
-                <h3 id="futureLongRecettesLissees">0€</h3>
-                <p>Recettes Récurrentes HT Lissées</p>
-                <p class="sub-info">tous clients sortants exclus</p>
-            </div>
+            <div class="stat-card positive"><h3 id="future6mRecettesLissees">0€</h3><p>Recettes Récurrentes HT Lissées</p><p class="sub-info" id="diff6mRecettes" style="font-weight:600;">—</p></div>
+            <div class="stat-card negative"><h3 id="future6mChargesLissees">0€</h3><p>Charges Récurrentes HT Lissées</p><p class="sub-info" id="diff6mCharges" style="font-weight:600;">—</p></div>
+            <div class="stat-card highlight"><h3 id="future6mResultatMensuel">0€</h3><p>Résultat Mensuel HT</p><p class="sub-info" id="diff6mResultat" style="font-weight:600;">—</p></div>
+        </div>
+        <div class="divider"></div>
 
-            <div class="stat-card negative">
-                <h3 id="futureLongChargesLissees">0€</h3>
-                <p>Charges Récurrentes HT Lissées</p>
-                <p class="sub-info">charges inactives exclues</p>
-            </div>
+        <!-- PROJECTION 12 MOIS -->
+        <div class="section-title future-12m"><h2>📅 Projection à 12 mois</h2></div>
+        <div class="stats-grid">
+            <div class="stat-card positive"><h3 id="future12mRecettesLissees">0€</h3><p>Recettes Récurrentes HT Lissées</p><p class="sub-info" id="diff12mRecettes" style="font-weight:600;">—</p></div>
+            <div class="stat-card negative"><h3 id="future12mChargesLissees">0€</h3><p>Charges Récurrentes HT Lissées</p><p class="sub-info" id="diff12mCharges" style="font-weight:600;">—</p></div>
+            <div class="stat-card highlight"><h3 id="future12mResultatMensuel">0€</h3><p>Résultat Mensuel HT</p><p class="sub-info" id="diff12mResultat" style="font-weight:600;">—</p></div>
+        </div>
+        <div class="divider"></div>
 
-            <div class="stat-card highlight">
-                <h3 id="futureLongResultatMensuel">0€</h3>
-                <p>Résultat Mensuel HT</p>
-                <p class="sub-info" id="diffLongResultat" style="color: #721c24; font-weight: 600;">différence / projection à 3 mois</p>
-            </div>
+        <!-- LONG TERME -->
+        <div class="section-title future-long"><h2>🔮 Long terme (contrats pérennes)</h2></div>
+        <div class="stats-grid">
+            <div class="stat-card positive"><h3 id="futureLongRecettesLissees">0€</h3><p>Recettes Récurrentes HT Lissées</p><p class="sub-info" id="diffLongRecettes" style="font-weight:600;">—</p></div>
+            <div class="stat-card negative"><h3 id="futureLongChargesLissees">0€</h3><p>Charges Récurrentes HT Lissées</p><p class="sub-info" id="diffLongCharges" style="font-weight:600;">—</p></div>
+            <div class="stat-card highlight"><h3 id="futureLongResultatMensuel">0€</h3><p>Résultat Mensuel HT</p><p class="sub-info" id="diffLongResultat" style="font-weight:600;">—</p></div>
         </div>
 
         <!-- ============================================ -->
@@ -472,415 +445,239 @@
     </div>
 
     <script>
-        // Variables globales
+        // ── Variables globales ──────────────────────────────────────────
         let recettesData = [];
-        let chargesData = [];
-        let analytics = {};          // Situation actuelle
-        let future3mAnalytics = {};  // Projection 3 mois
-        let futureLongAnalytics = {}; // Future long terme
+        let chargesData  = [];
+        let analytics          = {};
+        let future3mAnalytics  = {};
+        let future6mAnalytics  = {};
+        let future12mAnalytics = {};
+        let futureLongAnalytics = {};
 
-        // Initialisation
+        // ── Initialisation ──────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', function() {
             chargerDonneesLocalStorage();
-            calculerAnalytics();
-            calculerFuture3mAnalytics();
-            calculerFutureLongAnalytics();
-            afficherAnalytics();
-            afficherFuture3mAnalytics();
-            afficherFutureLongAnalytics();
+            toutCalculer();
+            toutAfficher();
             genererRepartitions();
         });
 
-        // ============================================
-        // FONCTION UTILITAIRE - CALCUL PROXIMITÉ DÉPART
-        // ============================================
-        
-        // Calculer si un client part dans les 3 prochains mois (90 jours)
-        function estSortantProche(dateDepart) {
-            try {
-                if (!dateDepart) return false;
-                
-                const maintenant = new Date();
-                const dateSortie = new Date(dateDepart);
-                
-                // Vérifier que la date est valide
-                if (isNaN(dateSortie.getTime())) return false;
-                
-                const diffTemps = dateSortie - maintenant;
-                const diffJours = diffTemps / (1000 * 60 * 60 * 24);
-                
-                return diffJours >= 0 && diffJours <= 90;
-            } catch (e) {
-                console.error('Erreur estSortantProche:', e);
-                return false;
-            }
+        function toutCalculer() {
+            calculerAnalytics();
+            calculerProjectionN(future3mAnalytics,   90);
+            calculerProjectionN(future6mAnalytics,  180);
+            calculerProjectionN(future12mAnalytics, 365);
+            calculerFutureLong();
         }
 
-        // Vérifier si un client entrant n'est pas encore arrivé (date d'entrée dans le futur)
-        function estEntrantFutur(dateEntree) {
-            try {
-                if (!dateEntree) return false;
-                const maintenant = new Date();
-                maintenant.setHours(0, 0, 0, 0);
-                const dateArr = new Date(dateEntree);
-                if (isNaN(dateArr.getTime())) return false;
-                return dateArr > maintenant;
-            } catch (e) {
-                return false;
-            }
+        function toutAfficher() {
+            afficherVueActuelle();
+            afficherVue('3m',  future3mAnalytics);
+            afficherVue('6m',  future6mAnalytics);
+            afficherVue('12m', future12mAnalytics);
+            afficherVueLong();
         }
 
-        // Vérifier si un client entrant arrive dans les 90 prochains jours
-        function estEntrantDans3mois(dateEntree) {
-            try {
-                if (!dateEntree) return false;
-                const maintenant = new Date();
-                maintenant.setHours(0, 0, 0, 0);
-                const dateArr = new Date(dateEntree);
-                if (isNaN(dateArr.getTime())) return false;
-                const diffJours = (dateArr - maintenant) / (1000 * 60 * 60 * 24);
-                return diffJours >= 0 && diffJours <= 90;
-            } catch (e) {
-                return false;
-            }
-        }
-
+        // ── Chargement localStorage ─────────────────────────────────────
         function chargerDonneesLocalStorage() {
-            console.log('📊 === CHARGEMENT DONNÉES ANALYTICS (AVEC PROJECTIONS) ===');
-            
+            console.log('📊 === CHARGEMENT DONNÉES ANALYTICS ===');
             try {
-                // Lecture Module 2 (Recettes)
                 const recettesJSON = localStorage.getItem('recettesRT');
                 if (recettesJSON) {
-                    const toutesRecettes = JSON.parse(recettesJSON);
-                    recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF');
-                    
-                    const nbSortantsProches = recettesData.filter(r => r.sortant && r.dateDepart && estSortantProche(r.dateDepart)).length;
-                    const nbSortantsLongTerme = recettesData.filter(r => r.sortant && r.dateDepart && !estSortantProche(r.dateDepart)).length;
-                    const nbPerennes = recettesData.filter(r => !r.sortant).length;
-                    
+                    recettesData = JSON.parse(recettesJSON).filter(r => r.statut === 'ACTIF');
+                    const nbSortantsProches   = recettesData.filter(r => r.sortant && r.dateDepart && estSortantDansN(r.dateDepart, 90)).length;
+                    const nbSortantsLongTerme = recettesData.filter(r => r.sortant && r.dateDepart && !estSortantDansN(r.dateDepart, 90)).length;
+                    const nbPerennes          = recettesData.filter(r => !r.sortant).length;
                     console.log(`✅ Recettes chargées: ${recettesData.length} actives`);
                     console.log(`   • ${nbPerennes} pérennes`);
                     console.log(`   • ${nbSortantsProches} sortants proches (≤3 mois)`);
                     console.log(`   • ${nbSortantsLongTerme} sortants long terme (>3 mois)`);
                 } else {
                     recettesData = [];
-                    console.warn('⚠️ Aucune donnée recettes trouvée');
+                    console.warn('⚠️ Aucune donnée recettes');
                 }
-
-                // Lecture Module 3 (Charges récurrentes)
                 const chargesJSON = localStorage.getItem('chargesRecurrentesRT');
                 if (chargesJSON) {
-                    const toutesCharges = JSON.parse(chargesJSON);
-                    chargesData = toutesCharges.filter(c => c.statut === 'ACTIF');
+                    chargesData = JSON.parse(chargesJSON).filter(c => !c.statut || c.statut === 'ACTIF');
                     console.log(`✅ Charges chargées: ${chargesData.length} actives`);
                 } else {
                     chargesData = [];
-                    console.warn('⚠️ Aucune donnée charges trouvée');
+                    console.warn('⚠️ Aucune donnée charges');
                 }
-
-                // Mise à jour info sources
-                const nbSortantsProches = recettesData.filter(r => r.sortant && r.dateDepart && estSortantProche(r.dateDepart)).length;
-                const nbSortantsLongTerme = recettesData.filter(r => r.sortant && r.dateDepart && !estSortantProche(r.dateDepart)).length;
-                const nbPerennes = recettesData.filter(r => !r.sortant).length;
-                
-                document.getElementById('infoSources').textContent = 
-                    `Sources : ${recettesData.length} recettes actives (${nbPerennes} pérennes + ${nbSortantsProches} sortants proches + ${nbSortantsLongTerme} sortants long terme) • ${chargesData.length} charges actives`;
-
-            } catch (error) {
-                console.error('❌ Erreur chargement localStorage:', error);
-                recettesData = [];
-                chargesData = [];
+                document.getElementById('infoSources').textContent =
+                    `Sources : ${recettesData.length} recettes actives • ${chargesData.length} charges actives`;
+            } catch (e) {
+                console.error('❌ Erreur chargement:', e);
+                recettesData = []; chargesData = [];
                 document.getElementById('infoSources').textContent = 'Erreur chargement données';
             }
         }
 
+        // ── Fonctions de date ───────────────────────────────────────────
+        function estEntrantFutur(dateEntree) {
+            if (!dateEntree) return false;
+            const d = new Date(dateEntree);
+            if (isNaN(d)) return false;
+            const auj = new Date(); auj.setHours(0,0,0,0);
+            return d > auj;
+        }
+
+        function estEntrantDansN(dateEntree, jours) {
+            if (!dateEntree) return false;
+            const d = new Date(dateEntree);
+            if (isNaN(d)) return false;
+            const auj = new Date(); auj.setHours(0,0,0,0);
+            const diff = (d - auj) / 86400000;
+            return diff >= 0 && diff <= jours;
+        }
+
+        function estSortantDansN(dateDepart, jours) {
+            if (!dateDepart) return false;
+            const d = new Date(dateDepart);
+            if (isNaN(d)) return false;
+            const diff = (d - new Date()) / 86400000;
+            return diff >= 0 && diff <= jours;
+        }
+
+        // ── Calcul lissé ────────────────────────────────────────────────
         function calculerMontantLisse(item) {
-            const facteurs = {
-                'MENSUEL': 1,
-                'BIMESTRIEL': 2,
-                'TRIMESTRIEL': 3,
-                'SEMESTRIEL': 6,
-                'ANNUEL': 12
-            };
-            
-            const facteurLissage = facteurs[item.periodicite] || 1;
-            return Math.abs(item.montantHT) / facteurLissage;
+            const f = { MENSUEL:1, BIMESTRIEL:2, TRIMESTRIEL:3, SEMESTRIEL:6, ANNUEL:12 };
+            return Math.abs(item.montantHT) / (f[item.periodicite] || 1);
         }
 
-        // ============================================
-        // CALCULS SITUATION ACTUELLE (TOUS LES CLIENTS)
-        // ============================================
+        // ── Situation actuelle ──────────────────────────────────────────
         function calculerAnalytics() {
-            console.log('📸 Calcul Situation Actuelle (tous clients)...');
-            
-            // Situation actuelle : clients actifs dont l'entrée est déjà effective (exclure entrants futurs)
-            const recettesActuelles = recettesData.filter(r => !estEntrantFutur(r.dateEntree));
-            console.log(`   ${recettesData.length - recettesActuelles.length} entrants futurs exclus de la situation actuelle`);
-            analytics.totalRecettesLissees = recettesActuelles.reduce((sum, item) => {
-                return sum + calculerMontantLisse(item);
-            }, 0);
-
-            // Charges actives dont le démarrage est déjà effectif (exclure charges entrants-futurs)
-            const chargesActuelles = chargesData.filter(c => !estEntrantFutur(c.dateEntree));
-            analytics.totalChargesLissees = chargesActuelles.reduce((sum, item) => {
-                return sum + calculerMontantLisse(item);
-            }, 0);
-
-            analytics.resultatMensuel = analytics.totalRecettesLissees - analytics.totalChargesLissees;
-
-            if (analytics.totalRecettesLissees > 0) {
-                analytics.ratioChargesRecettes = (analytics.totalChargesLissees / analytics.totalRecettesLissees) * 100;
-                analytics.margeOperationnelle = (analytics.resultatMensuel / analytics.totalRecettesLissees) * 100;
-            } else {
-                analytics.ratioChargesRecettes = 0;
-                analytics.margeOperationnelle = 0;
-            }
-
-            analytics.equilibreFinancier = analytics.resultatMensuel >= 0 ? 'ATTEINT' : 
-                (Math.abs(analytics.resultatMensuel) / analytics.totalRecettesLissees > 0.1 ? 'CRITIQUE' : 'ALERTE');
+            console.log('📸 Calcul Situation Actuelle...');
+            const rec = recettesData.filter(r => !estEntrantFutur(r.dateEntree));
+            const ch  = chargesData.filter(c  => !estEntrantFutur(c.dateEntree));
+            console.log(`   ${recettesData.length - rec.length} entrants futurs exclus (recettes), ${chargesData.length - ch.length} (charges)`);
+            analytics.totalRecettesLissees = rec.reduce((s,i) => s + calculerMontantLisse(i), 0);
+            analytics.totalChargesLissees  = ch.reduce((s,i)  => s + calculerMontantLisse(i), 0);
+            analytics.resultatMensuel      = analytics.totalRecettesLissees - analytics.totalChargesLissees;
         }
 
-        // ============================================
-        // CALCULS PROJECTION 3 MOIS (SANS SORTANTS PROCHES)
-        // ============================================
-        function calculerFuture3mAnalytics() {
-            console.log('⏰ Calcul Projection 3 mois...');
-
-            // RECETTES : exclure sortants proches + entrants arrivant après 3 mois
-            const recettesFuture3m = recettesData.filter(r => {
-                if (r.sortant && r.dateDepart && estSortantProche(r.dateDepart)) return false;
-                if (estEntrantFutur(r.dateEntree) && !estEntrantDans3mois(r.dateEntree)) return false;
+        // ── Projections N jours (générique) ─────────────────────────────
+        function calculerProjectionN(obj, jours) {
+            const label = jours <= 90 ? '3 mois' : jours <= 180 ? '6 mois' : '12 mois';
+            console.log(`⏰ Calcul Projection ${label}...`);
+            const filtre = arr => arr.filter(x => {
+                if (x.sortant && x.dateDepart && estSortantDansN(x.dateDepart, jours)) return false;
+                if (estEntrantFutur(x.dateEntree) && !estEntrantDansN(x.dateEntree, jours)) return false;
                 return true;
             });
-
-            // CHARGES : même logique symétrique
-            const chargesFuture3m = chargesData.filter(c => {
-                if (c.sortant && c.dateDepart && estSortantProche(c.dateDepart)) return false;
-                if (estEntrantFutur(c.dateEntree) && !estEntrantDans3mois(c.dateEntree)) return false;
-                return true;
-            });
-
-            const nbExclusRecSortants  = recettesData.filter(r => r.sortant && r.dateDepart && estSortantProche(r.dateDepart)).length;
-            const nbExclusRecEntrants  = recettesData.filter(r => estEntrantFutur(r.dateEntree) && !estEntrantDans3mois(r.dateEntree)).length;
-            const nbExclusChSortants   = chargesData.filter(c => c.sortant && c.dateDepart && estSortantProche(c.dateDepart)).length;
-            const nbExclusChEntrants   = chargesData.filter(c => estEntrantFutur(c.dateEntree) && !estEntrantDans3mois(c.dateEntree)).length;
-            console.log(`   Recettes : ${recettesFuture3m.length} retenues (${nbExclusRecSortants} sortants exclus, ${nbExclusRecEntrants} entrants lointains exclus)`);
-            console.log(`   Charges  : ${chargesFuture3m.length} retenues (${nbExclusChSortants} sortants exclus, ${nbExclusChEntrants} entrants lointains exclus)`);
-
-            future3mAnalytics.totalRecettesLissees = recettesFuture3m.reduce((sum, item) => sum + calculerMontantLisse(item), 0);
-            future3mAnalytics.totalChargesLissees  = chargesFuture3m.reduce((sum, item) => sum + calculerMontantLisse(item), 0);
-
-            future3mAnalytics.resultatMensuel = future3mAnalytics.totalRecettesLissees - future3mAnalytics.totalChargesLissees;
-
-            if (future3mAnalytics.totalRecettesLissees > 0) {
-                future3mAnalytics.ratioChargesRecettes = (future3mAnalytics.totalChargesLissees / future3mAnalytics.totalRecettesLissees) * 100;
-                future3mAnalytics.margeOperationnelle = (future3mAnalytics.resultatMensuel / future3mAnalytics.totalRecettesLissees) * 100;
-            } else {
-                future3mAnalytics.ratioChargesRecettes = 0;
-                future3mAnalytics.margeOperationnelle = 0;
-            }
-
-            future3mAnalytics.equilibreFinancier = future3mAnalytics.resultatMensuel >= 0 ? 'ATTEINT' : 
-                (Math.abs(future3mAnalytics.resultatMensuel) / future3mAnalytics.totalRecettesLissees > 0.1 ? 'CRITIQUE' : 'ALERTE');
+            const rec = filtre(recettesData);
+            const ch  = filtre(chargesData);
+            console.log(`   Recettes : ${rec.length}/${recettesData.length} • Charges : ${ch.length}/${chargesData.length}`);
+            obj.totalRecettesLissees = rec.reduce((s,i) => s + calculerMontantLisse(i), 0);
+            obj.totalChargesLissees  = ch.reduce((s,i)  => s + calculerMontantLisse(i), 0);
+            obj.resultatMensuel      = obj.totalRecettesLissees - obj.totalChargesLissees;
         }
 
-        // ============================================
-        // CALCULS FUTURE LONG TERME (SANS TOUS LES SORTANTS)
-        // ============================================
-        function calculerFutureLongAnalytics() {
-            console.log('🔮 Calcul Future Long terme (pérennes uniquement)...');
-
-            // RECETTES : exclure tous les sortants ET les entrants futurs (base stable actuelle)
-            const recettesPerennes = recettesData.filter(r => !r.sortant && !estEntrantFutur(r.dateEntree));
-
-            // CHARGES : exclure tous les sortants ET les entrants futurs
-            const chargesPerennes = chargesData.filter(c => !c.sortant && !estEntrantFutur(c.dateEntree));
-
-            console.log(`   Recettes pérennes : ${recettesPerennes.length} / ${recettesData.length}`);
-            console.log(`   Charges pérennes  : ${chargesPerennes.length} / ${chargesData.length}`);
-
-            futureLongAnalytics.totalRecettesLissees = recettesPerennes.reduce((sum, item) => sum + calculerMontantLisse(item), 0);
-            futureLongAnalytics.totalChargesLissees  = chargesPerennes.reduce((sum, item) => sum + calculerMontantLisse(item), 0);
-
-            futureLongAnalytics.resultatMensuel = futureLongAnalytics.totalRecettesLissees - futureLongAnalytics.totalChargesLissees;
-
-            if (futureLongAnalytics.totalRecettesLissees > 0) {
-                futureLongAnalytics.ratioChargesRecettes = (futureLongAnalytics.totalChargesLissees / futureLongAnalytics.totalRecettesLissees) * 100;
-                futureLongAnalytics.margeOperationnelle = (futureLongAnalytics.resultatMensuel / futureLongAnalytics.totalRecettesLissees) * 100;
-            } else {
-                futureLongAnalytics.ratioChargesRecettes = 0;
-                futureLongAnalytics.margeOperationnelle = 0;
-            }
-
-            futureLongAnalytics.equilibreFinancier = futureLongAnalytics.resultatMensuel >= 0 ? 'ATTEINT' : 
-                (Math.abs(futureLongAnalytics.resultatMensuel) / futureLongAnalytics.totalRecettesLissees > 0.1 ? 'CRITIQUE' : 'ALERTE');
+        // ── Vision long terme ───────────────────────────────────────────
+        function calculerFutureLong() {
+            console.log('🔮 Calcul Long terme (pérennes)...');
+            const rec = recettesData.filter(r => !r.sortant && !estEntrantFutur(r.dateEntree));
+            const ch  = chargesData.filter(c  => !c.sortant && !estEntrantFutur(c.dateEntree));
+            console.log(`   Recettes pérennes : ${rec.length}/${recettesData.length} • Charges pérennes : ${ch.length}/${chargesData.length}`);
+            futureLongAnalytics.totalRecettesLissees = rec.reduce((s,i) => s + calculerMontantLisse(i), 0);
+            futureLongAnalytics.totalChargesLissees  = ch.reduce((s,i)  => s + calculerMontantLisse(i), 0);
+            futureLongAnalytics.resultatMensuel      = futureLongAnalytics.totalRecettesLissees - futureLongAnalytics.totalChargesLissees;
         }
 
-        // ============================================
-        // AFFICHAGE SITUATION ACTUELLE
-        // ============================================
-        function afficherAnalytics() {
-            document.getElementById('totalRecettesLissees').textContent = 
-                Math.round(analytics.totalRecettesLissees).toLocaleString() + '€';
-            
-            document.getElementById('totalChargesLissees').textContent = 
-                Math.round(analytics.totalChargesLissees).toLocaleString() + '€';
-            
-            document.getElementById('resultatMensuel').textContent = 
-                Math.round(analytics.resultatMensuel).toLocaleString() + '€';
+        // ── Affichage ───────────────────────────────────────────────────
+        function fmt(val) { return Math.round(val).toLocaleString('fr-FR') + '€'; }
+
+        function formatDelta(val, label) {
+            const v = Math.round(val);
+            const signe = v > 0 ? '+' : '';
+            const couleur = v > 0 ? '#155724' : v < 0 ? '#721c24' : '#383d41';
+            return { texte: `${label} : ${signe}${v.toLocaleString('fr-FR')}€`, couleur };
         }
 
-        // ============================================
-        // AFFICHAGE PROJECTION 3 MOIS (AVEC DIFFÉRENCE)
-        // ============================================
-        function afficherFuture3mAnalytics() {
-            document.getElementById('future3mRecettesLissees').textContent = 
-                Math.round(future3mAnalytics.totalRecettesLissees).toLocaleString() + '€';
-            
-            document.getElementById('future3mChargesLissees').textContent = 
-                Math.round(future3mAnalytics.totalChargesLissees).toLocaleString() + '€';
-            
-            document.getElementById('future3mResultatMensuel').textContent = 
-                Math.round(future3mAnalytics.resultatMensuel).toLocaleString() + '€';
-
-            // AFFICHAGE DE LA DIFFÉRENCE vs Situation Actuelle
-            const diff = Math.round(future3mAnalytics.resultatMensuel - analytics.resultatMensuel);
-            const diffElement = document.getElementById('diff3mResultat');
-            diffElement.textContent = `différence / situation actuelle\n${diff.toLocaleString()} €`;
-            
-            if (diff < 0) {
-                diffElement.style.color = '#721c24';
-            } else if (diff > 0) {
-                diffElement.style.color = '#155724';
-            } else {
-                diffElement.style.color = '#383d41';
-            }
+        function afficherVueActuelle() {
+            document.getElementById('totalRecettesLissees').textContent = fmt(analytics.totalRecettesLissees);
+            document.getElementById('totalChargesLissees').textContent  = fmt(analytics.totalChargesLissees);
+            document.getElementById('resultatMensuel').textContent      = fmt(analytics.resultatMensuel);
         }
 
-        // ============================================
-        // AFFICHAGE FUTURE LONG TERME (AVEC DIFFÉRENCE)
-        // ============================================
-        function afficherFutureLongAnalytics() {
-            document.getElementById('futureLongRecettesLissees').textContent = 
-                Math.round(futureLongAnalytics.totalRecettesLissees).toLocaleString() + '€';
-            
-            document.getElementById('futureLongChargesLissees').textContent = 
-                Math.round(futureLongAnalytics.totalChargesLissees).toLocaleString() + '€';
-            
-            document.getElementById('futureLongResultatMensuel').textContent = 
-                Math.round(futureLongAnalytics.resultatMensuel).toLocaleString() + '€';
-
-            // AFFICHAGE DE LA DIFFÉRENCE vs Projection 3 mois
-            const diff = Math.round(futureLongAnalytics.resultatMensuel - future3mAnalytics.resultatMensuel);
-            const diffElement = document.getElementById('diffLongResultat');
-            diffElement.textContent = `différence / projection à 3 mois\n${diff.toLocaleString()} €`;
-            
-            if (diff < 0) {
-                diffElement.style.color = '#721c24';
-            } else if (diff > 0) {
-                diffElement.style.color = '#155724';
-            } else {
-                diffElement.style.color = '#383d41';
-            }
+        function afficherVue(suffix, obj) {
+            document.getElementById(`future${suffix}RecettesLissees`).textContent = fmt(obj.totalRecettesLissees);
+            document.getElementById(`future${suffix}ChargesLissees`).textContent  = fmt(obj.totalChargesLissees);
+            document.getElementById(`future${suffix}ResultatMensuel`).textContent = fmt(obj.resultatMensuel);
+            const set = (id, val, label) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const d = formatDelta(val, label);
+                el.textContent = d.texte; el.style.color = d.couleur;
+            };
+            set(`diff${suffix}Recettes`, obj.totalRecettesLissees - analytics.totalRecettesLissees, 'vs actuel recettes');
+            set(`diff${suffix}Charges`,  obj.totalChargesLissees  - analytics.totalChargesLissees,  'vs actuel charges');
+            set(`diff${suffix}Resultat`, obj.resultatMensuel      - analytics.resultatMensuel,       'vs actuel résultat');
         }
 
-        // ============================================
-        // FONCTION UTILITAIRE : AFFICHAGE DIFFÉRENCE (DEPRECATED - kept for compatibility)
-        // ============================================
-        function afficherDifference(elementId, difference) {
-            // Cette fonction n'est plus utilisée mais conservée pour compatibilité
+        function afficherVueLong() {
+            document.getElementById('futureLongRecettesLissees').textContent = fmt(futureLongAnalytics.totalRecettesLissees);
+            document.getElementById('futureLongChargesLissees').textContent  = fmt(futureLongAnalytics.totalChargesLissees);
+            document.getElementById('futureLongResultatMensuel').textContent = fmt(futureLongAnalytics.resultatMensuel);
+            const set = (id, val, label) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const d = formatDelta(val, label);
+                el.textContent = d.texte; el.style.color = d.couleur;
+            };
+            set('diffLongRecettes', futureLongAnalytics.totalRecettesLissees - analytics.totalRecettesLissees, 'vs actuel recettes');
+            set('diffLongCharges',  futureLongAnalytics.totalChargesLissees  - analytics.totalChargesLissees,  'vs actuel charges');
+            set('diffLongResultat', futureLongAnalytics.resultatMensuel      - analytics.resultatMensuel,       'vs actuel résultat');
         }
 
+        // ── Répartitions ────────────────────────────────────────────────
         function genererRepartitions() {
-            // Répartition recettes par type
             if (recettesData.length > 0) {
-                const repartitionRecettes = {};
-                recettesData.forEach(r => {
-                    const type = r.type || 'Non catégorisé';
-                    if (!repartitionRecettes[type]) {
-                        repartitionRecettes[type] = { count: 0, total: 0 };
-                    }
-                    repartitionRecettes[type].count++;
-                    repartitionRecettes[type].total += calculerMontantLisse(r);
+                const map = {};
+                recettesData.filter(r => !estEntrantFutur(r.dateEntree)).forEach(r => {
+                    const t = r.type || 'Non catégorisé';
+                    if (!map[t]) map[t] = { count:0, total:0 };
+                    map[t].count++; map[t].total += calculerMontantLisse(r);
                 });
-
-                const recettesTableBody = document.getElementById('repartitionRecettes');
-                recettesTableBody.innerHTML = '';
-                
-                Object.entries(repartitionRecettes)
-                    .sort((a, b) => b[1].total - a[1].total)
-                    .forEach(([type, data]) => {
-                        const pourcentage = (data.total / analytics.totalRecettesLissees * 100).toFixed(1);
-                        const row = `
-                            <tr>
-                                <td>${type}</td>
-                                <td>${data.count}</td>
-                                <td>${Math.round(data.total).toLocaleString()}€</td>
-                                <td>${pourcentage}%</td>
-                            </tr>
-                        `;
-                        recettesTableBody.innerHTML += row;
-                    });
+                const tbody = document.getElementById('repartitionRecettes');
+                tbody.innerHTML = '';
+                Object.entries(map).sort((a,b) => b[1].total - a[1].total).forEach(([t,d]) => {
+                    const pct = analytics.totalRecettesLissees > 0
+                        ? (d.total / analytics.totalRecettesLissees * 100).toFixed(1) : '0.0';
+                    tbody.innerHTML += `<tr><td>${t}</td><td>${d.count}</td><td>${Math.round(d.total).toLocaleString('fr-FR')}€</td><td>${pct}%</td></tr>`;
+                });
             }
-
-            // Répartition charges par type
             if (chargesData.length > 0) {
-                const repartitionCharges = {};
-                chargesData.forEach(c => {
-                    const type = c.type || 'Non catégorisé';
-                    if (!repartitionCharges[type]) {
-                        repartitionCharges[type] = { count: 0, total: 0 };
-                    }
-                    repartitionCharges[type].count++;
-                    repartitionCharges[type].total += calculerMontantLisse(c);
+                const map = {};
+                chargesData.filter(c => !estEntrantFutur(c.dateEntree)).forEach(c => {
+                    const t = c.type || 'Non catégorisé';
+                    if (!map[t]) map[t] = { count:0, total:0 };
+                    map[t].count++; map[t].total += calculerMontantLisse(c);
                 });
-
-                const chargesTableBody = document.getElementById('repartitionCharges');
-                chargesTableBody.innerHTML = '';
-                
-                Object.entries(repartitionCharges)
-                    .sort((a, b) => b[1].total - a[1].total)
-                    .forEach(([type, data]) => {
-                        const pourcentage = (data.total / analytics.totalChargesLissees * 100).toFixed(1);
-                        const row = `
-                            <tr>
-                                <td>${type}</td>
-                                <td>${data.count}</td>
-                                <td>${Math.round(data.total).toLocaleString()}€</td>
-                                <td>${pourcentage}%</td>
-                            </tr>
-                        `;
-                        chargesTableBody.innerHTML += row;
-                    });
+                const tbody = document.getElementById('repartitionCharges');
+                tbody.innerHTML = '';
+                Object.entries(map).sort((a,b) => b[1].total - a[1].total).forEach(([t,d]) => {
+                    const pct = analytics.totalChargesLissees > 0
+                        ? (d.total / analytics.totalChargesLissees * 100).toFixed(1) : '0.0';
+                    tbody.innerHTML += `<tr><td>${t}</td><td>${d.count}</td><td>${Math.round(d.total).toLocaleString('fr-FR')}€</td><td>${pct}%</td></tr>`;
+                });
             }
         }
 
+        // ── Actions ─────────────────────────────────────────────────────
         function actualiserDonnees() {
             chargerDonneesLocalStorage();
-            calculerAnalytics();
-            calculerFuture3mAnalytics();
-            calculerFutureLongAnalytics();
-            afficherAnalytics();
-            afficherFuture3mAnalytics();
-            afficherFutureLongAnalytics();
+            toutCalculer();
+            toutAfficher();
             genererRepartitions();
-            
-            // Feedback visuel
             const btn = event.target;
-            const originalText = btn.textContent;
-            btn.textContent = '✅ Actualisé';
-            btn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.background = '';
-            }, 2000);
+            const orig = btn.textContent;
+            btn.textContent = '✅ Actualisé'; btn.style.background = '#28a745';
+            setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
         }
 
         function exporterPDF() {
-            // Simulation export PDF
-            alert('🖨️ Export PDF - Fonctionnalité en développement\n\nVous pouvez utiliser Ctrl+P (Imprimer) en attendant.');
+            alert('🖨️ Export PDF\n\nUtilisez Cmd+P pour imprimer.');
         }
     </script>
 </body>
