@@ -681,6 +681,10 @@
                     <div class="stat-value" id="totalEntrants">0</div>
                     <div class="stat-label">Entrants à venir</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalSortants">0</div>
+                    <div class="stat-label">Sortants prévus</div>
+                </div>
             </div>
         </div>
 
@@ -1265,6 +1269,8 @@
                 const recettesActives = recettesFiltrees.filter(r => !estEntrantFutur(r.dateEntree));
                 // Entrants à venir (date d'entrée dans le futur)
                 const totalEntrants = recettesFiltrees.filter(r => estEntrantFutur(r.dateEntree)).length;
+                // Sortants prévus (date de départ renseignée)
+                const totalSortants = recettesFiltrees.filter(r => r.sortant && r.dateDepart).length;
 
                 const totalRecettes = recettesFiltrees.length;
                 const totalMontantHT = recettesActives.reduce((sum, r) => sum + (r.montantHT || 0), 0);
@@ -1276,6 +1282,7 @@
                 document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
                 document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
                 document.getElementById('totalEntrants').textContent = totalEntrants;
+                document.getElementById('totalSortants').textContent = totalSortants;
                 
                 console.log('✅ Stats mises à jour');
             } catch (error) {
