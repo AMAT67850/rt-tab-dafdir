@@ -621,7 +621,9 @@
                 return sum + calculerMontantLisse(item);
             }, 0);
 
-            analytics.totalChargesLissees = chargesData.reduce((sum, item) => {
+            // Charges actives dont le démarrage est déjà effectif (exclure charges entrants-futurs)
+            const chargesActuelles = chargesData.filter(c => !estEntrantFutur(c.dateEntree));
+            analytics.totalChargesLissees = chargesActuelles.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
 
