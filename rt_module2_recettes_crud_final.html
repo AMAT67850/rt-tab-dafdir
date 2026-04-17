@@ -161,13 +161,6 @@
             border-color: #27ae60;
         }
 
-        .filter-group select:disabled {
-            background: #f8f9fa;
-            color: #adb5bd;
-            cursor: not-allowed;
-            border-color: #e9ecef;
-        }
-
         .stats {
             background: white;
             padding: 25px;
@@ -206,12 +199,13 @@
         .table-container {
             background: white;
             border-radius: 12px;
-            overflow: hidden;
+            overflow-x: auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         table {
             width: 100%;
+            min-width: 1100px;
             border-collapse: collapse;
         }
 
@@ -665,27 +659,6 @@
                         <option value="ANNUEL">Annuel</option>
                     </select>
                 </div>
-
-                <div class="filter-group">
-                    <label>Mouvements</label>
-                    <select id="filtreMouvements" onchange="toggleHorizon(); appliquerFiltres();">
-                        <option value="tous">Tous</option>
-                        <option value="entrants">Entrants</option>
-                        <option value="sortants">Sortants</option>
-                        <option value="avec-mouvements">Avec mouvements</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Horizon</label>
-                    <select id="filtreHorizon" onchange="appliquerFiltres()" disabled>
-                        <option value="tous">Sans limite</option>
-                        <option value="1">1 mois</option>
-                        <option value="3">3 mois</option>
-                        <option value="6">6 mois</option>
-                        <option value="12">12 mois</option>
-                    </select>
-                </div>
             </div>
         </div>
 
@@ -931,44 +904,8 @@
             }
         }
 
-        // Activer/désactiver le select Horizon selon le filtre Mouvements
-        function toggleHorizon() {
-            const filtreMouvements = document.getElementById('filtreMouvements').value;
-            const filtreHorizon = document.getElementById('filtreHorizon');
-            if (filtreMouvements === 'tous') {
-                filtreHorizon.disabled = true;
-                filtreHorizon.value = 'tous';
-            } else {
-                filtreHorizon.disabled = false;
-            }
-        }
 
-        // Retourne les bornes de la fenêtre temporelle
-        function getFenetreHorizon(horizon) {
-            const debut = new Date();
-            debut.setDate(1);
-            debut.setHours(0, 0, 0, 0);
-            if (horizon === 'tous') return { debut, fin: null };
-            const fin = new Date(debut);
-            fin.setMonth(fin.getMonth() + parseInt(horizon) + 1); // +1 pour inclure tout le dernier mois
-            return { debut, fin };
-        }
-
-        // Teste si une date de mouvement est dans la fenêtre
-        function estDansFenetre(dateStr, typeMouvement, fenetre) {
-            if (!dateStr) return false;
-            const d = new Date(dateStr);
-            d.setHours(0, 0, 0, 0);
-            if (typeMouvement === 'entrant') {
-                if (fenetre.fin === null) return true;
-                return d >= fenetre.debut && d < fenetre.fin;
-            } else { // sortant
-                if (fenetre.fin === null) return true;
-                return d < fenetre.fin;
-            }
-        }
-
-
+        
         // Types par défaut (fallback si pas de types dans localStorage)
         const TYPES_RECETTES_DEFAUT = [
             "bureau privatif",
@@ -1094,7 +1031,6 @@
                 const filtreType = document.getElementById('filtreType').value;
                 const filtreCentre = document.getElementById('filtreCentre').value;
                 const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
-                const filtreMouvements = document.getElementById('filtreMouvements').value;
 
                 let recettesFiltrees = [...recettes];
                 
@@ -1113,21 +1049,6 @@
                 
                 if (filtrePeriodicite !== 'toutes') {
                     recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
-                }
-
-                if (filtreMouvements !== 'tous') {
-                    const horizon = document.getElementById('filtreHorizon').value;
-                    const fenetre = getFenetreHorizon(horizon);
-                    if (filtreMouvements === 'entrants') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre));
-                    } else if (filtreMouvements === 'sortants') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre));
-                    } else if (filtreMouvements === 'avec-mouvements') {
-                        recettesFiltrees = recettesFiltrees.filter(r =>
-                            (r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre)) ||
-                            (r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre))
-                        );
-                    }
                 }
                 
                 if (searchTerm) {
@@ -1310,7 +1231,6 @@
                 const filtreType = document.getElementById('filtreType').value;
                 const filtreCentre = document.getElementById('filtreCentre').value;
                 const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
-                const filtreMouvements = document.getElementById('filtreMouvements').value;
                 const searchTerm = document.getElementById('searchInput').value.toLowerCase();
                 
                 let recettesFiltrees = [...recettes];
@@ -1331,21 +1251,6 @@
                 if (filtrePeriodicite !== 'toutes') {
                     recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
                 }
-
-                if (filtreMouvements !== 'tous') {
-                    const horizon = document.getElementById('filtreHorizon').value;
-                    const fenetre = getFenetreHorizon(horizon);
-                    if (filtreMouvements === 'entrants') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre));
-                    } else if (filtreMouvements === 'sortants') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre));
-                    } else if (filtreMouvements === 'avec-mouvements') {
-                        recettesFiltrees = recettesFiltrees.filter(r =>
-                            (r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre)) ||
-                            (r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre))
-                        );
-                    }
-                }
                 
                 if (searchTerm) {
                     recettesFiltrees = recettesFiltrees.filter(r => 
@@ -1356,51 +1261,20 @@
                     );
                 }
 
-                // Option A : totaux sur les recettes affichées
-                // Sauf en vue "Tous" sans filtre mouvement : exclure entrants futurs des totaux
-                let recettesPourTotaux;
-                let totalMontantHT, totalMontantLisse;
-
-                if (filtreMouvements === 'avec-mouvements') {
-                    // Solde net : entrants − sortants (recettesFiltrees déjà filtrées par fenêtre)
-                    const entrants = recettesFiltrees.filter(r => r.entrant && r.dateEntree);
-                    const sortants = recettesFiltrees.filter(r => r.sortant && r.dateDepart && !(r.entrant && r.dateEntree));
-                    const htEntrants = entrants.reduce((sum, r) => sum + (r.montantHT || 0), 0);
-                    const htSortants = sortants.reduce((sum, r) => sum + (r.montantHT || 0), 0);
-                    const lisseEntrants = entrants.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
-                    const lisseSortants = sortants.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
-                    totalMontantHT = htEntrants - htSortants;
-                    totalMontantLisse = lisseEntrants - lisseSortants;
-                    document.querySelector('.stat-card:nth-child(2) .stat-label').textContent = 'Impact HT net';
-                    document.querySelector('.stat-card:nth-child(3) .stat-label').textContent = 'Impact Lissé/Mois net';
-                } else if (filtreMouvements === 'tous') {
-                    recettesPourTotaux = recettesFiltrees.filter(r => !estEntrantFutur(r.dateEntree));
-                    totalMontantHT = recettesPourTotaux.reduce((sum, r) => sum + (r.montantHT || 0), 0);
-                    totalMontantLisse = recettesPourTotaux.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
-                    document.querySelector('.stat-card:nth-child(2) .stat-label').textContent = 'Montant Total HT';
-                    document.querySelector('.stat-card:nth-child(3) .stat-label').textContent = 'Montant Lissé Mensuel';
-                } else {
-                    recettesPourTotaux = recettesFiltrees;
-                    totalMontantHT = recettesPourTotaux.reduce((sum, r) => sum + (r.montantHT || 0), 0);
-                    totalMontantLisse = recettesPourTotaux.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
-                    document.querySelector('.stat-card:nth-child(2) .stat-label').textContent = 'Montant Total HT';
-                    document.querySelector('.stat-card:nth-child(3) .stat-label').textContent = 'Montant Lissé Mensuel';
-                }
-
+                // Recettes dont l'entrée est déjà effective (pas futures)
+                const recettesActives = recettesFiltrees.filter(r => !estEntrantFutur(r.dateEntree));
+                // Entrants à venir (date d'entrée dans le futur)
                 const totalEntrants = recettesFiltrees.filter(r => estEntrantFutur(r.dateEntree)).length;
+
                 const totalRecettes = recettesFiltrees.length;
+                const totalMontantHT = recettesActives.reduce((sum, r) => sum + (r.montantHT || 0), 0);
+                const totalMontantLisse = recettesActives.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
 
-                // Formatage avec signe pour les soldes nets
-                const formatMontant = (val) => {
-                    const signe = filtreMouvements === 'avec-mouvements' && val > 0 ? '+' : '';
-                    return signe + val.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '€';
-                };
-
-                console.log(`Stats: ${totalRecettes} recettes, ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé`);
+                console.log(`Stats: ${totalRecettes} recettes (${totalEntrants} entrants futurs exclus des totaux), ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé`);
 
                 document.getElementById('totalRecettes').textContent = totalRecettes;
-                document.getElementById('totalMontantHT').textContent = formatMontant(totalMontantHT);
-                document.getElementById('totalMontantLisse').textContent = formatMontant(totalMontantLisse);
+                document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
+                document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
                 document.getElementById('totalEntrants').textContent = totalEntrants;
                 
                 console.log('✅ Stats mises à jour');
@@ -1575,7 +1449,6 @@
                     const filtreType = document.getElementById('filtreType').value;
                     const filtreCentre = document.getElementById('filtreCentre').value;
                     const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
-                    const filtreMouvements = document.getElementById('filtreMouvements').value;
                     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
                     
                     // Obtenir les indices réels dans le tableau complet
@@ -1596,21 +1469,6 @@
                     
                     if (filtrePeriodicite !== 'toutes') {
                         recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
-                    }
-
-                    if (filtreMouvements !== 'tous') {
-                        const horizon = document.getElementById('filtreHorizon').value;
-                        const fenetre = getFenetreHorizon(horizon);
-                        if (filtreMouvements === 'entrants') {
-                            recettesFiltrees = recettesFiltrees.filter(r => r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre));
-                        } else if (filtreMouvements === 'sortants') {
-                            recettesFiltrees = recettesFiltrees.filter(r => r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre));
-                        } else if (filtreMouvements === 'avec-mouvements') {
-                            recettesFiltrees = recettesFiltrees.filter(r =>
-                                (r.entrant && r.dateEntree && estDansFenetre(r.dateEntree, 'entrant', fenetre)) ||
-                                (r.sortant && r.dateDepart && estDansFenetre(r.dateDepart, 'sortant', fenetre))
-                            );
-                        }
                     }
                     
                     if (searchTerm) {
