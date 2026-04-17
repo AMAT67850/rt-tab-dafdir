@@ -721,8 +721,8 @@
                 const chargesStorage = localStorage.getItem('chargesRecurrentesRT');
                 const prevStorage = localStorage.getItem('previsionnel12moisRT');
                 
-                recettesData = recettesStorage ? JSON.parse(recettesStorage) : [];
-                chargesData = chargesStorage ? JSON.parse(chargesStorage) : [];
+                recettesData = recettesStorage ? JSON.parse(recettesStorage).filter(r => !r.statut || r.statut === 'ACTIF') : [];
+                chargesData = chargesStorage ? JSON.parse(chargesStorage).filter(c => !c.statut || c.statut === 'ACTIF') : [];
                 
                 console.log(`📥 Données chargées: ${recettesData.length} recettes, ${chargesData.length} charges`);
                 
