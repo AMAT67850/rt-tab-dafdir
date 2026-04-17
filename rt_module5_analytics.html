@@ -516,6 +516,35 @@
             }
         }
 
+        // Vérifier si un client entrant n'est pas encore arrivé (date d'entrée dans le futur)
+        function estEntrantFutur(dateEntree) {
+            try {
+                if (!dateEntree) return false;
+                const maintenant = new Date();
+                maintenant.setHours(0, 0, 0, 0);
+                const dateArr = new Date(dateEntree);
+                if (isNaN(dateArr.getTime())) return false;
+                return dateArr > maintenant;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Vérifier si un client entrant arrive dans les 90 prochains jours
+        function estEntrantDans3mois(dateEntree) {
+            try {
+                if (!dateEntree) return false;
+                const maintenant = new Date();
+                maintenant.setHours(0, 0, 0, 0);
+                const dateArr = new Date(dateEntree);
+                if (isNaN(dateArr.getTime())) return false;
+                const diffJours = (dateArr - maintenant) / (1000 * 60 * 60 * 24);
+                return diffJours >= 0 && diffJours <= 90;
+            } catch (e) {
+                return false;
+            }
+        }
+
         function chargerDonneesLocalStorage() {
             console.log('📊 === CHARGEMENT DONNÉES ANALYTICS (AVEC PROJECTIONS) ===');
             
@@ -585,8 +614,10 @@
         function calculerAnalytics() {
             console.log('📸 Calcul Situation Actuelle (tous clients)...');
             
-            // Tous les clients actifs (y compris tous les sortants)
-            analytics.totalRecettesLissees = recettesData.reduce((sum, item) => {
+            // Situation actuelle : clients actifs dont l'entrée est déjà effective (exclure entrants futurs)
+            const recettesActuelles = recettesData.filter(r => !estEntrantFutur(r.dateEntree));
+            console.log(`   ${recettesData.length - recettesActuelles.length} entrants futurs exclus de la situation actuelle`);
+            analytics.totalRecettesLissees = recettesActuelles.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
             }, 0);
 
@@ -614,24 +645,25 @@
         function calculerFuture3mAnalytics() {
             console.log('⏰ Calcul Projection 3 mois (sans sortants proches)...');
             
-            // Filtrer pour exclure uniquement les départs proches (≤ 3 mois)
-            // On garde les pérennes ET les sortants long terme (> 3 mois)
+            // Filtrer pour la projection 3 mois :
+            // - Exclure sortants proches (≤ 3 mois)
+            // - Exclure entrants futurs dont la date est > 3 mois (pas encore actifs dans 3 mois)
+            // - Inclure entrants futurs dont la date est ≤ 3 mois (seront actifs)
             const recettesFuture3m = recettesData.filter(r => {
-                // Si le client n'est pas sortant, on le garde
-                if (!r.sortant) return true;
-                
-                // Si le client est sortant mais sans date, on le considère comme long terme (on le garde)
-                if (!r.dateDepart) return true;
-                
-                // Si le client est sortant avec date, on garde seulement si ce n'est PAS proche
-                return !estSortantProche(r.dateDepart);
+                // Exclure les sortants proches
+                if (r.sortant && r.dateDepart && estSortantProche(r.dateDepart)) return false;
+
+                // Exclure les entrants qui n'arriveront pas dans les 3 prochains mois
+                if (estEntrantFutur(r.dateEntree) && !estEntrantDans3mois(r.dateEntree)) return false;
+
+                return true;
             });
             
             console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois`);
-            const nbExclus = recettesData.length - recettesFuture3m.length;
-            if (nbExclus > 0) {
-                console.log(`   ${nbExclus} clients exclus (départs ≤ 3 mois)`);
-            }
+            const nbExclusSortants = recettesData.filter(r => r.sortant && r.dateDepart && estSortantProche(r.dateDepart)).length;
+            const nbExclusEntrants = recettesData.filter(r => estEntrantFutur(r.dateEntree) && !estEntrantDans3mois(r.dateEntree)).length;
+            if (nbExclusSortants > 0) console.log(`   ${nbExclusSortants} clients exclus (départs ≤ 3 mois)`);
+            if (nbExclusEntrants > 0) console.log(`   ${nbExclusEntrants} entrants exclus (arrivée > 3 mois)`);
 
             future3mAnalytics.totalRecettesLissees = recettesFuture3m.reduce((sum, item) => {
                 return sum + calculerMontantLisse(item);
