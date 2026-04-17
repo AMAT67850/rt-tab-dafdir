@@ -709,6 +709,10 @@
                     <div class="stat-value" id="totalEntrants">0</div>
                     <div class="stat-label">Entrants à venir</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalSortants">0</div>
+                    <div class="stat-label">Sortants prévus</div>
+                </div>
             </div>
         </div>
 
@@ -1139,6 +1143,8 @@
             // Charges dont le démarrage est déjà effectif (pas entrants futurs)
             const chargesActives = chargesFiltrees.filter(c => !estEntrantFutur(c.dateEntree));
             const totalEntrants = chargesFiltrees.filter(c => estEntrantFutur(c.dateEntree)).length;
+            // Sortants prévus (date de fin renseignée)
+            const totalSortants = chargesFiltrees.filter(c => c.sortant && c.dateDepart).length;
 
             const totalCharges = chargesFiltrees.length;
             const totalMontantHT = chargesActives.reduce((sum, c) => sum + Math.abs(c.montantHT), 0);
@@ -1150,6 +1156,7 @@
             document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
             document.getElementById('totalMontantLisse').textContent = totalMontantLisse.toLocaleString('fr-FR') + '€';
             document.getElementById('totalEntrants').textContent = totalEntrants;
+            document.getElementById('totalSortants').textContent = totalSortants;
         }
 
         // Gestion Modal
