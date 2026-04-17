@@ -849,6 +849,17 @@
                         if (dateEntree > debutMois) return; // pas encore actif ce mois
                     }
 
+                    // Exclure les sortants dont la date de départ est passée pour ce mois
+                    if (recette.sortant && recette.dateDepart) {
+                        const dateDepart = new Date(recette.dateDepart);
+                        dateDepart.setDate(1);
+                        dateDepart.setHours(0, 0, 0, 0);
+                        const debutMois = new Date(dateMois);
+                        debutMois.setDate(1);
+                        debutMois.setHours(0, 0, 0, 0);
+                        if (dateDepart <= debutMois) return; // déjà parti ce mois
+                    }
+
                     if (doitApparaitreCeMois(recette, dateMois)) {
                         // Vérifier si supprimée temporairement
                         const suppressions = window.suppressionsTemporaires?.[moisCle]?.recettes || [];
@@ -878,7 +889,7 @@
                 
                 // Charges récurrentes
                 chargesData.forEach((charge, chargeIndex) => {
-                    // Exclure les charges dont la date d'entrée est postérieure au mois calculé
+                    // Exclure les entrants dont la date d'entrée est postérieure au mois calculé
                     if (charge.entrant && charge.dateEntree) {
                         const dateEntree = new Date(charge.dateEntree);
                         dateEntree.setDate(1);
@@ -887,6 +898,17 @@
                         debutMois.setDate(1);
                         debutMois.setHours(0, 0, 0, 0);
                         if (dateEntree > debutMois) return; // pas encore active ce mois
+                    }
+
+                    // Exclure les sortants dont la date de fin est passée pour ce mois
+                    if (charge.sortant && charge.dateDepart) {
+                        const dateDepart = new Date(charge.dateDepart);
+                        dateDepart.setDate(1);
+                        dateDepart.setHours(0, 0, 0, 0);
+                        const debutMois = new Date(dateMois);
+                        debutMois.setDate(1);
+                        debutMois.setHours(0, 0, 0, 0);
+                        if (dateDepart <= debutMois) return; // déjà résiliée ce mois
                     }
 
                     if (doitApparaitreCeMois(charge, dateMois)) {
