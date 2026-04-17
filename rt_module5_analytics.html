@@ -645,36 +645,31 @@
         // CALCULS PROJECTION 3 MOIS (SANS SORTANTS PROCHES)
         // ============================================
         function calculerFuture3mAnalytics() {
-            console.log('⏰ Calcul Projection 3 mois (sans sortants proches)...');
-            
-            // Filtrer pour la projection 3 mois :
-            // - Exclure sortants proches (≤ 3 mois)
-            // - Exclure entrants futurs dont la date est > 3 mois (pas encore actifs dans 3 mois)
-            // - Inclure entrants futurs dont la date est ≤ 3 mois (seront actifs)
+            console.log('⏰ Calcul Projection 3 mois...');
+
+            // RECETTES : exclure sortants proches + entrants arrivant après 3 mois
             const recettesFuture3m = recettesData.filter(r => {
-                // Exclure les sortants proches
                 if (r.sortant && r.dateDepart && estSortantProche(r.dateDepart)) return false;
-
-                // Exclure les entrants qui n'arriveront pas dans les 3 prochains mois
                 if (estEntrantFutur(r.dateEntree) && !estEntrantDans3mois(r.dateEntree)) return false;
-
                 return true;
             });
-            
-            console.log(`   ${recettesFuture3m.length} clients dans projection 3 mois`);
-            const nbExclusSortants = recettesData.filter(r => r.sortant && r.dateDepart && estSortantProche(r.dateDepart)).length;
-            const nbExclusEntrants = recettesData.filter(r => estEntrantFutur(r.dateEntree) && !estEntrantDans3mois(r.dateEntree)).length;
-            if (nbExclusSortants > 0) console.log(`   ${nbExclusSortants} clients exclus (départs ≤ 3 mois)`);
-            if (nbExclusEntrants > 0) console.log(`   ${nbExclusEntrants} entrants exclus (arrivée > 3 mois)`);
 
-            future3mAnalytics.totalRecettesLissees = recettesFuture3m.reduce((sum, item) => {
-                return sum + calculerMontantLisse(item);
-            }, 0);
+            // CHARGES : même logique symétrique
+            const chargesFuture3m = chargesData.filter(c => {
+                if (c.sortant && c.dateDepart && estSortantProche(c.dateDepart)) return false;
+                if (estEntrantFutur(c.dateEntree) && !estEntrantDans3mois(c.dateEntree)) return false;
+                return true;
+            });
 
-            // Les charges restent les mêmes
-            future3mAnalytics.totalChargesLissees = chargesData.reduce((sum, item) => {
-                return sum + calculerMontantLisse(item);
-            }, 0);
+            const nbExclusRecSortants  = recettesData.filter(r => r.sortant && r.dateDepart && estSortantProche(r.dateDepart)).length;
+            const nbExclusRecEntrants  = recettesData.filter(r => estEntrantFutur(r.dateEntree) && !estEntrantDans3mois(r.dateEntree)).length;
+            const nbExclusChSortants   = chargesData.filter(c => c.sortant && c.dateDepart && estSortantProche(c.dateDepart)).length;
+            const nbExclusChEntrants   = chargesData.filter(c => estEntrantFutur(c.dateEntree) && !estEntrantDans3mois(c.dateEntree)).length;
+            console.log(`   Recettes : ${recettesFuture3m.length} retenues (${nbExclusRecSortants} sortants exclus, ${nbExclusRecEntrants} entrants lointains exclus)`);
+            console.log(`   Charges  : ${chargesFuture3m.length} retenues (${nbExclusChSortants} sortants exclus, ${nbExclusChEntrants} entrants lointains exclus)`);
+
+            future3mAnalytics.totalRecettesLissees = recettesFuture3m.reduce((sum, item) => sum + calculerMontantLisse(item), 0);
+            future3mAnalytics.totalChargesLissees  = chargesFuture3m.reduce((sum, item) => sum + calculerMontantLisse(item), 0);
 
             future3mAnalytics.resultatMensuel = future3mAnalytics.totalRecettesLissees - future3mAnalytics.totalChargesLissees;
 
@@ -694,21 +689,19 @@
         // CALCULS FUTURE LONG TERME (SANS TOUS LES SORTANTS)
         // ============================================
         function calculerFutureLongAnalytics() {
-            console.log('🔮 Calcul Future Long terme (clients pérennes uniquement)...');
-            
-            // Filtrer les recettes pour exclure TOUS les sortants
-            const recettesPerennes = recettesData.filter(r => !r.sortant);
-            
-            console.log(`   ${recettesPerennes.length} clients pérennes sur ${recettesData.length} actifs`);
+            console.log('🔮 Calcul Future Long terme (pérennes uniquement)...');
 
-            futureLongAnalytics.totalRecettesLissees = recettesPerennes.reduce((sum, item) => {
-                return sum + calculerMontantLisse(item);
-            }, 0);
+            // RECETTES : exclure tous les sortants ET les entrants futurs (base stable actuelle)
+            const recettesPerennes = recettesData.filter(r => !r.sortant && !estEntrantFutur(r.dateEntree));
 
-            // Les charges restent les mêmes
-            futureLongAnalytics.totalChargesLissees = chargesData.reduce((sum, item) => {
-                return sum + calculerMontantLisse(item);
-            }, 0);
+            // CHARGES : exclure tous les sortants ET les entrants futurs
+            const chargesPerennes = chargesData.filter(c => !c.sortant && !estEntrantFutur(c.dateEntree));
+
+            console.log(`   Recettes pérennes : ${recettesPerennes.length} / ${recettesData.length}`);
+            console.log(`   Charges pérennes  : ${chargesPerennes.length} / ${chargesData.length}`);
+
+            futureLongAnalytics.totalRecettesLissees = recettesPerennes.reduce((sum, item) => sum + calculerMontantLisse(item), 0);
+            futureLongAnalytics.totalChargesLissees  = chargesPerennes.reduce((sum, item) => sum + calculerMontantLisse(item), 0);
 
             futureLongAnalytics.resultatMensuel = futureLongAnalytics.totalRecettesLissees - futureLongAnalytics.totalChargesLissees;
 
