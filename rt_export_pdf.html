@@ -5,119 +5,138 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🚀 Rocket Tower — Export PDF</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #0f1923; color: #e2e8f0; min-height: 100vh; }
-    .header { background: linear-gradient(135deg, #0f1923, #1a2d3d); border-bottom: 2px solid #27ae60; padding: 28px 40px; display: flex; align-items: center; gap: 20px; }
-    .header-logo { font-size: 2.2em; }
-    .header-text h1 { font-size: 1.6em; color: #fff; }
-    .header-text p  { font-size: 0.85em; color: #94a3b8; margin-top: 3px; }
-    .header-nav { margin-left: auto; }
-    .nav-link { display: inline-block; padding: 8px 16px; background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.4); border-radius: 6px; color: #4ade80; text-decoration: none; font-size: 0.82em; }
-    .container { max-width: 860px; margin: 0 auto; padding: 36px 24px; }
-    .data-status { background: #1e2d3d; border: 1px solid #2d4a5e; border-radius: 10px; padding: 18px 22px; margin-bottom: 32px; display: flex; gap: 24px; flex-wrap: wrap; }
-    .data-status h3 { font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; width: 100%; margin-bottom: 6px; }
-    .status-item { display: flex; align-items: center; gap: 8px; font-size: 0.83em; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot.ok   { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
-    .dot.warn { background: #f59e0b; }
-    .status-label { color: #94a3b8; }
-    .status-count { color: #e2e8f0; font-weight: 600; }
-    .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width:640px) { .export-grid { grid-template-columns: 1fr; } }
-    .export-card { background: #1e2d3d; border: 1px solid #2d4a5e; border-radius: 12px; padding: 28px 24px; display: flex; flex-direction: column; gap: 14px; }
-    .export-card:hover { border-color: #27ae60; }
-    .card-icon  { font-size: 2em; }
-    .card-title { font-size: 1.05em; font-weight: 700; color: #fff; }
-    .card-desc  { font-size: 0.82em; color: #94a3b8; line-height: 1.55; }
-    .card-contents { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-    .card-contents li { font-size: 0.79em; color: #64748b; padding-left: 14px; position: relative; }
-    .card-contents li::before { content: '›'; position: absolute; left: 0; color: #27ae60; font-weight: bold; }
-    .card-meta { font-size: 0.75em; color: #475569; }
-    .btn-export { margin-top: auto; padding: 11px 18px; background: linear-gradient(135deg,#27ae60,#2ecc71); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 0.88em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-export:hover { opacity: 0.9; }
-    .btn-export:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-secondary { padding: 9px 18px; background: transparent; border: 1px solid #2d4a5e; border-radius: 8px; color: #94a3b8; font-size: 0.82em; cursor: pointer; text-align: center; }
-    .btn-secondary:hover { border-color: #27ae60; color: #4ade80; }
-    .info-box { background: rgba(39,174,96,0.07); border: 1px solid rgba(39,174,96,0.2); border-radius: 8px; padding: 14px 18px; font-size: 0.81em; color: #94a3b8; line-height: 1.55; margin-top: 20px; }
-    .info-box strong { color: #4ade80; }
-    #report-mensuel, #report-previsionnel { display: none; }
+    /* ---- ÉCRAN ---- */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI',sans-serif; background:#0f1923; color:#e2e8f0; min-height:100vh; }
+    .header { background:linear-gradient(135deg,#0f1923,#1a2d3d); border-bottom:2px solid #27ae60; padding:28px 40px; display:flex; align-items:center; gap:20px; }
+    .header-logo { font-size:2.2em; }
+    .header-text h1 { font-size:1.6em; color:#fff; }
+    .header-text p  { font-size:0.85em; color:#94a3b8; margin-top:3px; }
+    .header-nav { margin-left:auto; }
+    .nav-link { display:inline-block; padding:8px 16px; background:rgba(39,174,96,0.15); border:1px solid rgba(39,174,96,0.4); border-radius:6px; color:#4ade80; text-decoration:none; font-size:0.82em; }
+    .nav-link:hover { background:rgba(39,174,96,0.25); }
+    .container { max-width:860px; margin:0 auto; padding:36px 24px; }
+    .data-status { background:#1e2d3d; border:1px solid #2d4a5e; border-radius:10px; padding:18px 22px; margin-bottom:32px; display:flex; gap:24px; flex-wrap:wrap; }
+    .data-status h3 { font-size:0.78em; text-transform:uppercase; letter-spacing:0.8px; color:#64748b; width:100%; margin-bottom:6px; }
+    .status-item { display:flex; align-items:center; gap:8px; font-size:0.83em; }
+    .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .dot.ok   { background:#22c55e; box-shadow:0 0 6px rgba(34,197,94,0.5); }
+    .dot.warn { background:#f59e0b; }
+    .status-label { color:#94a3b8; }
+    .status-count { color:#e2e8f0; font-weight:600; }
+    .export-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    @media(max-width:640px){ .export-grid{ grid-template-columns:1fr; } }
+    .export-card { background:#1e2d3d; border:1px solid #2d4a5e; border-radius:12px; padding:28px 24px; display:flex; flex-direction:column; gap:14px; }
+    .export-card:hover { border-color:#27ae60; }
+    .card-icon  { font-size:2em; }
+    .card-title { font-size:1.05em; font-weight:700; color:#fff; }
+    .card-desc  { font-size:0.82em; color:#94a3b8; line-height:1.55; }
+    .card-contents { list-style:none; display:flex; flex-direction:column; gap:5px; }
+    .card-contents li { font-size:0.79em; color:#64748b; padding-left:14px; position:relative; }
+    .card-contents li::before { content:'›'; position:absolute; left:0; color:#27ae60; font-weight:bold; }
+    .card-meta { font-size:0.75em; color:#475569; }
+    .btn-export { margin-top:auto; padding:11px 18px; background:linear-gradient(135deg,#27ae60,#2ecc71); border:none; border-radius:8px; color:white; font-weight:700; font-size:0.88em; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-export:hover { opacity:0.9; }
+    .btn-export:disabled { opacity:0.4; cursor:not-allowed; }
+    .btn-secondary { padding:9px 18px; background:transparent; border:1px solid #2d4a5e; border-radius:8px; color:#94a3b8; font-size:0.82em; cursor:pointer; text-align:center; }
+    .btn-secondary:hover { border-color:#27ae60; color:#4ade80; }
+    .info-box { background:rgba(39,174,96,0.07); border:1px solid rgba(39,174,96,0.2); border-radius:8px; padding:14px 18px; font-size:0.81em; color:#94a3b8; line-height:1.55; margin-top:20px; }
+    .info-box strong { color:#4ade80; }
+    #report-mensuel, #report-previsionnel { display:none; }
 
+    /* ============================================================
+       IMPRESSION
+    ============================================================ */
     @media print {
-      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      body { background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif; font-size: 9pt; line-height: 1.35; }
-      .screen-only { display: none !important; }
-      body.mode-mensuel      #report-mensuel      { display: block !important; }
-      body.mode-mensuel      #report-previsionnel { display: none  !important; }
-      body.mode-previsionnel #report-previsionnel { display: block !important; }
-      body.mode-previsionnel #report-mensuel      { display: none  !important; }
+      * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      body { background:#fff; color:#000; font-family:Arial,Helvetica,sans-serif; font-size:9pt; line-height:1.35; }
+      .screen-only { display:none !important; }
+      body.mode-mensuel      #report-mensuel      { display:block !important; }
+      body.mode-mensuel      #report-previsionnel { display:none  !important; }
+      body.mode-previsionnel #report-previsionnel { display:block !important; }
+      body.mode-previsionnel #report-mensuel      { display:none  !important; }
 
-      /* En-tête */
-      .rpt-header { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.5pt solid #000; padding-bottom: 5pt; margin-bottom: 6pt; }
-      .rpt-header-left h1 { font-size: 13pt; font-weight: bold; margin-bottom: 1pt; }
-      .rpt-header-left p  { font-size: 8pt; color: #444; }
-      .rpt-header-right   { text-align: right; font-size: 7.5pt; color: #444; }
+      /* ---- En-tête ---- */
+      .rpt-header { display:flex; align-items:flex-end; justify-content:space-between; border-bottom:1.5pt solid #000; padding-bottom:5pt; margin-bottom:6pt; }
+      .rpt-header-left h1 { font-size:13pt; font-weight:bold; margin-bottom:1pt; }
+      .rpt-header-left p  { font-size:8pt; color:#444; }
+      .rpt-header-right   { text-align:right; font-size:7.5pt; color:#444; }
 
-      /* Texte intro */
-      .rpt-intro { font-size: 8pt; color: #333; font-style: italic; line-height: 1.5; border-left: 2pt solid #555; padding: 4pt 8pt; margin-bottom: 7pt; background: #f9f9f9; page-break-inside: avoid; }
+      /* ---- Texte intro ---- */
+      .rpt-intro { font-size:8pt; color:#333; font-style:italic; line-height:1.5; border-left:2.5pt solid #0056b3; padding:4pt 8pt; margin-bottom:8pt; background:#f4f7fc; page-break-inside:avoid; }
 
-      /* Sections */
-      .rpt-section { margin-bottom: 7pt; page-break-inside: avoid; }
-      .rpt-section-title { font-size: 9.5pt; font-weight: bold; background: #222; color: #fff; padding: 2.5pt 5pt; margin-bottom: 3pt; }
-      .rpt-section-title-green { font-size: 10pt; font-weight: bold; background: #1a6b3a; color: #fff; padding: 4pt 7pt; margin-bottom: 4pt; letter-spacing: 0.3pt; }
+      /* ================================================================
+         TITRES — même police, même hauteur, même padding, couleur seule change
+         Charte : Analytics=bleu, Dashboard=violet, Recettes=vert, Charges=rouge, Variations=orange
+      ================================================================ */
+      .rpt-h1 {
+        font-size:10pt; font-weight:bold; color:#fff;
+        padding:4pt 7pt; margin-bottom:4pt;
+        page-break-after:avoid;
+      }
+      .rpt-h1.analytics  { background:#0056b3; }   /* bleu  — analytics */
+      .rpt-h1.details    { background:#5c4bc7; }   /* violet — dashboard */
+      .rpt-h1.recettes   { background:#1e8449; }   /* vert   — module recettes */
+      .rpt-h1.charges    { background:#b71c1c; }   /* rouge  — module charges */
+      .rpt-h1.variations { background:#c96a00; }   /* orange — avertissement */
 
-      /* Tableau comparatif 4 horizons */
-      .tbl-horizons { width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 5pt; }
-      .tbl-horizons th { color: #fff; padding: 5pt 7pt; text-align: center; border: 0.5pt solid rgba(255,255,255,0.25); font-size: 8.5pt; font-weight: bold; }
-      .tbl-horizons th.th-label    { text-align: left; background: #444; }
-      .tbl-horizons th.th-actuelle { background: #1a6b3a; }
-      .tbl-horizons th.th-proj     { background: #1e4d8c; }
-      .tbl-horizons td { padding: 4pt 7pt; border: 0.5pt solid #ccc; vertical-align: middle; }
-      .tbl-horizons td.td-label { font-weight: bold; font-size: 8.5pt; background: #f5f5f5; border-right: 1pt solid #aaa; }
-      .tbl-horizons td.td-val      { text-align: right; white-space: nowrap; font-size: 11pt; font-weight: bold; }
-      .tbl-horizons td.td-val-act  { background: #edf7f1; }
-      .tbl-horizons td.td-val-proj { background: #eef2fb; }
-      .tbl-horizons tr.tr-resultat td { border-top: 1.5pt solid #666; }
-      .tbl-horizons tr.tr-resultat td.td-val { font-size: 13pt; }
-      .tbl-horizons tr.tr-resultat td.td-val-act  { background: #d6f0e2; }
-      .tbl-horizons tr.tr-resultat td.td-val-proj { background: #dde8f8; }
-      .pos { color: #1a7a40; }
-      .neg { color: #b91c1c; }
-      .neu { color: #555; }
+      /* ---- Sections ---- */
+      .rpt-section { margin-bottom:8pt; page-break-inside:avoid; }
 
-      /* Variations — même style que tableaux détail */
-      .var-block { margin-bottom: 5pt; page-break-inside: avoid; }
-      .var-title { font-size: 8pt; font-weight: bold; background: #dde; border: 0.4pt solid #aab; padding: 3pt 6pt; margin-bottom: 2pt; display: flex; justify-content: space-between; color: #223; }
-      .var-impact { font-size: 7.5pt; font-style: italic; }
-      .var-tbl-title { font-size: 8pt; font-weight: bold; color: #fff; background: #555; padding: 2pt 5pt; margin: 3pt 0 0; }
-      .var-subtotal { text-align: right; font-size: 8pt; font-weight: bold; padding: 2pt 5pt; border-top: 0.5pt solid #999; background: #f0f0f0; }
-      /* var-tbl hérite de detail-tbl */
+      /* ---- Tableau synthèse 4 horizons ---- */
+      table.tbl-horizons { width:100%; border-collapse:collapse; font-size:9pt; margin-bottom:4pt; }
+      table.tbl-horizons th { color:#fff; padding:4pt 6pt; text-align:center; border:0.4pt solid rgba(255,255,255,0.3); font-size:8.5pt; font-weight:bold; }
+      table.tbl-horizons th.th-lbl      { text-align:left; background:#444; width:24%; }
+      table.tbl-horizons th.th-actuelle { background:#0056b3; }
+      table.tbl-horizons th.th-proj     { background:#1565a0; }
+      table.tbl-horizons td { padding:4pt 7pt; border:0.5pt solid #ccc; vertical-align:middle; }
+      table.tbl-horizons td.td-lbl { font-weight:bold; font-size:8.5pt; background:#f4f4f4; border-right:1pt solid #aaa; }
+      table.tbl-horizons td.td-act  { text-align:right; white-space:nowrap; font-size:11pt; font-weight:bold; background:#edf4fb; }
+      table.tbl-horizons td.td-proj { text-align:right; white-space:nowrap; font-size:11pt; font-weight:bold; background:#f4f4f4; }
+      table.tbl-horizons tr.tr-res td { border-top:1.5pt solid #555; }
+      table.tbl-horizons tr.tr-res td.td-act  { font-size:14pt; background:#d6e9f8; }
+      table.tbl-horizons tr.tr-res td.td-proj { font-size:14pt; background:#ececec; }
+      .c-pos { color:#1a7a40; }
+      .c-neg { color:#b71c1c; }
+      .c-neu { color:#555; }
+      .c-diff { font-size:7pt; font-weight:normal; color:#666; display:block; margin-top:1pt; }
 
-      /* Tableaux détail */
-      table.detail-tbl { width: 100%; border-collapse: collapse; font-size: 8pt; table-layout: fixed; }
-      table.detail-tbl th { background: #444; color: #fff; font-weight: bold; padding: 2pt 4pt; text-align: left; border: 0.4pt solid #555; font-size: 7.5pt; }
-      table.detail-tbl td { padding: 1.8pt 4pt; border: 0.4pt solid #ccc; vertical-align: top; word-break: break-word; }
-      table.detail-tbl tr:nth-child(even) td { background: #f7f7f7; }
-      table.detail-tbl tr.row-sortant td { background: #fff8f0 !important; }
-      .td-right  { text-align: right; white-space: nowrap; }
-      .td-center { text-align: center; }
-      .badge-per { font-size: 6.5pt; padding: 0.5pt 3pt; border-radius: 2pt; border: 0.4pt solid #aaa; white-space: nowrap; }
-      .tag-sortant { font-size: 6pt; color: #b45309; background: #fef3c7; border: 0.3pt solid #d97706; padding: 0.5pt 2pt; border-radius: 1pt; white-space: nowrap; }
+      /* ---- Tableaux de données (recettes, charges, variations) — IDENTIQUES ---- */
+      table.data-tbl { width:100%; border-collapse:collapse; font-size:8pt; table-layout:fixed; margin-bottom:1pt; }
+      table.data-tbl th { color:#fff; font-weight:bold; padding:2.5pt 4pt; text-align:left; border:0.4pt solid rgba(255,255,255,0.3); font-size:7.5pt; }
+      /* couleur th = couleur section parente */
+      .rpt-section.sec-recettes   table.data-tbl th { background:#1e8449; }
+      .rpt-section.sec-charges    table.data-tbl th { background:#b71c1c; }
+      .rpt-section.sec-variations table.data-tbl th { background:#c96a00; }
+      table.data-tbl td { padding:1.8pt 4pt; border:0.4pt solid #ccc; vertical-align:top; word-break:break-word; }
+      table.data-tbl tr:nth-child(even) td { background:#f8f8f8; }
+      table.data-tbl tr.row-sortant td { background:#fff8f0 !important; }
+      .td-r { text-align:right; white-space:nowrap; }
+      .td-c { text-align:center; }
+      .badge-per { font-size:6.5pt; padding:0.5pt 3pt; border-radius:2pt; border:0.4pt solid #aaa; white-space:nowrap; }
+      .tag-sortant { font-size:6pt; color:#b45309; background:#fef3c7; border:0.3pt solid #d97706; padding:0.5pt 2pt; border-radius:1pt; white-space:nowrap; }
 
-      .rpt-total { display: flex; justify-content: flex-end; gap: 20pt; padding: 3pt 5pt; border-top: 1pt solid #000; background: #f0f0f0; font-size: 8.5pt; font-weight: bold; page-break-inside: avoid; }
-      .rpt-total span { white-space: nowrap; }
+      /* ---- Ligne totaux ---- */
+      .rpt-total { display:flex; justify-content:flex-end; gap:18pt; padding:3pt 5pt; border-top:1pt solid #000; background:#efefef; font-size:8.5pt; font-weight:bold; page-break-inside:avoid; margin-bottom:5pt; }
+      .rpt-total span { white-space:nowrap; }
 
-      .page-break { page-break-before: always; }
-      .no-break   { page-break-inside: avoid; }
+      /* ---- Impact net variations ---- */
+      .var-net { text-align:right; font-size:8.5pt; font-weight:bold; padding:3pt 6pt; background:#fff8ee; border:0.5pt solid #e0a060; margin-top:2pt; margin-bottom:5pt; }
 
-      /* Prévisionnel */
-      .prev-pos { color: #1a7a40; font-weight: bold; }
-      .prev-neg { color: #b91c1c; font-weight: bold; }
-      .rpt-summary { margin-top: 6pt; border: 0.5pt solid #999; padding: 4pt 6pt; background: #f5f5f5; page-break-inside: avoid; }
-      .rpt-summary h3 { font-size: 8.5pt; font-weight: bold; margin-bottom: 4pt; border-bottom: 0.5pt solid #aaa; padding-bottom: 2pt; }
-      .summary-row { display: flex; justify-content: space-between; font-size: 8pt; padding: 1.5pt 0; border-bottom: 0.3pt solid #ddd; }
-      .summary-row:last-child { border-bottom: none; font-weight: bold; font-size: 8.5pt; }
+      /* ---- Sauts de page ---- */
+      .page-break { page-break-before:always; }
+      .no-break   { page-break-inside:avoid; }
 
-      .rpt-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 7pt; color: #777; border-top: 0.4pt solid #ccc; padding: 3pt 0 0; display: flex; justify-content: space-between; }
+      /* ---- Prévisionnel ---- */
+      .prev-pos { color:#1a7a40; font-weight:bold; }
+      .prev-neg { color:#b71c1c; font-weight:bold; }
+      .rpt-summary { margin-top:6pt; border:0.5pt solid #999; padding:4pt 6pt; background:#f5f5f5; page-break-inside:avoid; }
+      .rpt-summary h3 { font-size:8.5pt; font-weight:bold; margin-bottom:4pt; border-bottom:0.5pt solid #aaa; padding-bottom:2pt; }
+      .summary-row { display:flex; justify-content:space-between; font-size:8pt; padding:1.5pt 0; border-bottom:0.3pt solid #ddd; }
+      .summary-row:last-child { border-bottom:none; font-weight:bold; font-size:8.5pt; }
+
+      /* ---- Pied de page ---- */
+      .rpt-footer { position:fixed; bottom:0; left:0; right:0; font-size:7pt; color:#777; border-top:0.4pt solid #ccc; padding:3pt 0 0; display:flex; justify-content:space-between; }
     }
   </style>
 </head>
@@ -147,9 +166,8 @@
         <div class="card-desc">Synthèse financière pour la direction, avec projections sur 12 mois.</div>
         <ul class="card-contents">
           <li>Texte introductif</li>
-          <li>Synthèse analytique : situation actuelle + projections 3 / 6 / 12 mois</li>
-          <li>Variations connues entre chaque période</li>
-          <li>Détail recettes et charges actives</li>
+          <li>Synthèse analytique — situation actuelle + projections 3 / 6 / 12 mois</li>
+          <li>Détails : recettes actives, charges actives, variations connues</li>
         </ul>
         <div class="card-meta" id="meta-mensuel">—</div>
         <button class="btn-export" id="btn-mensuel" onclick="exporterRapportMensuel()">🖨️ Imprimer Rapport Mensuel</button>
@@ -170,7 +188,7 @@
       </div>
     </div>
     <div class="info-box">
-      <strong>ℹ️ Filtrage appliqué :</strong> Seuls les contrats <strong>effectifs à chaque date</strong> sont comptabilisés. Les projections à 3, 6 et 12 mois sont calculées automatiquement à partir des dates d'entrée et de sortie enregistrées. Pour générer le PDF, choisissez <strong>« Enregistrer en PDF »</strong> dans la boîte d'impression.
+      <strong>ℹ️ Filtrage :</strong> Seuls les contrats <strong>effectifs à chaque date</strong> sont comptabilisés. Les projections sont calculées depuis les dates d'entrée/sortie enregistrées. Pour PDF : choisissez <strong>« Enregistrer en PDF »</strong> dans la boîte d'impression.
     </div>
   </div>
 </div>
@@ -186,59 +204,73 @@
     <div class="rpt-header-right" id="rpt-men-right"></div>
   </div>
 
-  <!-- Texte introductif -->
-  <div class="rpt-intro" id="rpt-intro-text">
-    Sur la base des contrats de recettes et des charges récurrentes effectivement actifs à ce jour, le résultat mensuel lissé de Rocket Tower s'établit comme présenté ci-dessous. Ces chiffres reflètent la situation contractuelle réelle — les entrées dont la date d'arrivée est future et les sorties déjà effectives sont exclues du calcul. Les variations connues (entrées et sorties planifiées) permettent d'anticiper l'évolution de ce résultat à 3, 6 et 12 mois. Le détail des recettes et charges enregistrées dans le tableau de bord financier figure en pages suivantes.
+  <!-- Texte intro -->
+  <div class="rpt-intro">
+    Sur la base des contrats de recettes et des charges récurrentes effectivement actifs à ce jour, le résultat mensuel lissé de Rocket Tower s'établit comme présenté ci-dessous. Ces chiffres reflètent la situation contractuelle réelle — les entrées dont la date d'arrivée est future et les sorties déjà effectives sont exclues du calcul. Les variations connues (entrées et sorties planifiées) permettent d'anticiper l'évolution de ce résultat à 3, 6 et 12 mois. Le détail des recettes et charges enregistrées dans le tableau de bord financier figure ci-dessous.
   </div>
 
-  <!-- SYNTHÈSE ANALYTIQUE -->
+  <!-- ==================== SYNTHÈSE ANALYTIQUE ==================== -->
   <div class="rpt-section no-break">
-    <div class="rpt-section-title-green">📊 SYNTHÈSE ANALYTIQUE — Situation actuelle et projections</div>
-
-    <!-- Tableau comparatif 4 horizons -->
-    <table class="tbl-horizons" id="tbl-horizons">
+    <div class="rpt-h1 analytics">📊 SYNTHÈSE ANALYTIQUE — Situation actuelle et projections</div>
+    <table class="tbl-horizons">
       <thead>
         <tr>
-          <th class="th-label" style="width:24%">Indicateur</th>
-          <th class="th-actuelle" style="width:19%">📸 Situation actuelle</th>
-          <th class="th-proj"    style="width:19%">⏰ À 3 mois</th>
-          <th class="th-proj"    style="width:19%">📆 À 6 mois</th>
-          <th class="th-proj"    style="width:19%">📅 À 12 mois</th>
+          <th class="th-lbl">Indicateur</th>
+          <th class="th-actuelle">📸 Situation actuelle</th>
+          <th class="th-proj">⏰ À 3 mois</th>
+          <th class="th-proj">📆 À 6 mois</th>
+          <th class="th-proj">📅 À 12 mois</th>
         </tr>
       </thead>
       <tbody id="tbody-horizons"></tbody>
     </table>
   </div>
 
-  <!-- VARIATIONS ENTRE PÉRIODES -->
-  <div id="section-variations"></div>
-
-  <!-- PAGE BREAK avant le détail -->
+  <!-- ==================== DÉTAILS ==================== -->
   <div class="page-break"></div>
+  <div class="rpt-h1 details">📋 DÉTAILS — Recettes, Charges et Variations connues</div>
 
-  <!-- RECETTES -->
-  <div class="rpt-section no-break">
-    <div class="rpt-section-title">💵 RECETTES RÉCURRENTES — Contrats actifs aujourd'hui</div>
-    <table class="detail-tbl">
-      <colgroup><col style="width:20%"><col style="width:8%"><col style="width:15%"><col style="width:22%"><col style="width:9%"><col style="width:11%"><col style="width:8%"><col style="width:7%"></colgroup>
-      <thead><tr><th>Client</th><th>Centre</th><th>Type</th><th>Libellé</th><th class="td-right">Montant HT</th><th class="td-center">Périodicité</th><th class="td-right">Lissé/mois</th><th class="td-center">Statut</th></tr></thead>
+  <!-- 1. Recettes récurrentes -->
+  <div class="rpt-section sec-recettes no-break">
+    <div class="rpt-h1 recettes">💵 RECETTES RÉCURRENTES — Contrats actifs aujourd'hui</div>
+    <table class="data-tbl">
+      <colgroup><col style="width:20%"><col style="width:8%"><col style="width:14%"><col style="width:21%"><col style="width:9%"><col style="width:11%"><col style="width:10%"><col style="width:7%"></colgroup>
+      <thead><tr>
+        <th>Client</th><th>Centre</th><th>Type</th><th>Libellé</th>
+        <th class="td-r">Montant HT</th><th class="td-c">Périodicité</th><th class="td-r">Lissé/mois</th><th class="td-c">Statut</th>
+      </tr></thead>
       <tbody id="tbody-recettes"></tbody>
     </table>
-    <div class="rpt-total"><span>Total nominal HT : <span id="total-rec-nominal"></span></span><span>Total lissé mensuel HT : <span id="total-rec-lisse"></span></span></div>
+    <div class="rpt-total">
+      <span>Total nominal HT : <span id="total-rec-nominal"></span></span>
+      <span>Total lissé mensuel HT : <span id="total-rec-lisse"></span></span>
+    </div>
   </div>
 
-  <!-- CHARGES -->
-  <div class="rpt-section no-break">
-    <div class="rpt-section-title">💰 CHARGES RÉCURRENTES — Actives aujourd'hui</div>
-    <table class="detail-tbl">
-      <colgroup><col style="width:19%"><col style="width:14%"><col style="width:13%"><col style="width:25%"><col style="width:10%"><col style="width:11%"><col style="width:8%"></colgroup>
-      <thead><tr><th>Fournisseur</th><th>Catégorie</th><th>Type</th><th>Libellé</th><th class="td-right">Montant HT</th><th class="td-center">Périodicité</th><th class="td-right">Lissé/mois</th></tr></thead>
+  <!-- 2. Charges récurrentes -->
+  <div class="rpt-section sec-charges no-break">
+    <div class="rpt-h1 charges">💰 CHARGES RÉCURRENTES — Actives aujourd'hui</div>
+    <table class="data-tbl">
+      <colgroup><col style="width:19%"><col style="width:13%"><col style="width:13%"><col style="width:25%"><col style="width:10%"><col style="width:12%"><col style="width:8%"></colgroup>
+      <thead><tr>
+        <th>Fournisseur</th><th>Catégorie</th><th>Type</th><th>Libellé</th>
+        <th class="td-r">Montant HT</th><th class="td-c">Périodicité</th><th class="td-r">Lissé/mois</th>
+      </tr></thead>
       <tbody id="tbody-charges-rec"></tbody>
     </table>
-    <div class="rpt-total"><span>Total nominal HT : <span id="total-chr-nominal"></span></span><span>Total lissé mensuel HT : <span id="total-chr-lisse"></span></span></div>
+    <div class="rpt-total">
+      <span>Total nominal HT : <span id="total-chr-nominal"></span></span>
+      <span>Total lissé mensuel HT : <span id="total-chr-lisse"></span></span>
+    </div>
   </div>
 
-  <div class="rpt-footer"><span>🚀 Rocket Tower — Rapport Financier Mensuel</span><span id="rpt-men-footer-date"></span></div>
+  <!-- 3. Variations connues (généré dynamiquement) -->
+  <div id="section-variations"></div>
+
+  <div class="rpt-footer">
+    <span>🚀 Rocket Tower — Rapport Financier Mensuel</span>
+    <span id="rpt-men-footer-date"></span>
+  </div>
 </div>
 
 
@@ -251,11 +283,14 @@
     </div>
     <div class="rpt-header-right" id="rpt-prev-info"></div>
   </div>
-  <div class="rpt-section">
-    <div class="rpt-section-title">🔮 PROJECTION MENSUELLE</div>
-    <table class="detail-tbl">
-      <colgroup><col style="width:16%"><col style="width:21%"><col style="width:21%"><col style="width:21%"><col style="width:21%"></colgroup>
-      <thead><tr><th>Mois</th><th class="td-right">Recettes HT</th><th class="td-right">Charges HT</th><th class="td-right">Solde mensuel</th><th class="td-right">Solde cumulé</th></tr></thead>
+  <div class="rpt-section sec-recettes">
+    <div class="rpt-h1 analytics">🔮 PROJECTION MENSUELLE</div>
+    <table class="data-tbl">
+      <colgroup><col style="width:18%"><col style="width:21%"><col style="width:21%"><col style="width:20%"><col style="width:20%"></colgroup>
+      <thead><tr>
+        <th>Mois</th><th class="td-r">Recettes HT</th><th class="td-r">Charges HT</th>
+        <th class="td-r">Solde mensuel</th><th class="td-r">Solde cumulé</th>
+      </tr></thead>
       <tbody id="tbody-prev"></tbody>
     </table>
   </div>
@@ -267,131 +302,119 @@
     <div class="summary-row"><span>Solde initial</span><span id="sum-solde-init"></span></div>
     <div class="summary-row"><span>Solde final projeté</span><span id="sum-solde-fin"></span></div>
   </div>
-  <div class="rpt-footer"><span>🚀 Rocket Tower — Prévisionnel 12 Mois</span><span id="rpt-prev-footer-date"></span></div>
+  <div class="rpt-footer">
+    <span>🚀 Rocket Tower — Prévisionnel 12 Mois</span>
+    <span id="rpt-prev-footer-date"></span>
+  </div>
 </div>
 
 
 <!-- ============================================================ JAVASCRIPT ============================================================ -->
 <script>
   const eur  = v => (parseFloat(v)||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0});
-  const pct  = v => (parseFloat(v)||0).toFixed(1)+' %';
   const fmtD = d => new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
   const dateStr = () => new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
   const FACT = {MENSUEL:1,BIMESTRIEL:2,TRIMESTRIEL:3,SEMESTRIEL:6,ANNUEL:12};
   const lisse = (m,p) => m/(FACT[(p||'').toUpperCase()]||1);
 
-  // ---- Dates horizons ----
+  /* ---- Horizons ---- */
   const today = new Date(); today.setHours(0,0,0,0);
   const d3m  = new Date(today); d3m.setMonth(d3m.getMonth()+3);
   const d6m  = new Date(today); d6m.setMonth(d6m.getMonth()+6);
   const d12m = new Date(today); d12m.setMonth(d12m.getMonth()+12);
 
-  // ---- Filtrage : un contrat est-il actif À une date donnée ? ----
+  /* ---- Un contrat est-il actif à une date donnée ? ---- */
   function estActifA(r, date) {
     if (r.statut !== 'ACTIF') return false;
-    if (r.entrant === true && r.dateEntree) {
-      if (new Date(r.dateEntree) > date) return false;      // pas encore arrivé
-    }
+    if (r.entrant === true && r.dateEntree && new Date(r.dateEntree) > date) return false;
     if (r.sortant === true && r.dateDepart) {
       const dd = new Date(r.dateDepart); dd.setHours(0,0,0,0);
-      if (dd < date) return false;                           // déjà parti
+      if (dd < date) return false;
     }
     return true;
   }
 
-  // ---- Calcul d'une situation à une date ----
-  function calculerSituation(recettes, charges, date) {
-    const tR = recettes.filter(r=>estActifA(r,date)).reduce((s,r)=>s+lisse(r.montantHT,r.periodicite),0);
-    const tC = charges.filter(c=>estActifA(c,date)).reduce((s,c)=>s+Math.abs(lisse(c.montantHT,c.periodicite)),0);
-    return { recettes: tR, charges: tC, resultat: tR-tC };
+  /* ---- Situation financière à une date ---- */
+  function calcSit(rec, chr, date) {
+    const tR = rec.filter(r=>estActifA(r,date)).reduce((s,r)=>s+lisse(r.montantHT,r.periodicite),0);
+    const tC = chr.filter(c=>estActifA(c,date)).reduce((s,c)=>s+Math.abs(lisse(c.montantHT,c.periodicite)),0);
+    return { r:tR, c:tC, res:tR-tC };
   }
 
-  // ---- Variations entre deux dates ----
-  // Retourne les contrats qui changent de statut entre pStart et pEnd
-  function getVariations(items, pStart, pEnd, isCharge) {
-    const out = [];
+  /* ---- Variations entre deux dates ---- */
+  function getVar(items, pStart, pEnd, isCharge) {
+    const out=[];
     items.filter(r=>r.statut==='ACTIF').forEach(r=>{
-      // Entrée dans la période
       if (r.entrant===true && r.dateEntree) {
-        const de = new Date(r.dateEntree);
-        if (de > pStart && de <= pEnd) {
-          const impact = lisse(Math.abs(r.montantHT), r.periodicite);
-          out.push({
-            label:   isCharge ? (r.fournisseur||'—') : (r.client||'—'),
-            element: r.element||'',
-            type:    r.type||r.categorie||'',
-            date:    r.dateEntree,
-            motif:   isCharge ? 'Démarrage' : 'Entrée',
-            impactR: isCharge ? 0        : +impact,   // impact sur recettes
-            impactC: isCharge ? +impact  : 0           // impact sur charges (positif = hausse)
-          });
+        const de=new Date(r.dateEntree);
+        if (de>pStart && de<=pEnd) {
+          const imp=lisse(Math.abs(r.montantHT),r.periodicite);
+          out.push({ label:isCharge?(r.fournisseur||'—'):(r.client||'—'), element:r.element||'', type:r.type||r.categorie||'', date:r.dateEntree, motif:isCharge?'Démarrage':'Entrée', impR:isCharge?0:+imp, impC:isCharge?+imp:0 });
         }
       }
-      // Sortie dans la période
       if (r.sortant===true && r.dateDepart) {
-        const dd = new Date(r.dateDepart); dd.setHours(0,0,0,0);
-        if (dd > pStart && dd <= pEnd) {
-          const impact = lisse(Math.abs(r.montantHT), r.periodicite);
-          out.push({
-            label:   isCharge ? (r.fournisseur||'—') : (r.client||'—'),
-            element: r.element||'',
-            type:    r.type||r.categorie||'',
-            date:    r.dateDepart,
-            motif:   isCharge ? 'Résiliation' : 'Départ',
-            impactR: isCharge ? 0       : -impact,
-            impactC: isCharge ? -impact : 0    // résiliation = baisse des charges
-          });
+        const dd=new Date(r.dateDepart); dd.setHours(0,0,0,0);
+        if (dd>pStart && dd<=pEnd) {
+          const imp=lisse(Math.abs(r.montantHT),r.periodicite);
+          out.push({ label:isCharge?(r.fournisseur||'—'):(r.client||'—'), element:r.element||'', type:r.type||r.categorie||'', date:r.dateDepart, motif:isCharge?'Résiliation':'Départ', impR:isCharge?0:-imp, impC:isCharge?-imp:0 });
         }
       }
     });
     return out.sort((a,b)=>new Date(a.date)-new Date(b.date));
   }
 
-  // ---- Construction HTML bloc variations ----
-  function buildVarBlock(label, recettes, charges, varRec, varChr) {
-    const totalImpactR = varRec.reduce((s,v)=>s+v.impactR,0);
-    const totalImpactC = varChr.reduce((s,v)=>s+v.impactC,0);
-    const netResult    = totalImpactR - totalImpactC;
-    const netClass     = netResult>0?'pos':netResult<0?'neg':'neu';
-    const netSign      = netResult>0?'+':'';
+  /* ---- Construction HTML d'un bloc variation ---- */
+  function buildVar(titre, varRec, varChr) {
+    const totImpR = varRec.reduce((s,v)=>s+v.impR,0);
+    // Pour résultat : entrée charge = impC positif = résultat se dégrade → contribution négative
+    // résiliation charge = impC négatif = résultat s'améliore → contribution positive
+    const totImpC = varChr.reduce((s,v)=>s+v.impC,0);  // hausse charges si positif
+    const net = totImpR - totImpC;                       // impact net sur résultat
+    const netSign = net>0?'+':''; const netCls = net>0?'c-pos':net<0?'c-neg':'c-neu';
 
-    if (varRec.length===0 && varChr.length===0) return `
-      <div class="var-block">
-        <div class="var-title"><span>${label}</span><span class="var-impact neu">Aucune variation — Impact net : 0 €/mois</span></div>
-      </div>`;
+    let html = `<div class="rpt-section sec-variations no-break">
+      <div class="rpt-h1 variations">📋 ${titre}</div>`;
 
-    let html = `<div class="var-block"><div class="var-title"><span>${label}</span><span class="var-impact ${netClass}">Impact net sur résultat : ${netSign}${eur(netResult)}/mois</span></div>`;
-
-    if (varRec.length > 0) {
-      html += `<div class="var-tbl-title">RECETTES</div>
-      <table class="detail-tbl">
-        <thead><tr><th style="width:22%">Client</th><th style="width:15%">Type</th><th style="width:30%">Libellé</th><th style="width:10%">Date</th><th style="width:10%">Motif</th><th style="width:13%" class="td-right">Impact/mois</th></tr></thead>
-        <tbody>`;
-      varRec.forEach(v=>{
-        const imp = v.impactR; const cl = imp>0?'pos':'neg';
-        html += `<tr><td>${v.label}</td><td>${v.type}</td><td>${v.element}</td><td>${fmtD(v.date)}</td><td>${v.motif}</td><td class="td-right ${cl}">${imp>0?'+':''}${eur(imp)}</td></tr>`;
-      });
-      html += `</tbody></table><div class="var-subtotal">Total impact recettes : <span class="${totalImpactR>=0?'pos':'neg'}">${totalImpactR>0?'+':''}${eur(totalImpactR)}</span></div>`;
+    if (varRec.length===0 && varChr.length===0) {
+      html += `<p style="font-size:8pt;color:#666;padding:4pt 0;font-style:italic;">Aucune variation connue sur cette période.</p>`;
+    } else {
+      // Tableau recettes (si présent)
+      if (varRec.length > 0) {
+        html += `<table class="data-tbl">
+          <colgroup><col style="width:24%"><col style="width:14%"><col style="width:28%"><col style="width:12%"><col style="width:10%"><col style="width:12%"></colgroup>
+          <thead><tr>
+            <th>Recettes</th><th>Type</th><th>Libellé</th>
+            <th class="td-c">Date</th><th class="td-c">Motif</th><th class="td-r">Impact/mois</th>
+          </tr></thead><tbody>`;
+        varRec.forEach(v=>{
+          const cl=v.impR>0?'c-pos':'c-neg';
+          html += `<tr><td>${v.label}</td><td>${v.type}</td><td>${v.element}</td><td class="td-c">${fmtD(v.date)}</td><td class="td-c">${v.motif}</td><td class="td-r ${cl}">${v.impR>0?'+':''}${eur(v.impR)}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+      // Tableau charges (si présent)
+      if (varChr.length > 0) {
+        html += `<table class="data-tbl" style="margin-top:2pt">
+          <colgroup><col style="width:24%"><col style="width:14%"><col style="width:28%"><col style="width:12%"><col style="width:10%"><col style="width:12%"></colgroup>
+          <thead><tr>
+            <th>Charges</th><th>Type</th><th>Libellé</th>
+            <th class="td-c">Date</th><th class="td-c">Motif</th><th class="td-r">Impact/mois</th>
+          </tr></thead><tbody>`;
+        varChr.forEach(v=>{
+          // Impact sur résultat : résiliation = améliore résultat (+), démarrage = dégrade (-)
+          const impResult = -v.impC;
+          const cl = impResult>0?'c-pos':'c-neg';
+          html += `<tr><td>${v.label}</td><td>${v.type}</td><td>${v.element}</td><td class="td-c">${fmtD(v.date)}</td><td class="td-c">${v.motif}</td><td class="td-r ${cl}">${impResult>0?'+':''}${eur(impResult)}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+      html += `<div class="var-net">Impact net sur résultat : <span class="${netCls}">${netSign}${eur(net)} / mois</span></div>`;
     }
-
-    if (varChr.length > 0) {
-      html += `<div class="var-tbl-title">CHARGES</div>
-      <table class="detail-tbl">
-        <thead><tr><th style="width:22%">Fournisseur</th><th style="width:15%">Type</th><th style="width:30%">Libellé</th><th style="width:10%">Date</th><th style="width:10%">Motif</th><th style="width:13%" class="td-right">Impact/mois</th></tr></thead>
-        <tbody>`;
-      varChr.forEach(v=>{
-        // Pour les charges : résiliation = résultat s'améliore (+), démarrage = résultat se dégrade (-)
-        const impResult = -v.impactC; // impactC positif = hausse charges = résultat se dégrade
-        const cl = impResult>=0?'pos':'neg';
-        html += `<tr><td>${v.label}</td><td>${v.type}</td><td>${v.element}</td><td>${fmtD(v.date)}</td><td>${v.motif}</td><td class="td-right ${cl}">${impResult>0?'+':''}${eur(impResult)}</td></tr>`;
-      });
-      html += `</tbody></table><div class="var-subtotal">Total impact charges sur résultat : <span class="${totalImpactC<=0?'pos':'neg'}">${-totalImpactC>=0?'+':''}${eur(-totalImpactC)}</span></div>`;
-    }
-
     html += `</div>`;
     return html;
   }
 
+  /* ---- Données ---- */
   let recettes=[], chargesRec=[], previsionnel=null;
 
   function chargerDonnees() {
@@ -412,12 +435,7 @@
     const tRL = recAct.reduce((s,r)=>s+lisse(r.montantHT,r.periodicite),0);
     const tCL = chrAct.reduce((s,c)=>s+Math.abs(lisse(c.montantHT,c.periodicite)),0);
 
-    const entrantsFuturs  = recettes.filter(r=>r.statut==='ACTIF'&&r.entrant&&r.dateEntree&&new Date(r.dateEntree)>today).length;
-    const sortantsActuels = recettes.filter(r=>estActifA(r,today)&&r.sortant===true&&r.dateDepart).length;
-
-    document.getElementById('count-rec').textContent =
-      recAct.length+' effectifs'+(entrantsFuturs>0?' · '+entrantsFuturs+' entrant(s) futur(s) exclu(s)':'')+
-      (sortantsActuels>0?' · dont '+sortantsActuels+' sortant(s) en cours':'');
+    document.getElementById('count-rec').textContent  = recAct.length+' effectifs / '+recettes.length+' total';
     document.getElementById('count-chr').textContent  = chrAct.length+' effectifs / '+chargesRec.length+' total';
     document.getElementById('count-prev').textContent = prevMois>0?prevMois+' mois projetés':'Non calculé';
     document.getElementById('meta-mensuel').textContent = 'Résultat courant : '+eur(tRL-tCL)+' / mois';
@@ -433,92 +451,85 @@
     }
   }
 
+  /* ---- Construction rapport mensuel ---- */
   function construireRapportMensuel() {
     const recAct = recettes.filter(r=>estActifA(r,today));
     const chrAct = chargesRec.filter(c=>estActifA(c,today));
     const d = dateStr();
     document.getElementById('rpt-men-date').textContent = d;
     document.getElementById('rpt-men-footer-date').textContent = 'Généré le '+d;
-    document.getElementById('rpt-men-counts').innerHTML = recAct.length+' recettes · '+chrAct.length+' charges récurrentes';
+    document.getElementById('rpt-men-counts').textContent = recAct.length+' recettes · '+chrAct.length+' charges';
 
-    // ---- Calcul des 4 situations ----
-    const s0  = calculerSituation(recettes, chargesRec, today);
-    const s3  = calculerSituation(recettes, chargesRec, d3m);
-    const s6  = calculerSituation(recettes, chargesRec, d6m);
-    const s12 = calculerSituation(recettes, chargesRec, d12m);
+    /* ---- 4 situations ---- */
+    const s0=calcSit(recettes,chargesRec,today);
+    const s3=calcSit(recettes,chargesRec,d3m);
+    const s6=calcSit(recettes,chargesRec,d6m);
+    const s12=calcSit(recettes,chargesRec,d12m);
 
-    const diff = (a,b) => {
-      const d=b-a; if(Math.abs(d)<0.5) return '<span class="neu">—</span>';
-      return `<span class="${d>0?'pos':'neg'}">${d>0?'+':''}${eur(d)}</span>`;
-    };
-    const cls = v => v>0?'pos':v<0?'neg':'neu';
+    const diff=(a,b)=>{ const d=b-a; if(Math.abs(d)<0.5) return ''; const s=d>0?'+':''; const cl=d>0?'c-pos':'c-neg'; return `<span class="c-diff ${cl}">${s}${eur(d)}</span>`; };
+    const cl=v=>v>0?'c-pos':v<0?'c-neg':'c-neu';
 
-    // ---- Tableau comparatif ----
-    const tbody = document.getElementById('tbody-horizons');
-    tbody.innerHTML = `
+    document.getElementById('tbody-horizons').innerHTML = `
       <tr>
-        <td class="td-label">Recettes HT lissées / mois</td>
-        <td class="td-val td-val-act pos">${eur(s0.recettes)}</td>
-        <td class="td-val td-val-proj">${eur(s3.recettes)}<br><span style="font-size:7pt;font-weight:normal">${diff(s0.recettes,s3.recettes)}</span></td>
-        <td class="td-val td-val-proj">${eur(s6.recettes)}<br><span style="font-size:7pt;font-weight:normal">${diff(s3.recettes,s6.recettes)}</span></td>
-        <td class="td-val td-val-proj">${eur(s12.recettes)}<br><span style="font-size:7pt;font-weight:normal">${diff(s6.recettes,s12.recettes)}</span></td>
+        <td class="td-lbl">Recettes HT lissées / mois</td>
+        <td class="td-act c-pos">${eur(s0.r)}</td>
+        <td class="td-proj c-pos">${eur(s3.r)}${diff(s0.r,s3.r)}</td>
+        <td class="td-proj c-pos">${eur(s6.r)}${diff(s3.r,s6.r)}</td>
+        <td class="td-proj c-pos">${eur(s12.r)}${diff(s6.r,s12.r)}</td>
       </tr>
       <tr>
-        <td class="td-label">Charges HT lissées / mois</td>
-        <td class="td-val td-val-act neg">${eur(s0.charges)}</td>
-        <td class="td-val td-val-proj neg">${eur(s3.charges)}<br><span style="font-size:7pt;font-weight:normal">${diff(s0.charges,s3.charges)}</span></td>
-        <td class="td-val td-val-proj neg">${eur(s6.charges)}<br><span style="font-size:7pt;font-weight:normal">${diff(s3.charges,s6.charges)}</span></td>
-        <td class="td-val td-val-proj neg">${eur(s12.charges)}<br><span style="font-size:7pt;font-weight:normal">${diff(s6.charges,s12.charges)}</span></td>
+        <td class="td-lbl">Charges HT lissées / mois</td>
+        <td class="td-act c-neg">${eur(s0.c)}</td>
+        <td class="td-proj c-neg">${eur(s3.c)}${diff(s0.c,s3.c)}</td>
+        <td class="td-proj c-neg">${eur(s6.c)}${diff(s3.c,s6.c)}</td>
+        <td class="td-proj c-neg">${eur(s12.c)}${diff(s6.c,s12.c)}</td>
       </tr>
-      <tr class="tr-resultat">
-        <td class="td-label">Résultat mensuel HT</td>
-        <td class="td-val td-val-act ${cls(s0.resultat)}">${eur(s0.resultat)}</td>
-        <td class="td-val td-val-proj ${cls(s3.resultat)}">${eur(s3.resultat)}<br><span style="font-size:7pt;font-weight:normal">${diff(s0.resultat,s3.resultat)}</span></td>
-        <td class="td-val td-val-proj ${cls(s6.resultat)}">${eur(s6.resultat)}<br><span style="font-size:7pt;font-weight:normal">${diff(s3.resultat,s6.resultat)}</span></td>
-        <td class="td-val td-val-proj ${cls(s12.resultat)}">${eur(s12.resultat)}<br><span style="font-size:7pt;font-weight:normal">${diff(s6.resultat,s12.resultat)}</span></td>
+      <tr class="tr-res">
+        <td class="td-lbl">Résultat mensuel HT</td>
+        <td class="td-act ${cl(s0.res)}">${eur(s0.res)}</td>
+        <td class="td-proj ${cl(s3.res)}">${eur(s3.res)}${diff(s0.res,s3.res)}</td>
+        <td class="td-proj ${cl(s6.res)}">${eur(s6.res)}${diff(s3.res,s6.res)}</td>
+        <td class="td-proj ${cl(s12.res)}">${eur(s12.res)}${diff(s6.res,s12.res)}</td>
       </tr>`;
 
-    // ---- Variations entre périodes ----
-    const varR_p1 = getVariations(recettes,  today, d3m,  false);
-    const varC_p1 = getVariations(chargesRec,today, d3m,  true);
-    const varR_p2 = getVariations(recettes,  d3m,   d6m,  false);
-    const varC_p2 = getVariations(chargesRec,d3m,   d6m,  true);
-    const varR_p3 = getVariations(recettes,  d6m,   d12m, false);
-    const varC_p3 = getVariations(chargesRec,d6m,   d12m, true);
-
-    const fmtH = d => d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
-    document.getElementById('section-variations').innerHTML =
-      buildVarBlock(`Variations connues — aujourd'hui (${fmtH(today)}) → 3 mois (${fmtH(d3m)})`, recettes, chargesRec, varR_p1, varC_p1) +
-      buildVarBlock(`Variations connues — 3 mois (${fmtH(d3m)}) → 6 mois (${fmtH(d6m)})`,       recettes, chargesRec, varR_p2, varC_p2) +
-      buildVarBlock(`Variations connues — 6 mois (${fmtH(d6m)}) → 12 mois (${fmtH(d12m)})`,     recettes, chargesRec, varR_p3, varC_p3);
-
-    // ---- Tableau recettes ----
+    /* ---- Tableau recettes ---- */
     const tbR=document.getElementById('tbody-recettes'); tbR.innerHTML='';
     let tRN=0,tRL=0;
     recAct.forEach(r=>{
       const l=lisse(r.montantHT,r.periodicite); tRN+=r.montantHT; tRL+=l;
       const isSortant=r.sortant===true&&r.dateDepart&&estActifA(r,today);
-      const tag=isSortant?'<span class="tag-sortant">↗ sortant '+fmtD(r.dateDepart)+'</span>':'';
+      const tag=isSortant?`<span class="tag-sortant">↗ sortant ${fmtD(r.dateDepart)}</span>`:'';
       const tr=document.createElement('tr'); if(isSortant)tr.className='row-sortant';
-      tr.innerHTML='<td>'+(r.client||'—')+' '+tag+'</td><td>'+(r.centre||'—')+'</td><td>'+(r.type||'—')+'</td><td>'+(r.element||'—')+'</td><td class="td-right">'+eur(r.montantHT)+'</td><td class="td-center"><span class="badge-per">'+(r.periodicite||'—')+'</span></td><td class="td-right">'+eur(l)+'</td><td class="td-center">'+(r.statut||'—')+'</td>';
+      tr.innerHTML=`<td>${r.client||'—'} ${tag}</td><td>${r.centre||'—'}</td><td>${r.type||'—'}</td><td>${r.element||'—'}</td><td class="td-r">${eur(r.montantHT)}</td><td class="td-c"><span class="badge-per">${r.periodicite||'—'}</span></td><td class="td-r">${eur(l)}</td><td class="td-c">${r.statut||'—'}</td>`;
       tbR.appendChild(tr);
     });
     document.getElementById('total-rec-nominal').textContent=eur(tRN);
     document.getElementById('total-rec-lisse').textContent=eur(tRL);
 
-    // ---- Tableau charges ----
+    /* ---- Tableau charges ---- */
     const tbC=document.getElementById('tbody-charges-rec'); tbC.innerHTML='';
     let tCN=0,tCL=0;
-    chrAct.forEach(c=>{
+    chargesRec.filter(c=>estActifA(c,today)).forEach(c=>{
       const m=Math.abs(c.montantHT),l=lisse(m,c.periodicite); tCN+=m; tCL+=l;
       const tr=document.createElement('tr');
-      tr.innerHTML='<td>'+(c.fournisseur||'—')+'</td><td>'+(c.categorie||'—')+'</td><td>'+(c.type||'—')+'</td><td>'+(c.element||'—')+'</td><td class="td-right">'+eur(m)+'</td><td class="td-center"><span class="badge-per">'+(c.periodicite||'—')+'</span></td><td class="td-right">'+eur(l)+'</td>';
+      tr.innerHTML=`<td>${c.fournisseur||'—'}</td><td>${c.categorie||'—'}</td><td>${c.type||'—'}</td><td>${c.element||'—'}</td><td class="td-r">${eur(m)}</td><td class="td-c"><span class="badge-per">${c.periodicite||'—'}</span></td><td class="td-r">${eur(l)}</td>`;
       tbC.appendChild(tr);
     });
     document.getElementById('total-chr-nominal').textContent=eur(tCN);
     document.getElementById('total-chr-lisse').textContent=eur(tCL);
+
+    /* ---- Variations ---- */
+    const fmtH = d=>d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    document.getElementById('section-variations').innerHTML =
+      buildVar(`VARIATIONS CONNUES — aujourd'hui (${fmtH(today)}) → 3 mois (${fmtH(d3m)})`,
+        getVar(recettes,today,d3m,false), getVar(chargesRec,today,d3m,true)) +
+      buildVar(`VARIATIONS CONNUES — 3 mois (${fmtH(d3m)}) → 6 mois (${fmtH(d6m)})`,
+        getVar(recettes,d3m,d6m,false), getVar(chargesRec,d3m,d6m,true)) +
+      buildVar(`VARIATIONS CONNUES — 6 mois (${fmtH(d6m)}) → 12 mois (${fmtH(d12m)})`,
+        getVar(recettes,d6m,d12m,false), getVar(chargesRec,d6m,d12m,true));
   }
 
+  /* ---- Construction prévisionnel ---- */
   function construireRapportPrevisionnel() {
     if(!previsionnel?.projectionMensuelle) return;
     const pm=previsionnel.projectionMensuelle;
@@ -529,7 +540,7 @@
     const tb=document.getElementById('tbody-prev'); tb.innerHTML='';
     pm.forEach(m=>{
       const tr=document.createElement('tr');
-      tr.innerHTML='<td>'+m.mois+'</td><td class="td-right">'+eur(m.totalRecettes)+'</td><td class="td-right">'+eur(m.totalCharges)+'</td><td class="td-right"><span class="'+(m.solde>=0?'prev-pos':'prev-neg')+'">'+eur(m.solde)+'</span></td><td class="td-right"><span class="'+(m.soldeCumule>=0?'prev-pos':'prev-neg')+'">'+eur(m.soldeCumule)+'</span></td>';
+      tr.innerHTML=`<td>${m.mois}</td><td class="td-r">${eur(m.totalRecettes)}</td><td class="td-r">${eur(m.totalCharges)}</td><td class="td-r"><span class="${m.solde>=0?'prev-pos':'prev-neg'}">${eur(m.solde)}</span></td><td class="td-r"><span class="${m.soldeCumule>=0?'prev-pos':'prev-neg'}">${eur(m.soldeCumule)}</span></td>`;
       tb.appendChild(tr);
     });
     const tR=pm.reduce((s,m)=>s+m.totalRecettes,0),tC=pm.reduce((s,m)=>s+m.totalCharges,0),res=tR-tC;
@@ -538,9 +549,10 @@
     document.getElementById('sum-chr-ann').textContent=eur(tC);
     document.getElementById('sum-solde-init').textContent=eur(sI);
     document.getElementById('sum-solde-fin').textContent=eur(sF);
-    const elR=document.getElementById('sum-res-ann'); elR.textContent=eur(res); elR.style.color=res>=0?'#1a7a40':'#b91c1c'; elR.style.fontWeight='bold';
+    const el=document.getElementById('sum-res-ann'); el.textContent=eur(res); el.style.color=res>=0?'#1a7a40':'#b71c1c'; el.style.fontWeight='bold';
   }
 
+  /* ---- Exports ---- */
   function exporterRapportMensuel() {
     construireRapportMensuel();
     document.body.className='mode-mensuel';
@@ -553,7 +565,6 @@
     window.print();
     setTimeout(()=>{ document.body.className=''; },500);
   }
-
   function previsualiserMensuel() {
     construireRapportMensuel();
     const el=document.getElementById('report-mensuel');
