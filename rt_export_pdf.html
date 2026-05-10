@@ -60,8 +60,6 @@
 
       .rpt-section { margin-bottom: 7pt; page-break-inside: avoid; }
       .rpt-section-title { font-size: 9.5pt; font-weight: bold; background: #222; color: #fff; padding: 2.5pt 5pt; margin-bottom: 2pt; }
-      .rpt-section-note { font-size: 7pt; color: #666; font-style: italic; padding: 1.5pt 5pt 3pt; border: 0.4pt dashed #bbb; margin-bottom: 2pt; background: #fafafa; }
-      .rpt-section-info .rpt-section-title { background: #777; }
 
       table { width: 100%; border-collapse: collapse; font-size: 8pt; table-layout: fixed; }
       th { background: #444; color: #fff; font-weight: bold; padding: 2pt 4pt; text-align: left; border: 0.4pt solid #555; font-size: 7.5pt; }
@@ -117,7 +115,6 @@
       <h3>📦 Données chargées — situation au <span id="dateAujourdhui"></span></h3>
       <div class="status-item"><div class="dot" id="dot-rec"></div><span class="status-label">Recettes actives aujourd'hui :</span><span class="status-count" id="count-rec">—</span></div>
       <div class="status-item"><div class="dot" id="dot-chr"></div><span class="status-label">Charges actives aujourd'hui :</span><span class="status-count" id="count-chr">—</span></div>
-      <div class="status-item"><div class="dot" id="dot-per"></div><span class="status-label">Charges périodiques (info) :</span><span class="status-count" id="count-per">—</span></div>
       <div class="status-item"><div class="dot" id="dot-prev"></div><span class="status-label">Prévisionnel :</span><span class="status-count" id="count-prev">—</span></div>
     </div>
 
@@ -201,17 +198,6 @@
     </div>
   </div>
 
-  <div class="rpt-section rpt-section-info no-break">
-    <div class="rpt-section-title">📅 CHARGES PÉRIODIQUES — Information uniquement (non incluses dans la balance)</div>
-    <div class="rpt-section-note">Ces charges annuelles ou semestrielles sont affichées à titre de rappel. Elles ne sont pas intégrées dans la synthèse analytique ci-dessus.</div>
-    <table>
-      <colgroup><col style="width:9%"><col style="width:17%"><col style="width:20%"><col style="width:20%"><col style="width:10%"><col style="width:11%"><col style="width:13%"></colgroup>
-      <thead><tr><th>Centre</th><th>Catégorie</th><th>Libellé</th><th>Fournisseur</th><th class="td-right">Montant HT</th><th class="td-center">Périodicité</th><th class="td-right">Équiv. lissé/mois</th></tr></thead>
-      <tbody id="tbody-charges-per"></tbody>
-    </table>
-    <div class="rpt-total"><span>Total nominal HT : <span id="total-per-nominal"></span></span><span>Équivalent lissé mensuel HT : <span id="total-per-lisse"></span></span></div>
-  </div>
-
   <div class="rpt-footer"><span>🚀 Rocket Tower — Rapport Mensuel</span><span id="rpt-men-footer-date"></span></div>
 </div>
 
@@ -275,12 +261,11 @@
   }
   const estSortantActif = r => r.sortant === true && r.dateDepart && estActifAujourdhui(r);
 
-  let recettes=[], chargesRec=[], chargesPer=[], previsionnel=null;
+  let recettes=[], chargesRec=[], previsionnel=null;
 
   function chargerDonnees() {
     try { recettes    = JSON.parse(localStorage.getItem('recettesRT')||'[]'); }           catch(e){ recettes=[]; }
     try { chargesRec  = JSON.parse(localStorage.getItem('chargesRecurrentesRT')||'[]'); } catch(e){ chargesRec=[]; }
-    try { chargesPer  = JSON.parse(localStorage.getItem('chargesPeriodiquesRT')||'[]'); } catch(e){ chargesPer=[]; }
     try { previsionnel= JSON.parse(localStorage.getItem('previsionnel12moisRT')||'null'); } catch(e){ previsionnel=null; }
 
     const recAct  = recettes.filter(estActifAujourdhui);
@@ -292,7 +277,7 @@
 
     const dot=(id,n)=>{ document.getElementById(id).className='dot '+(n>0?'ok':'warn'); };
     dot('dot-rec',recAct.length); dot('dot-chr',chrAct.length);
-    dot('dot-per',chargesPer.length); dot('dot-prev',prevMois);
+    dot('dot-prev',prevMois);
 
     const entrantsFuturs = recettes.filter(r=>r.statut==='ACTIF'&&r.entrant&&r.dateEntree&&new Date(r.dateEntree)>today).length;
     const sortantsActuels= recettes.filter(estSortantActif).length;
@@ -301,7 +286,6 @@
       recAct.length+' effectifs'+(entrantsFuturs>0?' · '+entrantsFuturs+' entrant(s) futur(s) exclu(s)':'')+
       (sortantsActuels>0?' · dont '+sortantsActuels+' sortant(s) en cours':'');
     document.getElementById('count-chr').textContent  = chrAct.length+' effectifs / '+chargesRec.length+' total';
-    document.getElementById('count-per').textContent  = chargesPer.length+' entrées (hors balance)';
     document.getElementById('count-prev').textContent = prevMois>0?prevMois+' mois projetés':'Non calculé';
 
     const tRL = recAct.reduce((s,r)=>s+lisse(r.montantHT,r.periodicite),0);
@@ -364,17 +348,6 @@
     document.getElementById('ac-equilibre').className='ac-value '+(eq?'ac-positive':'ac-negative');
     document.getElementById('ac-equilibre-sub').textContent=eq?'Excédent : '+eur(res)+' / mois':'Déficit : '+eur(Math.abs(res))+' / mois';
 
-    // Charges périodiques — informatif uniquement
-    const tbP=document.getElementById('tbody-charges-per'); tbP.innerHTML='';
-    let tPN=0,tPL=0;
-    chargesPer.forEach(c=>{
-      const m=Math.abs(c.montantHT),l=lisse(m,c.periodicite); tPN+=m; tPL+=l;
-      const tr=document.createElement('tr');
-      tr.innerHTML='<td>'+(c.centre||'—')+'</td><td>'+(c.categorie||'—')+'</td><td>'+(c.element||'—')+'</td><td>'+(c.fournisseur||'—')+'</td><td class="td-right">'+eur(m)+'</td><td class="td-center"><span class="badge-per">'+(c.periodicite||'—')+'</span></td><td class="td-right">'+eur(l)+'</td>';
-      tbP.appendChild(tr);
-    });
-    document.getElementById('total-per-nominal').textContent=eur(tPN);
-    document.getElementById('total-per-lisse').textContent=eur(tPL);
   }
 
   function construireRapportPrevisionnel() {
