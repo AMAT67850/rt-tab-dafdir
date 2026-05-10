@@ -6,26 +6,24 @@
   <title>🚀 Rocket Tower — Export PDF</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f1923; color: #e2e8f0; min-height: 100vh; }
-    .header { background: linear-gradient(135deg, #0f1923 0%, #1a2d3d 100%); border-bottom: 2px solid #27ae60; padding: 28px 40px; display: flex; align-items: center; gap: 20px; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f1923; color: #e2e8f0; min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #0f1923, #1a2d3d); border-bottom: 2px solid #27ae60; padding: 28px 40px; display: flex; align-items: center; gap: 20px; }
     .header-logo { font-size: 2.2em; }
     .header-text h1 { font-size: 1.6em; color: #fff; }
     .header-text p  { font-size: 0.85em; color: #94a3b8; margin-top: 3px; }
     .header-nav { margin-left: auto; }
     .nav-link { display: inline-block; padding: 8px 16px; background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.4); border-radius: 6px; color: #4ade80; text-decoration: none; font-size: 0.82em; }
-    .nav-link:hover { background: rgba(39,174,96,0.25); }
     .container { max-width: 860px; margin: 0 auto; padding: 36px 24px; }
-    .data-status { background: #1e2d3d; border: 1px solid #2d4a5e; border-radius: 10px; padding: 18px 22px; margin-bottom: 32px; display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+    .data-status { background: #1e2d3d; border: 1px solid #2d4a5e; border-radius: 10px; padding: 18px 22px; margin-bottom: 32px; display: flex; gap: 24px; flex-wrap: wrap; }
     .data-status h3 { font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; width: 100%; margin-bottom: 6px; }
     .status-item { display: flex; align-items: center; gap: 8px; font-size: 0.83em; }
     .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .dot.ok   { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
     .dot.warn { background: #f59e0b; }
-    .dot.err  { background: #ef4444; }
     .status-label { color: #94a3b8; }
     .status-count { color: #e2e8f0; font-weight: 600; }
     .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 640px) { .export-grid { grid-template-columns: 1fr; } }
+    @media (max-width:640px) { .export-grid { grid-template-columns: 1fr; } }
     .export-card { background: #1e2d3d; border: 1px solid #2d4a5e; border-radius: 12px; padding: 28px 24px; display: flex; flex-direction: column; gap: 14px; }
     .export-card:hover { border-color: #27ae60; }
     .card-icon  { font-size: 2em; }
@@ -35,7 +33,7 @@
     .card-contents li { font-size: 0.79em; color: #64748b; padding-left: 14px; position: relative; }
     .card-contents li::before { content: '›'; position: absolute; left: 0; color: #27ae60; font-weight: bold; }
     .card-meta { font-size: 0.75em; color: #475569; }
-    .btn-export { margin-top: auto; padding: 11px 18px; background: linear-gradient(135deg, #27ae60, #2ecc71); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 0.88em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-export { margin-top: auto; padding: 11px 18px; background: linear-gradient(135deg,#27ae60,#2ecc71); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 0.88em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-export:hover { opacity: 0.9; }
     .btn-export:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-secondary { padding: 9px 18px; background: transparent; border: 1px solid #2d4a5e; border-radius: 8px; color: #94a3b8; font-size: 0.82em; cursor: pointer; text-align: center; }
@@ -53,63 +51,92 @@
       body.mode-previsionnel #report-previsionnel { display: block !important; }
       body.mode-previsionnel #report-mensuel      { display: none  !important; }
 
-      .rpt-header { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.5pt solid #000; padding-bottom: 5pt; margin-bottom: 8pt; }
+      /* En-tête */
+      .rpt-header { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.5pt solid #000; padding-bottom: 5pt; margin-bottom: 6pt; }
       .rpt-header-left h1 { font-size: 13pt; font-weight: bold; margin-bottom: 1pt; }
       .rpt-header-left p  { font-size: 8pt; color: #444; }
       .rpt-header-right   { text-align: right; font-size: 7.5pt; color: #444; }
 
-      .rpt-section { margin-bottom: 7pt; page-break-inside: avoid; }
-      .rpt-section-title { font-size: 9.5pt; font-weight: bold; background: #222; color: #fff; padding: 2.5pt 5pt; margin-bottom: 2pt; }
+      /* Texte intro */
+      .rpt-intro { font-size: 8pt; color: #333; font-style: italic; line-height: 1.5; border-left: 2pt solid #555; padding: 4pt 8pt; margin-bottom: 7pt; background: #f9f9f9; page-break-inside: avoid; }
 
-      table { width: 100%; border-collapse: collapse; font-size: 8pt; table-layout: fixed; }
-      th { background: #444; color: #fff; font-weight: bold; padding: 2pt 4pt; text-align: left; border: 0.4pt solid #555; font-size: 7.5pt; }
-      td { padding: 1.8pt 4pt; border: 0.4pt solid #ccc; vertical-align: top; word-break: break-word; }
-      tr:nth-child(even) td { background: #f7f7f7; }
-      tr.row-sortant td { background: #fff8f0 !important; }
+      /* Sections */
+      .rpt-section { margin-bottom: 7pt; page-break-inside: avoid; }
+      .rpt-section-title { font-size: 9.5pt; font-weight: bold; background: #222; color: #fff; padding: 2.5pt 5pt; margin-bottom: 3pt; }
+
+      /* Tableau comparatif 4 horizons */
+      .tbl-horizons { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 4pt; }
+      .tbl-horizons th { background: #333; color: #fff; padding: 3pt 6pt; text-align: center; border: 0.5pt solid #444; font-size: 8pt; }
+      .tbl-horizons th.th-label { text-align: left; background: #555; }
+      .tbl-horizons td { padding: 3pt 6pt; border: 0.5pt solid #ccc; }
+      .tbl-horizons td.td-label { font-weight: bold; font-size: 8pt; background: #f5f5f5; }
+      .tbl-horizons td.td-val  { text-align: right; white-space: nowrap; }
+      .tbl-horizons td.td-diff { text-align: right; font-size: 7pt; color: #666; white-space: nowrap; }
+      .tbl-horizons tr.tr-resultat td { font-weight: bold; background: #f0f0f0; }
+      .pos { color: #1a7a40; }
+      .neg { color: #b91c1c; }
+      .neu { color: #555; }
+
+      /* KPIs actuels */
+      .kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5pt; margin-bottom: 5pt; }
+      .kpi-cell { border: 0.5pt solid #bbb; padding: 4pt 5pt; text-align: center; }
+      .kpi-label { font-size: 7pt; color: #555; margin-bottom: 2pt; }
+      .kpi-value { font-size: 13pt; font-weight: bold; }
+      .kpi-sub   { font-size: 7pt; color: #777; margin-top: 1pt; }
+
+      /* Variations */
+      .var-block { margin-bottom: 5pt; page-break-inside: avoid; }
+      .var-title { font-size: 8pt; font-weight: bold; background: #eee; border: 0.4pt solid #bbb; padding: 2pt 5pt; margin-bottom: 2pt; display: flex; justify-content: space-between; }
+      .var-impact { font-size: 7.5pt; font-style: italic; }
+      table.var-tbl { width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-bottom: 2pt; }
+      table.var-tbl th { background: #666; color: #fff; padding: 1.5pt 4pt; font-size: 7pt; border: 0.3pt solid #777; }
+      table.var-tbl td { padding: 1.5pt 4pt; border: 0.3pt solid #ddd; vertical-align: top; }
+      table.var-tbl tr:nth-child(even) td { background: #fafafa; }
+      .var-tbl-title { font-size: 7.5pt; font-weight: bold; color: #333; padding: 2pt 0 1pt; }
+      .var-subtotal { text-align: right; font-size: 7.5pt; font-weight: bold; padding: 2pt 5pt; border-top: 0.5pt solid #999; background: #f5f5f5; }
+      .var-net { text-align: right; font-size: 8pt; font-weight: bold; padding: 3pt 5pt; border-top: 1pt solid #555; background: #eee; }
+
+      /* Tableaux détail */
+      table.detail-tbl { width: 100%; border-collapse: collapse; font-size: 8pt; table-layout: fixed; }
+      table.detail-tbl th { background: #444; color: #fff; font-weight: bold; padding: 2pt 4pt; text-align: left; border: 0.4pt solid #555; font-size: 7.5pt; }
+      table.detail-tbl td { padding: 1.8pt 4pt; border: 0.4pt solid #ccc; vertical-align: top; word-break: break-word; }
+      table.detail-tbl tr:nth-child(even) td { background: #f7f7f7; }
+      table.detail-tbl tr.row-sortant td { background: #fff8f0 !important; }
       .td-right  { text-align: right; white-space: nowrap; }
       .td-center { text-align: center; }
+      .badge-per { font-size: 6.5pt; padding: 0.5pt 3pt; border-radius: 2pt; border: 0.4pt solid #aaa; white-space: nowrap; }
       .tag-sortant { font-size: 6pt; color: #b45309; background: #fef3c7; border: 0.3pt solid #d97706; padding: 0.5pt 2pt; border-radius: 1pt; white-space: nowrap; }
-      .badge-per  { font-size: 6.5pt; padding: 0.5pt 3pt; border-radius: 2pt; border: 0.4pt solid #aaa; white-space: nowrap; }
 
       .rpt-total { display: flex; justify-content: flex-end; gap: 20pt; padding: 3pt 5pt; border-top: 1pt solid #000; background: #f0f0f0; font-size: 8.5pt; font-weight: bold; page-break-inside: avoid; }
       .rpt-total span { white-space: nowrap; }
 
-      .analytics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5pt; margin-top: 2pt; }
-      .analytics-cell { border: 0.5pt solid #bbb; padding: 4pt 5pt; text-align: center; }
-      .analytics-cell .ac-label { font-size: 7pt; color: #555; margin-bottom: 2pt; }
-      .analytics-cell .ac-value { font-size: 11pt; font-weight: bold; }
-      .analytics-cell .ac-sub   { font-size: 7pt; color: #666; margin-top: 1pt; }
-      .ac-positive { color: #1a7a40; }
-      .ac-negative { color: #b91c1c; }
-      .ac-neutral  { color: #000; }
-
       .page-break { page-break-before: always; }
       .no-break   { page-break-inside: avoid; }
 
-      .rpt-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 7pt; color: #777; border-top: 0.4pt solid #ccc; padding: 3pt 0 0; display: flex; justify-content: space-between; }
-
+      /* Prévisionnel */
       .prev-pos { color: #1a7a40; font-weight: bold; }
       .prev-neg { color: #b91c1c; font-weight: bold; }
-
       .rpt-summary { margin-top: 6pt; border: 0.5pt solid #999; padding: 4pt 6pt; background: #f5f5f5; page-break-inside: avoid; }
       .rpt-summary h3 { font-size: 8.5pt; font-weight: bold; margin-bottom: 4pt; border-bottom: 0.5pt solid #aaa; padding-bottom: 2pt; }
       .summary-row { display: flex; justify-content: space-between; font-size: 8pt; padding: 1.5pt 0; border-bottom: 0.3pt solid #ddd; }
       .summary-row:last-child { border-bottom: none; font-weight: bold; font-size: 8.5pt; }
+
+      .rpt-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 7pt; color: #777; border-top: 0.4pt solid #ccc; padding: 3pt 0 0; display: flex; justify-content: space-between; }
     }
   </style>
 </head>
 <body>
 
+<!-- ============================================================ ÉCRAN ============================================================ -->
 <div class="screen-only">
   <div class="header">
     <div class="header-logo">🚀</div>
     <div class="header-text">
       <h1>Rocket Tower — Export PDF</h1>
-      <p>Situation actuelle — contrats effectifs aujourd'hui</p>
+      <p>Situation actuelle et projections — contrats effectifs</p>
     </div>
     <div class="header-nav"><a href="index.html" class="nav-link">← Dashboard</a></div>
   </div>
-
   <div class="container">
     <div class="data-status">
       <h3>📦 Données chargées — situation au <span id="dateAujourdhui"></span></h3>
@@ -117,23 +144,21 @@
       <div class="status-item"><div class="dot" id="dot-chr"></div><span class="status-label">Charges actives aujourd'hui :</span><span class="status-count" id="count-chr">—</span></div>
       <div class="status-item"><div class="dot" id="dot-prev"></div><span class="status-label">Prévisionnel :</span><span class="status-count" id="count-prev">—</span></div>
     </div>
-
     <div class="export-grid">
       <div class="export-card">
         <div class="card-icon">📊</div>
         <div class="card-title">Rapport Mensuel</div>
-        <div class="card-desc">Situation financière effective aujourd'hui, basée sur les contrats en cours.</div>
+        <div class="card-desc">Synthèse financière pour la direction, avec projections sur 12 mois.</div>
         <ul class="card-contents">
-          <li>Recettes actives (entrants futurs et sortants partis exclus)</li>
-          <li>Charges récurrentes actives (même filtrage)</li>
-          <li>Charges périodiques — informatif uniquement, hors balance</li>
-          <li>Synthèse analytique (recettes vs charges récurrentes)</li>
+          <li>Texte introductif</li>
+          <li>Synthèse analytique : situation actuelle + projections 3 / 6 / 12 mois</li>
+          <li>Variations connues entre chaque période</li>
+          <li>Détail recettes et charges actives</li>
         </ul>
         <div class="card-meta" id="meta-mensuel">—</div>
         <button class="btn-export" id="btn-mensuel" onclick="exporterRapportMensuel()">🖨️ Imprimer Rapport Mensuel</button>
         <button class="btn-secondary" onclick="previsualiserMensuel()">👁 Prévisualiser</button>
       </div>
-
       <div class="export-card">
         <div class="card-icon">🔮</div>
         <div class="card-title">Prévisionnel 12 Mois</div>
@@ -148,37 +173,68 @@
         <button class="btn-secondary" onclick="previsualiserPrevisionnel()">👁 Prévisualiser</button>
       </div>
     </div>
-
     <div class="info-box">
-      <strong>ℹ️ Filtrage appliqué :</strong> Seuls les contrats <strong>effectifs aujourd'hui</strong> sont comptabilisés — entrants dont la date d'arrivée est future et sortants dont la date de départ est passée sont exclus. Les sortants encore présents aujourd'hui apparaissent en surbrillance orange. Les charges périodiques sont affichées à titre informatif mais <strong>ne sont pas incluses dans la balance analytique</strong>. Pour générer le PDF, choisissez <strong>« Enregistrer en PDF »</strong> dans la boîte d'impression.
+      <strong>ℹ️ Filtrage appliqué :</strong> Seuls les contrats <strong>effectifs à chaque date</strong> sont comptabilisés. Les projections à 3, 6 et 12 mois sont calculées automatiquement à partir des dates d'entrée et de sortie enregistrées. Pour générer le PDF, choisissez <strong>« Enregistrer en PDF »</strong> dans la boîte d'impression.
     </div>
   </div>
 </div>
 
-
-<!-- RAPPORT MENSUEL -->
+<!-- ============================================================ RAPPORT MENSUEL ============================================================ -->
 <div id="report-mensuel">
+
   <div class="rpt-header">
     <div class="rpt-header-left">
-      <h1>🚀 ROCKET TOWER — Rapport Mensuel</h1>
-      <p>Contrats effectifs aujourd'hui — <span id="rpt-men-date"></span></p>
+      <h1>🚀 ROCKET TOWER — Rapport Financier Mensuel</h1>
+      <p>Situation au <span id="rpt-men-date"></span> — <span id="rpt-men-counts"></span></p>
     </div>
-    <div class="rpt-header-right" id="rpt-men-counts"></div>
+    <div class="rpt-header-right" id="rpt-men-right"></div>
   </div>
 
+  <!-- Texte introductif -->
+  <div class="rpt-intro" id="rpt-intro-text">
+    Sur la base des contrats de recettes et des charges récurrentes effectivement actifs à ce jour, le résultat mensuel lissé de Rocket Tower s'établit comme présenté ci-dessous. Ces chiffres reflètent la situation contractuelle réelle — les entrées dont la date d'arrivée est future et les sorties déjà effectives sont exclues du calcul. Les variations connues (entrées et sorties planifiées) permettent d'anticiper l'évolution de ce résultat à 3, 6 et 12 mois. Le détail des recettes et charges enregistrées dans le tableau de bord financier figure en pages suivantes.
+  </div>
+
+  <!-- SYNTHÈSE ANALYTIQUE -->
+  <div class="rpt-section no-break">
+    <div class="rpt-section-title">📊 SYNTHÈSE ANALYTIQUE — Situation actuelle et projections</div>
+
+    <!-- Tableau comparatif 4 horizons -->
+    <table class="tbl-horizons" id="tbl-horizons">
+      <thead>
+        <tr>
+          <th class="th-label">Indicateur</th>
+          <th>📸 Situation actuelle</th>
+          <th>⏰ À 3 mois</th>
+          <th>📆 À 6 mois</th>
+          <th>📅 À 12 mois</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-horizons"></tbody>
+    </table>
+  </div>
+
+  <!-- VARIATIONS ENTRE PÉRIODES -->
+  <div id="section-variations"></div>
+
+  <!-- PAGE BREAK avant le détail -->
+  <div class="page-break"></div>
+
+  <!-- RECETTES -->
   <div class="rpt-section no-break">
     <div class="rpt-section-title">💵 RECETTES RÉCURRENTES — Contrats actifs aujourd'hui</div>
-    <table>
-      <colgroup><col style="width:19%"><col style="width:8%"><col style="width:16%"><col style="width:21%"><col style="width:9%"><col style="width:11%"><col style="width:9%"><col style="width:7%"></colgroup>
+    <table class="detail-tbl">
+      <colgroup><col style="width:20%"><col style="width:8%"><col style="width:15%"><col style="width:22%"><col style="width:9%"><col style="width:11%"><col style="width:8%"><col style="width:7%"></colgroup>
       <thead><tr><th>Client</th><th>Centre</th><th>Type</th><th>Libellé</th><th class="td-right">Montant HT</th><th class="td-center">Périodicité</th><th class="td-right">Lissé/mois</th><th class="td-center">Statut</th></tr></thead>
       <tbody id="tbody-recettes"></tbody>
     </table>
     <div class="rpt-total"><span>Total nominal HT : <span id="total-rec-nominal"></span></span><span>Total lissé mensuel HT : <span id="total-rec-lisse"></span></span></div>
   </div>
 
+  <!-- CHARGES -->
   <div class="rpt-section no-break">
     <div class="rpt-section-title">💰 CHARGES RÉCURRENTES — Actives aujourd'hui</div>
-    <table>
+    <table class="detail-tbl">
       <colgroup><col style="width:19%"><col style="width:14%"><col style="width:13%"><col style="width:25%"><col style="width:10%"><col style="width:11%"><col style="width:8%"></colgroup>
       <thead><tr><th>Fournisseur</th><th>Catégorie</th><th>Type</th><th>Libellé</th><th class="td-right">Montant HT</th><th class="td-center">Périodicité</th><th class="td-right">Lissé/mois</th></tr></thead>
       <tbody id="tbody-charges-rec"></tbody>
@@ -186,23 +242,11 @@
     <div class="rpt-total"><span>Total nominal HT : <span id="total-chr-nominal"></span></span><span>Total lissé mensuel HT : <span id="total-chr-lisse"></span></span></div>
   </div>
 
-  <div class="rpt-section no-break">
-    <div class="rpt-section-title">📊 SYNTHÈSE ANALYTIQUE — Recettes vs Charges récurrentes</div>
-    <div class="analytics-grid">
-      <div class="analytics-cell"><div class="ac-label">Recettes lissées / mois</div><div class="ac-value ac-positive" id="ac-recettes">—</div><div class="ac-sub">HT · contrats effectifs</div></div>
-      <div class="analytics-cell"><div class="ac-label">Charges récurrentes lissées / mois</div><div class="ac-value ac-negative" id="ac-charges">—</div><div class="ac-sub">HT · hors charges périodiques</div></div>
-      <div class="analytics-cell"><div class="ac-label">Résultat mensuel</div><div class="ac-value" id="ac-resultat">—</div><div class="ac-sub">Recettes − Charges récurrentes</div></div>
-      <div class="analytics-cell"><div class="ac-label">Ratio charges / recettes</div><div class="ac-value" id="ac-ratio">—</div><div class="ac-sub">Charges ÷ Recettes</div></div>
-      <div class="analytics-cell"><div class="ac-label">Marge opérationnelle</div><div class="ac-value" id="ac-marge">—</div><div class="ac-sub">Résultat ÷ Recettes</div></div>
-      <div class="analytics-cell"><div class="ac-label">Équilibre financier</div><div class="ac-value" id="ac-equilibre">—</div><div class="ac-sub" id="ac-equilibre-sub"></div></div>
-    </div>
-  </div>
-
-  <div class="rpt-footer"><span>🚀 Rocket Tower — Rapport Mensuel</span><span id="rpt-men-footer-date"></span></div>
+  <div class="rpt-footer"><span>🚀 Rocket Tower — Rapport Financier Mensuel</span><span id="rpt-men-footer-date"></span></div>
 </div>
 
 
-<!-- RAPPORT PRÉVISIONNEL -->
+<!-- ============================================================ RAPPORT PRÉVISIONNEL ============================================================ -->
 <div id="report-previsionnel">
   <div class="rpt-header">
     <div class="rpt-header-left">
@@ -211,16 +255,14 @@
     </div>
     <div class="rpt-header-right" id="rpt-prev-info"></div>
   </div>
-
   <div class="rpt-section">
     <div class="rpt-section-title">🔮 PROJECTION MENSUELLE</div>
-    <table>
+    <table class="detail-tbl">
       <colgroup><col style="width:16%"><col style="width:21%"><col style="width:21%"><col style="width:21%"><col style="width:21%"></colgroup>
       <thead><tr><th>Mois</th><th class="td-right">Recettes HT</th><th class="td-right">Charges HT</th><th class="td-right">Solde mensuel</th><th class="td-right">Solde cumulé</th></tr></thead>
       <tbody id="tbody-prev"></tbody>
     </table>
   </div>
-
   <div class="rpt-summary no-break">
     <h3>Récapitulatif annuel</h3>
     <div class="summary-row"><span>Total recettes annuelles HT</span><span id="sum-rec-ann"></span></div>
@@ -229,37 +271,130 @@
     <div class="summary-row"><span>Solde initial</span><span id="sum-solde-init"></span></div>
     <div class="summary-row"><span>Solde final projeté</span><span id="sum-solde-fin"></span></div>
   </div>
-
   <div class="rpt-footer"><span>🚀 Rocket Tower — Prévisionnel 12 Mois</span><span id="rpt-prev-footer-date"></span></div>
 </div>
 
 
+<!-- ============================================================ JAVASCRIPT ============================================================ -->
 <script>
-  const eur = v => (parseFloat(v)||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0});
-  const pct = v => (parseFloat(v)||0).toFixed(1)+' %';
+  const eur  = v => (parseFloat(v)||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0});
+  const pct  = v => (parseFloat(v)||0).toFixed(1)+' %';
+  const fmtD = d => new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
   const dateStr = () => new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-  const FACTEURS = {MENSUEL:1,BIMESTRIEL:2,TRIMESTRIEL:3,SEMESTRIEL:6,ANNUEL:12};
-  const lisse = (m, p) => m / (FACTEURS[(p||'').toUpperCase()] || 1);
+  const FACT = {MENSUEL:1,BIMESTRIEL:2,TRIMESTRIEL:3,SEMESTRIEL:6,ANNUEL:12};
+  const lisse = (m,p) => m/(FACT[(p||'').toUpperCase()]||1);
 
-  // --- Filtrage date ---
-  // Un contrat est actif aujourd'hui si :
-  //   statut ACTIF
-  //   + si entrant=true : dateEntree <= aujourd'hui (sinon pas encore arrivé → exclu)
-  //   + si sortant=true : dateDepart >= aujourd'hui (sinon déjà parti → exclu)
+  // ---- Dates horizons ----
   const today = new Date(); today.setHours(0,0,0,0);
+  const d3m  = new Date(today); d3m.setMonth(d3m.getMonth()+3);
+  const d6m  = new Date(today); d6m.setMonth(d6m.getMonth()+6);
+  const d12m = new Date(today); d12m.setMonth(d12m.getMonth()+12);
 
-  function estActifAujourdhui(r) {
+  // ---- Filtrage : un contrat est-il actif À une date donnée ? ----
+  function estActifA(r, date) {
     if (r.statut !== 'ACTIF') return false;
     if (r.entrant === true && r.dateEntree) {
-      if (new Date(r.dateEntree) > today) return false;
+      if (new Date(r.dateEntree) > date) return false;      // pas encore arrivé
     }
     if (r.sortant === true && r.dateDepart) {
       const dd = new Date(r.dateDepart); dd.setHours(0,0,0,0);
-      if (dd < today) return false;
+      if (dd < date) return false;                           // déjà parti
     }
     return true;
   }
-  const estSortantActif = r => r.sortant === true && r.dateDepart && estActifAujourdhui(r);
+
+  // ---- Calcul d'une situation à une date ----
+  function calculerSituation(recettes, charges, date) {
+    const tR = recettes.filter(r=>estActifA(r,date)).reduce((s,r)=>s+lisse(r.montantHT,r.periodicite),0);
+    const tC = charges.filter(c=>estActifA(c,date)).reduce((s,c)=>s+Math.abs(lisse(c.montantHT,c.periodicite)),0);
+    return { recettes: tR, charges: tC, resultat: tR-tC };
+  }
+
+  // ---- Variations entre deux dates ----
+  // Retourne les contrats qui changent de statut entre pStart et pEnd
+  function getVariations(items, pStart, pEnd, isCharge) {
+    const out = [];
+    items.filter(r=>r.statut==='ACTIF').forEach(r=>{
+      // Entrée dans la période
+      if (r.entrant===true && r.dateEntree) {
+        const de = new Date(r.dateEntree);
+        if (de > pStart && de <= pEnd) {
+          const impact = lisse(Math.abs(r.montantHT), r.periodicite);
+          out.push({
+            label:   isCharge ? (r.fournisseur||'—') : (r.client||'—'),
+            element: r.element||'',
+            type:    r.type||r.categorie||'',
+            date:    r.dateEntree,
+            motif:   isCharge ? 'Démarrage' : 'Entrée',
+            impactR: isCharge ? 0        : +impact,   // impact sur recettes
+            impactC: isCharge ? +impact  : 0           // impact sur charges (positif = hausse)
+          });
+        }
+      }
+      // Sortie dans la période
+      if (r.sortant===true && r.dateDepart) {
+        const dd = new Date(r.dateDepart); dd.setHours(0,0,0,0);
+        if (dd > pStart && dd <= pEnd) {
+          const impact = lisse(Math.abs(r.montantHT), r.periodicite);
+          out.push({
+            label:   isCharge ? (r.fournisseur||'—') : (r.client||'—'),
+            element: r.element||'',
+            type:    r.type||r.categorie||'',
+            date:    r.dateDepart,
+            motif:   isCharge ? 'Résiliation' : 'Départ',
+            impactR: isCharge ? 0       : -impact,
+            impactC: isCharge ? -impact : 0    // résiliation = baisse des charges
+          });
+        }
+      }
+    });
+    return out.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  }
+
+  // ---- Construction HTML bloc variations ----
+  function buildVarBlock(label, recettes, charges, varRec, varChr) {
+    const totalImpactR = varRec.reduce((s,v)=>s+v.impactR,0);
+    const totalImpactC = varChr.reduce((s,v)=>s+v.impactC,0);
+    const netResult    = totalImpactR - totalImpactC;
+    const netClass     = netResult>0?'pos':netResult<0?'neg':'neu';
+    const netSign      = netResult>0?'+':'';
+
+    if (varRec.length===0 && varChr.length===0) return `
+      <div class="var-block">
+        <div class="var-title"><span>${label}</span><span class="var-impact neu">Aucune variation — Impact net : 0 €/mois</span></div>
+      </div>`;
+
+    let html = `<div class="var-block"><div class="var-title"><span>${label}</span><span class="var-impact ${netClass}">Impact net sur résultat : ${netSign}${eur(netResult)}/mois</span></div>`;
+
+    if (varRec.length > 0) {
+      html += `<div class="var-tbl-title">RECETTES</div>
+      <table class="var-tbl">
+        <thead><tr><th style="width:22%">Client</th><th style="width:15%">Type</th><th style="width:30%">Libellé</th><th style="width:10%">Date</th><th style="width:10%">Motif</th><th style="width:13%" class="td-right">Impact/mois</th></tr></thead>
+        <tbody>`;
+      varRec.forEach(v=>{
+        const imp = v.impactR; const cl = imp>0?'pos':'neg';
+        html += `<tr><td>${v.label}</td><td>${v.type}</td><td>${v.element}</td><td>${fmtD(v.date)}</td><td>${v.motif}</td><td class="td-right ${cl}">${imp>0?'+':''}${eur(imp)}</td></tr>`;
+      });
+      html += `</tbody></table><div class="var-subtotal">Total impact recettes : <span class="${totalImpactR>=0?'pos':'neg'}">${totalImpactR>0?'+':''}${eur(totalImpactR)}</span></div>`;
+    }
+
+    if (varChr.length > 0) {
+      html += `<div class="var-tbl-title">CHARGES</div>
+      <table class="var-tbl">
+        <thead><tr><th style="width:22%">Fournisseur</th><th style="width:15%">Type</th><th style="width:30%">Libellé</th><th style="width:10%">Date</th><th style="width:10%">Motif</th><th style="width:13%" class="td-right">Impact/mois</th></tr></thead>
+        <tbody>`;
+      varChr.forEach(v=>{
+        // Pour les charges : résiliation = résultat s'améliore (+), démarrage = résultat se dégrade (-)
+        const impResult = -v.impactC; // impactC positif = hausse charges = résultat se dégrade
+        const cl = impResult>=0?'pos':'neg';
+        html += `<tr><td>${v.label}</td><td>${v.type}</td><td>${v.element}</td><td>${fmtD(v.date)}</td><td>${v.motif}</td><td class="td-right ${cl}">${impResult>0?'+':''}${eur(impResult)}</td></tr>`;
+      });
+      html += `</tbody></table><div class="var-subtotal">Total impact charges sur résultat : <span class="${totalImpactC<=0?'pos':'neg'}">${-totalImpactC>=0?'+':''}${eur(-totalImpactC)}</span></div>`;
+    }
+
+    html += `</div>`;
+    return html;
+  }
 
   let recettes=[], chargesRec=[], previsionnel=null;
 
@@ -268,29 +403,29 @@
     try { chargesRec  = JSON.parse(localStorage.getItem('chargesRecurrentesRT')||'[]'); } catch(e){ chargesRec=[]; }
     try { previsionnel= JSON.parse(localStorage.getItem('previsionnel12moisRT')||'null'); } catch(e){ previsionnel=null; }
 
-    const recAct  = recettes.filter(estActifAujourdhui);
-    const chrAct  = chargesRec.filter(estActifAujourdhui);
+    const recAct  = recettes.filter(r=>estActifA(r,today));
+    const chrAct  = chargesRec.filter(c=>estActifA(c,today));
     const prevMois= previsionnel?.projectionMensuelle?.length||0;
 
     document.getElementById('dateAujourdhui').textContent =
       today.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
 
     const dot=(id,n)=>{ document.getElementById(id).className='dot '+(n>0?'ok':'warn'); };
-    dot('dot-rec',recAct.length); dot('dot-chr',chrAct.length);
-    dot('dot-prev',prevMois);
+    dot('dot-rec',recAct.length); dot('dot-chr',chrAct.length); dot('dot-prev',prevMois);
 
-    const entrantsFuturs = recettes.filter(r=>r.statut==='ACTIF'&&r.entrant&&r.dateEntree&&new Date(r.dateEntree)>today).length;
-    const sortantsActuels= recettes.filter(estSortantActif).length;
+    const tRL = recAct.reduce((s,r)=>s+lisse(r.montantHT,r.periodicite),0);
+    const tCL = chrAct.reduce((s,c)=>s+Math.abs(lisse(c.montantHT,c.periodicite)),0);
+
+    const entrantsFuturs  = recettes.filter(r=>r.statut==='ACTIF'&&r.entrant&&r.dateEntree&&new Date(r.dateEntree)>today).length;
+    const sortantsActuels = recettes.filter(r=>estActifA(r,today)&&r.sortant===true&&r.dateDepart).length;
 
     document.getElementById('count-rec').textContent =
       recAct.length+' effectifs'+(entrantsFuturs>0?' · '+entrantsFuturs+' entrant(s) futur(s) exclu(s)':'')+
       (sortantsActuels>0?' · dont '+sortantsActuels+' sortant(s) en cours':'');
     document.getElementById('count-chr').textContent  = chrAct.length+' effectifs / '+chargesRec.length+' total';
     document.getElementById('count-prev').textContent = prevMois>0?prevMois+' mois projetés':'Non calculé';
-
-    const tRL = recAct.reduce((s,r)=>s+lisse(r.montantHT,r.periodicite),0);
-    const tCL = chrAct.reduce((s,c)=>s+Math.abs(lisse(c.montantHT,c.periodicite)),0);
-    document.getElementById('meta-mensuel').textContent = 'Résultat courant estimé : '+eur(tRL-tCL)+' / mois';
+    document.getElementById('meta-mensuel').textContent = 'Résultat courant : '+eur(tRL-tCL)+' / mois';
+    document.getElementById('btn-prev').disabled = prevMois===0;
 
     if(prevMois>0){
       const pm=previsionnel.projectionMensuelle;
@@ -300,24 +435,74 @@
     } else {
       document.getElementById('meta-prev').textContent = 'Calculer d\'abord depuis le module Prévisionnel';
     }
-    document.getElementById('btn-prev').disabled = prevMois===0;
   }
 
   function construireRapportMensuel() {
-    const recAct = recettes.filter(estActifAujourdhui);
-    const chrAct = chargesRec.filter(estActifAujourdhui);
+    const recAct = recettes.filter(r=>estActifA(r,today));
+    const chrAct = chargesRec.filter(c=>estActifA(c,today));
     const d = dateStr();
     document.getElementById('rpt-men-date').textContent = d;
     document.getElementById('rpt-men-footer-date').textContent = 'Généré le '+d;
     document.getElementById('rpt-men-counts').innerHTML = recAct.length+' recettes · '+chrAct.length+' charges récurrentes';
 
-    // Recettes
+    // ---- Calcul des 4 situations ----
+    const s0  = calculerSituation(recettes, chargesRec, today);
+    const s3  = calculerSituation(recettes, chargesRec, d3m);
+    const s6  = calculerSituation(recettes, chargesRec, d6m);
+    const s12 = calculerSituation(recettes, chargesRec, d12m);
+
+    const diff = (a,b) => {
+      const d=b-a; if(Math.abs(d)<0.5) return '<span class="neu">—</span>';
+      return `<span class="${d>0?'pos':'neg'}">${d>0?'+':''}${eur(d)}</span>`;
+    };
+    const cls = v => v>0?'pos':v<0?'neg':'neu';
+
+    // ---- Tableau comparatif ----
+    const tbody = document.getElementById('tbody-horizons');
+    tbody.innerHTML = `
+      <tr>
+        <td class="td-label">Recettes HT lissées / mois</td>
+        <td class="td-val pos">${eur(s0.recettes)}</td>
+        <td class="td-val ${cls(s3.recettes)}">${eur(s3.recettes)}<br><span style="font-size:7pt;color:#888">${diff(s0.recettes,s3.recettes)}</span></td>
+        <td class="td-val ${cls(s6.recettes)}">${eur(s6.recettes)}<br><span style="font-size:7pt;color:#888">${diff(s3.recettes,s6.recettes)}</span></td>
+        <td class="td-val ${cls(s12.recettes)}">${eur(s12.recettes)}<br><span style="font-size:7pt;color:#888">${diff(s6.recettes,s12.recettes)}</span></td>
+      </tr>
+      <tr>
+        <td class="td-label">Charges HT lissées / mois</td>
+        <td class="td-val neg">${eur(s0.charges)}</td>
+        <td class="td-val">${eur(s3.charges)}<br><span style="font-size:7pt;color:#888">${diff(s0.charges,s3.charges)}</span></td>
+        <td class="td-val">${eur(s6.charges)}<br><span style="font-size:7pt;color:#888">${diff(s3.charges,s6.charges)}</span></td>
+        <td class="td-val">${eur(s12.charges)}<br><span style="font-size:7pt;color:#888">${diff(s6.charges,s12.charges)}</span></td>
+      </tr>
+      <tr class="tr-resultat">
+        <td class="td-label">Résultat mensuel HT</td>
+        <td class="td-val ${cls(s0.resultat)}">${eur(s0.resultat)}</td>
+        <td class="td-val ${cls(s3.resultat)}">${eur(s3.resultat)}<br><span style="font-size:7pt">${diff(s0.resultat,s3.resultat)}</span></td>
+        <td class="td-val ${cls(s6.resultat)}">${eur(s6.resultat)}<br><span style="font-size:7pt">${diff(s3.resultat,s6.resultat)}</span></td>
+        <td class="td-val ${cls(s12.resultat)}">${eur(s12.resultat)}<br><span style="font-size:7pt">${diff(s6.resultat,s12.resultat)}</span></td>
+      </tr>`;
+
+    // ---- Variations entre périodes ----
+    const varR_p1 = getVariations(recettes,  today, d3m,  false);
+    const varC_p1 = getVariations(chargesRec,today, d3m,  true);
+    const varR_p2 = getVariations(recettes,  d3m,   d6m,  false);
+    const varC_p2 = getVariations(chargesRec,d3m,   d6m,  true);
+    const varR_p3 = getVariations(recettes,  d6m,   d12m, false);
+    const varC_p3 = getVariations(chargesRec,d6m,   d12m, true);
+
+    const fmtH = d => d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    document.getElementById('section-variations').innerHTML =
+      buildVarBlock(`Variations connues — aujourd'hui (${fmtH(today)}) → 3 mois (${fmtH(d3m)})`, recettes, chargesRec, varR_p1, varC_p1) +
+      buildVarBlock(`Variations connues — 3 mois (${fmtH(d3m)}) → 6 mois (${fmtH(d6m)})`,       recettes, chargesRec, varR_p2, varC_p2) +
+      buildVarBlock(`Variations connues — 6 mois (${fmtH(d6m)}) → 12 mois (${fmtH(d12m)})`,     recettes, chargesRec, varR_p3, varC_p3);
+
+    // ---- Tableau recettes ----
     const tbR=document.getElementById('tbody-recettes'); tbR.innerHTML='';
     let tRN=0,tRL=0;
     recAct.forEach(r=>{
       const l=lisse(r.montantHT,r.periodicite); tRN+=r.montantHT; tRL+=l;
-      const isSortant=estSortantActif(r);
-      const tag=isSortant?'<span class="tag-sortant">↗ sortant '+new Date(r.dateDepart).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})+'</span>':'';
+      const isSortant=r.sortant===true&&r.dateDepart&&estActifA(r,today);
+      const tag=isSortant?'<span class="tag-sortant">↗ sortant '+fmtD(r.dateDepart)+'</span>':'';
       const tr=document.createElement('tr'); if(isSortant)tr.className='row-sortant';
       tr.innerHTML='<td>'+(r.client||'—')+' '+tag+'</td><td>'+(r.centre||'—')+'</td><td>'+(r.type||'—')+'</td><td>'+(r.element||'—')+'</td><td class="td-right">'+eur(r.montantHT)+'</td><td class="td-center"><span class="badge-per">'+(r.periodicite||'—')+'</span></td><td class="td-right">'+eur(l)+'</td><td class="td-center">'+(r.statut||'—')+'</td>';
       tbR.appendChild(tr);
@@ -325,7 +510,7 @@
     document.getElementById('total-rec-nominal').textContent=eur(tRN);
     document.getElementById('total-rec-lisse').textContent=eur(tRL);
 
-    // Charges récurrentes
+    // ---- Tableau charges ----
     const tbC=document.getElementById('tbody-charges-rec'); tbC.innerHTML='';
     let tCN=0,tCL=0;
     chrAct.forEach(c=>{
@@ -336,18 +521,6 @@
     });
     document.getElementById('total-chr-nominal').textContent=eur(tCN);
     document.getElementById('total-chr-lisse').textContent=eur(tCL);
-
-    // Analytics — UNIQUEMENT recettes vs charges récurrentes, sans charges périodiques
-    const res=tRL-tCL, ratio=tRL>0?(tCL/tRL)*100:0, marge=tRL>0?(res/tRL)*100:0, eq=res>=0;
-    document.getElementById('ac-recettes').textContent=eur(tRL);
-    document.getElementById('ac-charges').textContent=eur(tCL);
-    const elR=document.getElementById('ac-resultat'); elR.textContent=eur(res); elR.className='ac-value '+(eq?'ac-positive':'ac-negative');
-    const elRa=document.getElementById('ac-ratio'); elRa.textContent=pct(ratio); elRa.className='ac-value '+(ratio<=80?'ac-positive':ratio<=100?'ac-neutral':'ac-negative');
-    const elM=document.getElementById('ac-marge'); elM.textContent=pct(marge); elM.className='ac-value '+(marge>=20?'ac-positive':marge>=0?'ac-neutral':'ac-negative');
-    document.getElementById('ac-equilibre').textContent=eq?'✓ ATTEINT':'✗ NON ATTEINT';
-    document.getElementById('ac-equilibre').className='ac-value '+(eq?'ac-positive':'ac-negative');
-    document.getElementById('ac-equilibre-sub').textContent=eq?'Excédent : '+eur(res)+' / mois':'Déficit : '+eur(Math.abs(res))+' / mois';
-
   }
 
   function construireRapportPrevisionnel() {
@@ -363,8 +536,8 @@
       tr.innerHTML='<td>'+m.mois+'</td><td class="td-right">'+eur(m.totalRecettes)+'</td><td class="td-right">'+eur(m.totalCharges)+'</td><td class="td-right"><span class="'+(m.solde>=0?'prev-pos':'prev-neg')+'">'+eur(m.solde)+'</span></td><td class="td-right"><span class="'+(m.soldeCumule>=0?'prev-pos':'prev-neg')+'">'+eur(m.soldeCumule)+'</span></td>';
       tb.appendChild(tr);
     });
-    const tR=pm.reduce((s,m)=>s+m.totalRecettes,0), tC=pm.reduce((s,m)=>s+m.totalCharges,0), res=tR-tC;
-    const sF=pm[pm.length-1].soldeCumule, sI=previsionnel.soldeInitial||(sF-res);
+    const tR=pm.reduce((s,m)=>s+m.totalRecettes,0),tC=pm.reduce((s,m)=>s+m.totalCharges,0),res=tR-tC;
+    const sF=pm[pm.length-1].soldeCumule,sI=previsionnel.soldeInitial||(sF-res);
     document.getElementById('sum-rec-ann').textContent=eur(tR);
     document.getElementById('sum-chr-ann').textContent=eur(tC);
     document.getElementById('sum-solde-init').textContent=eur(sI);
