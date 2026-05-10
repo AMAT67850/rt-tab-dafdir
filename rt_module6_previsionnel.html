@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ðŸ”® Rocket Tower - PrÃ©visionnel 12 Mois</title>
+    <title>ðŸ”® Rocket Tower - Prévisionnel 12 Mois</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <!-- PRINT CSS : Styles optimisÃ©s pour export PDF -->
+    <!-- PRINT CSS : Styles optimisés pour export PDF -->
     <style>
         @media print {
             /* MASQUER Ã‰LÃ‰MENTS NAVIGATION */
@@ -535,29 +535,29 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>ðŸ”® PrÃ©visionnel 12 Mois</h1>
-            <p>Projection financiÃ¨re automatique avec donnÃ©es rÃ©currentes + suivi rÃ©alisÃ©</p>
+            <h1>ðŸ”® Prévisionnel 12 Mois</h1>
+            <p>Projection financière automatique avec données récurrentes + suivi réalisé</p>
         </div>
 
-        <!-- ParamÃ¨tres -->
+        <!-- Paramètres -->
         <div class="param-grid">
             <div class="param-item">
                 <label for="soldeInitial">ðŸ’° Solde au 31/07/2025 :</label>
                 <input type="number" id="soldeInitial" value="18881.28" step="0.01">
             </div>
             <div class="param-item">
-                <label>ðŸ“… PÃ©riode :</label>
-                <div class="periode-display" id="periodeAffichage">AoÃ»t 2025 - Juillet 2026</div>
+                <label>ðŸ“… Période :</label>
+                <div class="periode-display" id="periodeAffichage">Août 2025 - Juillet 2026</div>
             </div>
             <div class="param-item">
-                <button onclick="calculerPrevisionnel()" class="btn btn-primary">ðŸ”® Calculer PrÃ©visionnel</button>
-                <button onclick="viderOperationsSpecifiques()" class="btn btn-secondary" style="background: #dc3545;">ðŸ—‘ï¸ Vider OpÃ©rations</button>
+                <button onclick="calculerPrevisionnel()" class="btn btn-primary">ðŸ”® Calculer Prévisionnel</button>
+                <button onclick="viderOperationsSpecifiques()" class="btn btn-secondary" style="background: #dc3545;">ðŸ—‘ï¸ Vider Opérations</button>
                 <button onclick="exporterPDF()" class="btn pdf-btn">ðŸ–¨ï¸ Export PDF</button>
                 <a href="index.html" class="btn btn-secondary">ðŸ  Dashboard</a>
             </div>
         </div>
 
-        <!-- Stats RÃ©sumÃ© -->
+        <!-- Stats Résumé -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3 id="totalRecettes">0â‚¬</h3>
@@ -569,41 +569,41 @@
             </div>
             <div class="stat-card">
                 <h3 id="resultatAnnuel">0â‚¬</h3>
-                <p>RÃ©sultat PrÃ©visionnel HT</p>
+                <p>Résultat Prévisionnel HT</p>
             </div>
             <div class="stat-card">
                 <h3 id="soldeFinal">0â‚¬</h3>
-                <p>Solde Final PrÃ©vu</p>
+                <p>Solde Final Prévu</p>
             </div>
         </div>
 
         <!-- Graphique -->
         <div class="chart-section">
-            <h2>ðŸ“ˆ Ã‰volution Solde CumulÃ©</h2>
+            <h2>ðŸ“ˆ Ã‰volution Solde Cumulé</h2>
             <div class="chart-container">
                 <canvas id="prevChart"></canvas>
             </div>
         </div>
 
-        <!-- AccordÃ©ons Mensuels -->
+        <!-- Accordéons Mensuels -->
         <div id="accordeonContainer">
-            <!-- GÃ©nÃ©rÃ© dynamiquement -->
+            <!-- Généré dynamiquement -->
         </div>
 
         <!-- INFORMATIONS POUR IMPRESSION - MASQUÃ‰ES Ã€ L'Ã‰CRAN -->
         <div class="print-info">
             <p><strong>ðŸš€ ROCKET TOWER - PRÃ‰VISIONNEL 12 MOIS</strong></p>
-            <p>Rapport gÃ©nÃ©rÃ© le <span id="dateImpression"></span> Ã  <span id="heureImpression"></span></p>
-            <p>PÃ©riode : <span id="periodeImpression">AoÃ»t 2025 - Juillet 2026</span></p>
-            <p>DonnÃ©es sources : Recettes + Charges rÃ©currentes â€¢ GÃ©nÃ©rÃ© automatiquement</p>
+            <p>Rapport généré le <span id="dateImpression"></span> à <span id="heureImpression"></span></p>
+            <p>Période : <span id="periodeImpression">Août 2025 - Juillet 2026</span></p>
+            <p>Données sources : Recettes + Charges récurrentes â€¢ Généré automatiquement</p>
         </div>
     </div>
 
-    <!-- Modal Ajout OpÃ©ration -->
+    <!-- Modal Ajout Opération -->
     <div id="modalOperation" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Nouvelle OpÃ©ration</h2>
+                <h2 id="modalTitle">Nouvelle Opération</h2>
                 <span class="close" onclick="fermerModal()">&times;</span>
             </div>
             <div class="modal-body">
@@ -616,8 +616,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>LibellÃ©</label>
-                        <input type="text" id="operationLibelle" required placeholder="Description de l'opÃ©ration">
+                        <label>Libellé</label>
+                        <input type="text" id="operationLibelle" required placeholder="Description de l'opération">
                     </div>
                     <div class="form-group">
                         <label>Montant (â‚¬)</label>
@@ -625,7 +625,7 @@
                     </div>
                     <div class="form-group">
                         <label>Commentaire</label>
-                        <textarea id="operationCommentaire" rows="3" placeholder="Informations complÃ©mentaires (optionnel)"></textarea>
+                        <textarea id="operationCommentaire" rows="3" placeholder="Informations complémentaires (optionnel)"></textarea>
                     </div>
                     <div class="form-buttons">
                         <button type="button" class="btn-modal btn-secondary" onclick="fermerModal()">Annuler</button>
@@ -656,18 +656,18 @@
             console.log('ðŸ“¥ === DÃ‰BUT CHARGEMENT DONNÃ‰ES ===');
             
             try {
-                // DIAGNOSTIC: VÃ©rifier ce qui existe dans localStorage
-                console.log('ðŸ” ClÃ©s localStorage disponibles:');
+                // DIAGNOSTIC: Vérifier ce qui existe dans localStorage
+                console.log('ðŸ” Clés localStorage disponibles:');
                 for (let i = 0; i < localStorage.length; i++) {
                     const cle = localStorage.key(i);
                     if (cle.includes('RT') || cle.includes('recettes') || cle.includes('charges')) {
-                        console.log(`  - ${cle}: ${localStorage.getItem(cle)?.length || 0} caractÃ¨res`);
+                        console.log(`  - ${cle}: ${localStorage.getItem(cle)?.length || 0} caractères`);
                     }
                 }
                 
                 // Chargement recettes
                 const recettesJSON = localStorage.getItem('recettesRT');
-                console.log('ðŸ“Š DonnÃ©es recettes brutes:', recettesJSON ? recettesJSON.substring(0, 200) + '...' : 'NULL');
+                console.log('ðŸ“Š Données recettes brutes:', recettesJSON ? recettesJSON.substring(0, 200) + '...' : 'NULL');
                 
                 if (recettesJSON) {
                     const toutesRecettes = JSON.parse(recettesJSON);
@@ -679,15 +679,15 @@
                     });
                     
                     recettesData = toutesRecettes.filter(r => r.statut === 'ACTIF');
-                    console.log(`ðŸ“Š Recettes actives filtrÃ©es: ${recettesData.length}`);
+                    console.log(`ðŸ“Š Recettes actives filtrées: ${recettesData.length}`);
                 } else {
                     recettesData = [];
-                    console.warn('âŒ recettesRT non trouvÃ© dans localStorage');
+                    console.warn('âŒ recettesRT non trouvé dans localStorage');
                 }
 
                 // Chargement charges
                 const chargesJSON = localStorage.getItem('chargesRecurrentesRT');
-                console.log('ðŸ“Š DonnÃ©es charges brutes:', chargesJSON ? chargesJSON.substring(0, 200) + '...' : 'NULL');
+                console.log('ðŸ“Š Données charges brutes:', chargesJSON ? chargesJSON.substring(0, 200) + '...' : 'NULL');
                 
                 if (chargesJSON) {
                     const toutesCharges = JSON.parse(chargesJSON);
@@ -699,21 +699,21 @@
                     });
                     
                     chargesData = toutesCharges.filter(c => c.statut === 'ACTIF');
-                    console.log(`ðŸ“Š Charges actives filtrÃ©es: ${chargesData.length}`);
+                    console.log(`ðŸ“Š Charges actives filtrées: ${chargesData.length}`);
                 } else {
                     chargesData = [];
-                    console.warn('âŒ chargesRecurrentesRT non trouvÃ© dans localStorage');
+                    console.warn('âŒ chargesRecurrentesRT non trouvé dans localStorage');
                 }
 
-                // Chargement prÃ©visionnel existant
+                // Chargement prévisionnel existant
                 const prevJSON = localStorage.getItem('previsionnel12moisRT');
                 if (prevJSON) {
                     const prevData = JSON.parse(prevJSON);
                     operationsSpecifiques = prevData.operationsSpecifiques || {};
-                    console.log(`ðŸ“Š OpÃ©rations spÃ©cifiques chargÃ©es: ${Object.keys(operationsSpecifiques).length} mois`);
+                    console.log(`ðŸ“Š Opérations spécifiques chargées: ${Object.keys(operationsSpecifiques).length} mois`);
                 } else {
                     operationsSpecifiques = {};
-                    console.log('ðŸ“Š Aucune opÃ©ration spÃ©cifique existante');
+                    console.log('ðŸ“Š Aucune opération spécifique existante');
                 }
 
                 console.log('âœ… === FIN CHARGEMENT DONNÃ‰ES ===');
@@ -723,14 +723,14 @@
                     operations: Object.keys(operationsSpecifiques).length
                 });
 
-                // ALERTE si aucune donnÃ©e
+                // ALERTE si aucune donnée
                 if (recettesData.length === 0 && chargesData.length === 0) {
-                    alert('âš ï¸ AUCUNE DONNÃ‰E TROUVÃ‰E !\n\nLe prÃ©visionnel ne trouve pas les donnÃ©es des modules Recettes et Charges.\n\nVÃ©rifiez que vous avez bien des donnÃ©es dans les modules 2 et 3.');
+                    alert('âš ï¸ AUCUNE DONNÃ‰E TROUVÃ‰E !\n\nLe prévisionnel ne trouve pas les données des modules Recettes et Charges.\n\nVérifiez que vous avez bien des données dans les modules 2 et 3.');
                 }
 
             } catch (error) {
                 console.error('âŒ Erreur chargement:', error);
-                alert('Erreur lors du chargement des donnÃ©es: ' + error.message);
+                alert('Erreur lors du chargement des données: ' + error.message);
             }
         }
 
@@ -747,7 +747,7 @@
                 // HOOK SYNCHRONISATION : Marquer changement pour sync
                 localStorage.setItem('previsionnel12moisRT_lastModified', new Date().toISOString());
                 
-                console.log('ðŸ’¾ PrÃ©visionnel sauvegardÃ©');
+                console.log('ðŸ’¾ Prévisionnel sauvegardé');
             } catch (error) {
                 console.error('âŒ Erreur sauvegarde:', error);
             }
@@ -757,7 +757,7 @@
         function doitApparaitreCeMois(item, dateMois) {
             const moisActuel = dateMois.getMonth() + 1; // 1-12
             
-            // Gestion mois spÃ©cifiques (format numÃ©rique : "1,4,7,10")
+            // Gestion mois spécifiques (format numérique : "1,4,7,10")
             if (item.moisIntervention && 
                 item.moisIntervention.trim() && 
                 item.moisIntervention.trim().toLowerCase() !== 'tous') {
@@ -766,7 +766,7 @@
                 return moisListe.includes(moisActuel);
             }
             
-            // Gestion pÃ©riodicitÃ©s standards
+            // Gestion périodicités standards
             if (!item.periodicite || item.periodicite === 'MENSUEL') {
                 return true;
             }
@@ -785,27 +785,23 @@
             }
         }
 
-        // Vérifie si un contrat est actif pour un mois donné (1er du mois)
-        // Prend en compte les dates d'entrée (entrant) et de départ (sortant)
+        
+        // Correction : vérifie si un contrat est actif pour un mois donné
         function estActifCeMois(item, dateMois) {
-            // Si entrant avec date d'entrée future : pas encore arrivé ce mois
             if (item.entrant === true && item.dateEntree) {
-                const dateEntree = new Date(item.dateEntree);
-                dateEntree.setHours(0,0,0,0);
-                if (dateEntree > dateMois) return false;
+                const de = new Date(item.dateEntree); de.setHours(0,0,0,0);
+                if (de > dateMois) return false;
             }
-            // Si sortant avec date de départ passée : déjà parti ce mois
             if (item.sortant === true && item.dateDepart) {
-                const dateDepart = new Date(item.dateDepart);
-                dateDepart.setHours(0,0,0,0);
-                if (dateDepart < dateMois) return false;
+                const dd = new Date(item.dateDepart); dd.setHours(0,0,0,0);
+                if (dd < dateMois) return false;
             }
             return true;
         }
 
         function calculerPrevisionnel() {
             console.log('ðŸ”„ === DÃ‰BUT CALCUL PRÃ‰VISIONNEL ===');
-            console.log('ðŸ“Š OpÃ©rations spÃ©cifiques actuelles:', operationsSpecifiques);
+            console.log('ðŸ“Š Opérations spécifiques actuelles:', operationsSpecifiques);
             
             const dateDebut = new Date('2025-08-01');
             projectionMensuelle = [];
@@ -854,9 +850,9 @@
                     }
                 });
                 
-                // Ajout opÃ©rations spÃ©cifiques
+                // Ajout opérations spécifiques
                 if (operationsSpecifiques[moisCle]) {
-                    console.log(`ðŸ“… ${moisNom} - OpÃ©rations spÃ©cifiques trouvÃ©es:`, operationsSpecifiques[moisCle]);
+                    console.log(`ðŸ“… ${moisNom} - Opérations spécifiques trouvées:`, operationsSpecifiques[moisCle]);
                     operationsSpecifiques[moisCle].forEach(op => {
                         if (op.type === 'recette') {
                             totalRecettes += op.montant;
@@ -866,7 +862,7 @@
                                 type: 'specifique',
                                 commentaire: op.commentaire
                             });
-                            console.log(`ðŸ’° Ajout recette spÃ©cifique: ${op.libelle} = ${op.montant}â‚¬`);
+                            console.log(`ðŸ’° Ajout recette spécifique: ${op.libelle} = ${op.montant}â‚¬`);
                         } else {
                             totalCharges += op.montant;
                             detailCharges.push({
@@ -875,11 +871,11 @@
                                 type: 'specifique',
                                 commentaire: op.commentaire
                             });
-                            console.log(`ðŸ’¸ Ajout charge spÃ©cifique: ${op.libelle} = ${op.montant}â‚¬`);
+                            console.log(`ðŸ’¸ Ajout charge spécifique: ${op.libelle} = ${op.montant}â‚¬`);
                         }
                     });
                 } else {
-                    console.log(`ðŸ“… ${moisNom} - Aucune opÃ©ration spÃ©cifique`);
+                    console.log(`ðŸ“… ${moisNom} - Aucune opération spécifique`);
                 }
                 
                 const solde = totalRecettes - totalCharges;
@@ -908,9 +904,9 @@
                 totalChargesAnnuel: projectionMensuelle.reduce((sum, m) => sum + m.totalCharges, 0),
                 soldeFinal: projectionMensuelle[projectionMensuelle.length - 1]?.soldeCumule
             });
-            console.log('ðŸ“Š Projection complÃ¨te:', projectionMensuelle);
+            console.log('ðŸ“Š Projection complète:', projectionMensuelle);
             
-            console.log('âœ… PrÃ©visionnel calculÃ©:', projectionMensuelle);
+            console.log('âœ… Prévisionnel calculé:', projectionMensuelle);
         }
 
         function afficherStats() {
@@ -926,7 +922,7 @@
                 soldeFinal: Math.round(soldeFinal)
             });
             
-            // FORCER la mise Ã  jour des Ã©lÃ©ments DOM
+            // FORCER la mise à jour des éléments DOM
             const elemTotalRecettes = document.getElementById('totalRecettes');
             const elemTotalCharges = document.getElementById('totalCharges');
             const elemResultatAnnuel = document.getElementById('resultatAnnuel');
@@ -934,30 +930,30 @@
             
             if (elemTotalRecettes) {
                 elemTotalRecettes.textContent = Math.round(totalRecettes).toLocaleString('fr-FR') + 'â‚¬';
-                console.log('âœ… Total recettes affichÃ©:', elemTotalRecettes.textContent);
+                console.log('âœ… Total recettes affiché:', elemTotalRecettes.textContent);
             } else {
-                console.error('âŒ Ã‰lÃ©ment totalRecettes non trouvÃ©');
+                console.error('âŒ Ã‰lément totalRecettes non trouvé');
             }
             
             if (elemTotalCharges) {
                 elemTotalCharges.textContent = Math.round(totalCharges).toLocaleString('fr-FR') + 'â‚¬';
-                console.log('âœ… Total charges affichÃ©:', elemTotalCharges.textContent);
+                console.log('âœ… Total charges affiché:', elemTotalCharges.textContent);
             } else {
-                console.error('âŒ Ã‰lÃ©ment totalCharges non trouvÃ©');
+                console.error('âŒ Ã‰lément totalCharges non trouvé');
             }
             
             if (elemResultatAnnuel) {
                 elemResultatAnnuel.textContent = Math.round(resultatAnnuel).toLocaleString('fr-FR') + 'â‚¬';
-                console.log('âœ… RÃ©sultat annuel affichÃ©:', elemResultatAnnuel.textContent);
+                console.log('âœ… Résultat annuel affiché:', elemResultatAnnuel.textContent);
             } else {
-                console.error('âŒ Ã‰lÃ©ment resultatAnnuel non trouvÃ©');
+                console.error('âŒ Ã‰lément resultatAnnuel non trouvé');
             }
             
             if (elemSoldeFinal) {
                 elemSoldeFinal.textContent = Math.round(soldeFinal).toLocaleString('fr-FR') + 'â‚¬';
-                console.log('âœ… Solde final affichÃ©:', elemSoldeFinal.textContent);
+                console.log('âœ… Solde final affiché:', elemSoldeFinal.textContent);
             } else {
-                console.error('âŒ Ã‰lÃ©ment soldeFinal non trouvÃ©');
+                console.error('âŒ Ã‰lément soldeFinal non trouvé');
             }
         }
 
@@ -1004,7 +1000,7 @@
                                         <div class="value" style="color: ${mois.solde >= 0 ? '#28a745' : '#dc3545'}">${Math.round(mois.solde).toLocaleString('fr-FR')}â‚¬</div>
                                     </div>
                                     <div class="summary-item">
-                                        <div class="label">Solde CumulÃ©</div>
+                                        <div class="label">Solde Cumulé</div>
                                         <div class="value" style="color: ${mois.soldeCumule >= 0 ? '#28a745' : '#dc3545'}">${Math.round(mois.soldeCumule).toLocaleString('fr-FR')}â‚¬</div>
                                     </div>
                                 </div>
@@ -1013,16 +1009,16 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                 <div>
                                     <h4 style="color: #28a745; margin-bottom: 15px;">
-                                        ðŸ’° Recettes (${mois.detailRecettes.length} Ã©critures trouvÃ©es)
+                                        ðŸ’° Recettes (${mois.detailRecettes.length} écritures trouvées)
                                         <small style="font-size: 0.8em; color: #666; display: block;">
-                                            Total calculÃ©: ${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}â‚¬
+                                            Total calculé: ${Math.round(mois.totalRecettes).toLocaleString('fr-FR')}â‚¬
                                         </small>
                                     </h4>
                                     <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 5px;">
                                         <table class="month-table">
                                             <thead>
                                                 <tr>
-                                                    <th>LibellÃ©</th>
+                                                    <th>Libellé</th>
                                                     <th>Montant</th>
                                                     <th>Type</th>
                                                 </tr>
@@ -1033,7 +1029,7 @@
                                                         <td>${r.libelle}</td>
                                                         <td class="montant positif">${Math.round(r.montant).toLocaleString('fr-FR')}â‚¬</td>
                                                         <td>
-                                                            <span style="font-size: 0.8em; color: #666;">${r.type === 'recurrente' ? 'RÃ©currente' : 'SpÃ©cifique'}</span>
+                                                            <span style="font-size: 0.8em; color: #666;">${r.type === 'recurrente' ? 'Récurrente' : 'Spécifique'}</span>
                                                             ${r.type === 'specifique' ? `<button onclick="supprimerOperationSimple('${mois.moisCle}', 'recette', '${r.libelle.replace(/'/g, "\\\'")}')" style="margin-left: 8px; background: #dc3545; color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer; font-size: 0.7em;" title="Supprimer">ðŸ—‘ï¸</button>` : ''}
                                                         </td>
                                                     </tr>
@@ -1046,16 +1042,16 @@
                                 
                                 <div>
                                     <h4 style="color: #dc3545; margin-bottom: 15px;">
-                                        ðŸ’¸ Charges (${mois.detailCharges.length} Ã©critures trouvÃ©es)
+                                        ðŸ’¸ Charges (${mois.detailCharges.length} écritures trouvées)
                                         <small style="font-size: 0.8em; color: #666; display: block;">
-                                            Total calculÃ©: ${Math.round(mois.totalCharges).toLocaleString('fr-FR')}â‚¬
+                                            Total calculé: ${Math.round(mois.totalCharges).toLocaleString('fr-FR')}â‚¬
                                         </small>
                                     </h4>
                                     <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 5px;">
                                         <table class="month-table">
                                             <thead>
                                                 <tr>
-                                                    <th>LibellÃ©</th>
+                                                    <th>Libellé</th>
                                                     <th>Montant</th>
                                                     <th>Type</th>
                                                 </tr>
@@ -1066,7 +1062,7 @@
                                                         <td>${c.libelle}</td>
                                                         <td class="montant negatif">${Math.round(c.montant).toLocaleString('fr-FR')}â‚¬</td>
                                                         <td>
-                                                            <span style="font-size: 0.8em; color: #666;">${c.type === 'recurrente' ? 'RÃ©currente' : 'SpÃ©cifique'}</span>
+                                                            <span style="font-size: 0.8em; color: #666;">${c.type === 'recurrente' ? 'Récurrente' : 'Spécifique'}</span>
                                                             ${c.type === 'specifique' ? `<button onclick="supprimerOperationSimple('${mois.moisCle}', 'charge', '${c.libelle.replace(/'/g, "\\\'")}')" style="margin-left: 8px; background: #dc3545; color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer; font-size: 0.7em;" title="Supprimer">ðŸ—‘ï¸</button>` : ''}
                                                         </td>
                                                     </tr>
@@ -1080,7 +1076,7 @@
                             
                             <div class="add-operation" onclick="ajouterOperation('${mois.moisCle}', '${mois.mois}')">
                                 <div class="icon">âž•</div>
-                                <div>Ajouter une opÃ©ration spÃ©cifique Ã  ${mois.mois}</div>
+                                <div>Ajouter une opération spécifique à ${mois.mois}</div>
                             </div>
                         </div>
                     </div>
@@ -1100,7 +1096,7 @@
 
         function ajouterOperation(moisCle, moisNom) {
             currentMonth = { cle: moisCle, nom: moisNom };
-            document.getElementById('modalTitle').textContent = `Nouvelle OpÃ©ration - ${moisNom}`;
+            document.getElementById('modalTitle').textContent = `Nouvelle Opération - ${moisNom}`;
             document.getElementById('formOperation').reset();
             document.getElementById('modalOperation').style.display = 'block';
         }
@@ -1115,16 +1111,16 @@
             
             // Confirmation utilisateur
             const confirmation = confirm(
-                `ðŸ—‘ï¸ Supprimer cette opÃ©ration ?\n\n` +
+                `ðŸ—‘ï¸ Supprimer cette opération ?\n\n` +
                 `Mois : ${moisCle}\n` +
                 `Type : ${typeOperation}\n\n` +
-                `Cette action est irrÃ©versible.`
+                `Cette action est irréversible.`
             );
             
             if (!confirmation) return;
             
             try {
-                // Filtrer les opÃ©rations pour enlever celle Ã  supprimer
+                // Filtrer les opérations pour enlever celle à supprimer
                 const operationsFiltrees = [];
                 let indexSpecifique = -1;
                 
@@ -1139,21 +1135,21 @@
                     }
                 });
                 
-                // Mettre Ã  jour la liste
+                // Mettre à jour la liste
                 if (operationsFiltrees.length > 0) {
                     operationsSpecifiques[moisCle] = operationsFiltrees;
                 } else {
                     delete operationsSpecifiques[moisCle];
                 }
                 
-                // Recalculer tout le prÃ©visionnel
+                // Recalculer tout le prévisionnel
                 calculerPrevisionnel();
                 
-                console.log('ðŸ—‘ï¸ OpÃ©ration supprimÃ©e et prÃ©visionnel recalculÃ©');
+                console.log('ðŸ—‘ï¸ Opération supprimée et prévisionnel recalculé');
                 
             } catch (error) {
                 console.error('âŒ Erreur suppression:', error);
-                alert('Erreur lors de la suppression. Veuillez rÃ©essayer.');
+                alert('Erreur lors de la suppression. Veuillez réessayer.');
             }
         }
 
@@ -1177,38 +1173,38 @@
             
             operationsSpecifiques[currentMonth.cle].push(operation);
             
-            // Recalculer prÃ©visionnel
+            // Recalculer prévisionnel
             calculerPrevisionnel();
             
             // Fermer modal
             fermerModal();
             
-            console.log('âž• OpÃ©ration ajoutÃ©e:', operation);
+            console.log('âž• Opération ajoutée:', operation);
         });
 
-        // Fonction pour supprimer une opÃ©ration spÃ©cifique (VERSION CORRIGÃ‰E)
+        // Fonction pour supprimer une opération spécifique (VERSION CORRIGÃ‰E)
         function supprimerOperationSimple(moisCle, typeOperation, libelleOperation) {
             console.log('ðŸ—‘ï¸ Tentative suppression:', { moisCle, typeOperation, libelleOperation });
             
             if (!operationsSpecifiques[moisCle]) {
-                console.warn('âŒ Aucune opÃ©ration trouvÃ©e pour ce mois');
+                console.warn('âŒ Aucune opération trouvée pour ce mois');
                 return;
             }
             
             // Confirmation utilisateur
             const confirmation = confirm(
-                `ðŸ—‘ï¸ Supprimer cette opÃ©ration ?\n\n` +
-                `LibellÃ© : ${libelleOperation}\n` +
+                `ðŸ—‘ï¸ Supprimer cette opération ?\n\n` +
+                `Libellé : ${libelleOperation}\n` +
                 `Type : ${typeOperation}\n\n` +
-                `Cette action est irrÃ©versible.`
+                `Cette action est irréversible.`
             );
             
             if (!confirmation) return;
             
             try {
-                console.log('ðŸ“Š OpÃ©rations avant suppression:', operationsSpecifiques[moisCle]);
+                console.log('ðŸ“Š Opérations avant suppression:', operationsSpecifiques[moisCle]);
                 
-                // Filtrer pour supprimer l'opÃ©ration avec ce libellÃ© ET ce type
+                // Filtrer pour supprimer l'opération avec ce libellé ET ce type
                 const operationsAvant = operationsSpecifiques[moisCle].length;
                 operationsSpecifiques[moisCle] = operationsSpecifiques[moisCle].filter(op => {
                     const garder = !(op.type === typeOperation && op.libelle === libelleOperation);
@@ -1219,21 +1215,21 @@
                 });
                 
                 const operationsApres = operationsSpecifiques[moisCle].length;
-                console.log(`ðŸ“Š OpÃ©rations: ${operationsAvant} â†’ ${operationsApres}`);
+                console.log(`ðŸ“Š Opérations: ${operationsAvant} â†’ ${operationsApres}`);
                 
-                // Supprimer le mois entier si plus d'opÃ©rations
+                // Supprimer le mois entier si plus d'opérations
                 if (operationsSpecifiques[moisCle].length === 0) {
                     delete operationsSpecifiques[moisCle];
-                    console.log('ðŸ—‘ï¸ Mois supprimÃ© (plus d\'opÃ©rations)');
+                    console.log('ðŸ—‘ï¸ Mois supprimé (plus d\'opérations)');
                 }
                 
-                console.log('ðŸ“Š OpÃ©rations aprÃ¨s suppression:', operationsSpecifiques);
+                console.log('ðŸ“Š Opérations après suppression:', operationsSpecifiques);
                 
                 // FORCER le recalcul ET la sauvegarde
-                console.log('ðŸ”„ Recalcul forcÃ©...');
+                console.log('ðŸ”„ Recalcul forcé...');
                 calculerPrevisionnel();
                 
-                alert('âœ… OpÃ©ration supprimÃ©e avec succÃ¨s !');
+                alert('âœ… Opération supprimée avec succès !');
                 
             } catch (error) {
                 console.error('âŒ Erreur suppression:', error);
@@ -1241,34 +1237,34 @@
             }
         }
 
-        // Fonction pour vider toutes les opÃ©rations spÃ©cifiques (DEBUG)
+        // Fonction pour vider toutes les opérations spécifiques (DEBUG)
         function viderOperationsSpecifiques() {
             const confirmation = confirm(
-                'ðŸ—‘ï¸ ATTENTION: Supprimer TOUTES les opÃ©rations spÃ©cifiques ?\n\n' +
+                'ðŸ—‘ï¸ ATTENTION: Supprimer TOUTES les opérations spécifiques ?\n\n' +
                 'Cela va supprimer tous les ajouts manuels que vous avez faits.\n' +
-                'Les donnÃ©es rÃ©currentes (modules 2&3) ne seront pas affectÃ©es.\n\n' +
-                'Cette action est irrÃ©versible.'
+                'Les données récurrentes (modules 2&3) ne seront pas affectées.\n\n' +
+                'Cette action est irréversible.'
             );
             
             if (!confirmation) return;
             
             try {
-                console.log('ðŸ—‘ï¸ Vidage opÃ©rations spÃ©cifiques...');
+                console.log('ðŸ—‘ï¸ Vidage opérations spécifiques...');
                 console.log('ðŸ“Š Avant vidage:', operationsSpecifiques);
                 
-                // Vider complÃ¨tement
+                // Vider complètement
                 operationsSpecifiques = {};
                 
                 // Supprimer du localStorage aussi
                 localStorage.removeItem('previsionnel12moisRT');
                 localStorage.removeItem('previsionnel12moisRT_lastModified');
                 
-                console.log('ðŸ“Š AprÃ¨s vidage:', operationsSpecifiques);
+                console.log('ðŸ“Š Après vidage:', operationsSpecifiques);
                 
                 // Recalculer avec base propre
                 calculerPrevisionnel();
                 
-                alert('âœ… Toutes les opÃ©rations spÃ©cifiques ont Ã©tÃ© supprimÃ©es !\nLe prÃ©visionnel est maintenant basÃ© uniquement sur les donnÃ©es rÃ©currentes.');
+                alert('âœ… Toutes les opérations spécifiques ont été supprimées !\nLe prévisionnel est maintenant basé uniquement sur les données récurrentes.');
                 
             } catch (error) {
                 console.error('âŒ Erreur vidage:', error);
@@ -1284,7 +1280,7 @@
                 data: {
                     labels: [],
                     datasets: [{
-                        label: 'Solde CumulÃ©',
+                        label: 'Solde Cumulé',
                         data: [],
                         borderColor: '#8e44ad',
                         backgroundColor: 'rgba(142, 68, 173, 0.1)',
@@ -1299,7 +1295,7 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Ã‰volution Solde CumulÃ© sur 12 Mois',
+                            text: 'Ã‰volution Solde Cumulé sur 12 Mois',
                             font: { size: 16 }
                         }
                     },
@@ -1331,13 +1327,13 @@
         // EXPORT PDF VIA PRINT CSS - SOLUTION NATIVE
         // ==========================================
         function exporterPDF() {
-            // Mettre Ã  jour les informations d'impression
+            // Mettre à jour les informations d'impression
             const maintenant = new Date();
             document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
             document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
             document.getElementById('periodeImpression').textContent = document.getElementById('periodeAffichage').textContent;
 
-            // Ouvrir tous les accordÃ©ons pour l'impression
+            // Ouvrir tous les accordéons pour l'impression
             const accordeons = document.querySelectorAll('.accordion-content');
             const headers = document.querySelectorAll('.accordion-header');
             
@@ -1347,24 +1343,24 @@
             // Message informatif avant impression
             const confirmation = confirm(
                 'ðŸ“„ Export PDF via Impression\n\n' +
-                `â€¢ PÃ©riode : ${document.getElementById('periodeAffichage').textContent}\n` +
-                `â€¢ Ã‰lÃ©ments : ${projectionMensuelle.length} mois dÃ©taillÃ©s\n\n` +
-                'Dans la boÃ®te d\'impression :\n' +
+                `â€¢ Période : ${document.getElementById('periodeAffichage').textContent}\n` +
+                `â€¢ Ã‰léments : ${projectionMensuelle.length} mois détaillés\n\n` +
+                'Dans la boîte d\'impression :\n' +
                 '1. Choisir "Enregistrer au format PDF"\n' +
-                '2. SÃ©lectionner "Plus de paramÃ¨tres"\n' +
-                '3. Cocher "Graphiques d\'arriÃ¨re-plan"\n\n' +
+                '2. Sélectionner "Plus de paramètres"\n' +
+                '3. Cocher "Graphiques d\'arrière-plan"\n\n' +
                 'Continuer ?'
             );
 
             if (confirmation) {
-                // DÃ©clencher l'impression
+                // Déclencher l'impression
                 setTimeout(() => {
                     window.print();
                 }, 500);
             }
         }
 
-        // Fermer modal en cliquant Ã  l'extÃ©rieur
+        // Fermer modal en cliquant à l'extérieur
         window.onclick = function(event) {
             const modal = document.getElementById('modalOperation');
             if (event.target === modal) {
@@ -1383,7 +1379,7 @@
 
         const RT_SYNC_CONFIG = {
             enabled: true,
-            autoSync: false, // Mode manuel par dÃ©faut pour sÃ©curitÃ©
+            autoSync: false, // Mode manuel par défaut pour sécurité
             syncInterval: 300000, // 5 minutes
             retryAttempts: 3,
             
@@ -1395,7 +1391,7 @@
                 apiToken: 'af7d26a67a7e68ff3fa1243bc3d3baeb5d06eb07'
             },
             
-            // Mapping des clÃ©s localStorage vers tables SeaTable
+            // Mapping des clés localStorage vers tables SeaTable
             tableMapping: {
                 'recettesRT': 'RECETTES',
                 'chargesRecurrentesRT': 'CHARGES RÃ‰CURRENTES', 
@@ -1519,22 +1515,22 @@
                 
                 this.indicator.style.background = colors[status] || '#6c757d';
                 
-                // Animation pour les Ã©tats actifs
+                // Animation pour les états actifs
                 if (status === 'syncing') {
                     this.indicator.style.animation = 'pulse 1s infinite';
                 } else {
                     this.indicator.style.animation = '';
                 }
                 
-                // Mettre Ã  jour le tooltip
+                // Mettre à jour le tooltip
                 const messages = {
                     'idle': 'Synchronisation en veille',
-                    'synced': `PrÃ©visionnel synchronisÃ© (${this.formatLastSync()})`,
-                    'pending': `${this.pendingChanges} changements Ã  synchroniser`,
+                    'synced': `Prévisionnel synchronisé (${this.formatLastSync()})`,
+                    'pending': `${this.pendingChanges} changements à synchroniser`,
                     'syncing': 'Synchronisation en cours...',
                     'offline': 'Mode local (hors ligne)',
                     'error': 'Erreur de synchronisation',
-                    'online': 'Connexion rÃ©tablie'
+                    'online': 'Connexion rétablie'
                 };
                 
                 this.indicator.title = messages[status] || 'Synchronisation Multi-Utilisateurs';
@@ -1548,10 +1544,10 @@
                 const data = this.getLocalData();
                 const lastModified = localStorage.getItem(`${this.module.storageKey}_lastModified`);
                 
-                let dataInfo = 'Aucune donnÃ©e';
+                let dataInfo = 'Aucune donnée';
                 if (this.module.type === 'previsionnel' && data) {
                     const opCount = Object.keys(data.operationsSpecifiques || {}).length;
-                    dataInfo = `${data.projectionMensuelle?.length || 0} mois projetÃ©s + ${opCount} opÃ©rations spÃ©cifiques`;
+                    dataInfo = `${data.projectionMensuelle?.length || 0} mois projetés + ${opCount} opérations spécifiques`;
                 }
                 
                 const details = `
@@ -1560,27 +1556,27 @@ Module : ${this.module.type.toUpperCase()} (Hybride)
 
 ðŸ“Š DONNÃ‰ES LOCALES :
 â€¢ ${dataInfo}
-â€¢ DerniÃ¨re modification : ${lastModified ? new Date(lastModified).toLocaleString() : 'Inconnue'}
-â€¢ Sources : Recettes + Charges rÃ©currentes
+â€¢ Dernière modification : ${lastModified ? new Date(lastModified).toLocaleString() : 'Inconnue'}
+â€¢ Sources : Recettes + Charges récurrentes
 
 ðŸ”„ Ã‰TAT SYNCHRONISATION :
 â€¢ Statut : ${this.syncStatus.toUpperCase()}
-â€¢ DerniÃ¨re sync : ${this.formatLastSync()}
+â€¢ Dernière sync : ${this.formatLastSync()}
 â€¢ Changements en attente : ${this.pendingChanges}
 â€¢ Connexion : ${this.isOnline ? 'En ligne' : 'Hors ligne'}
 
 ðŸ’¡ MODE HYBRIDE :
-âœ… Projections calculÃ©es automatiquement
-âœ… OpÃ©rations spÃ©cifiques synchronisables
+âœ… Projections calculées automatiquement
+âœ… Opérations spécifiques synchronisables
 âœ… Performance optimale garantie
 âœ… Sauvegarde continue des ajouts
 
-Le module PrÃ©visionnel lit automatiquement les donnÃ©es 
-synchronisÃ©es des modules Recettes et Charges, et 
-synchronise ses propres opÃ©rations spÃ©cifiques.
+Le module Prévisionnel lit automatiquement les données 
+synchronisées des modules Recettes et Charges, et 
+synchronise ses propres opérations spécifiques.
                 `;
                 
-                if (confirm(details + '\n\nVoulez-vous ouvrir l\'interface de synchronisation complÃ¨te ?')) {
+                if (confirm(details + '\n\nVoulez-vous ouvrir l\'interface de synchronisation complète ?')) {
                     window.open('rocket_tower_sync_system.html', '_blank');
                 }
             }
@@ -1593,13 +1589,13 @@ synchronise ses propres opÃ©rations spÃ©cifiques.
                 window.addEventListener('online', () => {
                     this.isOnline = true;
                     this.updateSyncStatus('online');
-                    console.log('[RT-Sync] Connexion rÃ©tablie');
+                    console.log('[RT-Sync] Connexion rétablie');
                 });
                 
                 window.addEventListener('offline', () => {
                     this.isOnline = false;
                     this.updateSyncStatus('offline');
-                    console.log('[RT-Sync] Mode hors ligne activÃ©');
+                    console.log('[RT-Sync] Mode hors ligne activé');
                 });
             }
             
@@ -1615,7 +1611,7 @@ synchronise ses propres opÃ©rations spÃ©cifiques.
                         if (key === self.module.storageKey) {
                             self.pendingChanges++;
                             self.updateSyncStatus('pending');
-                            console.log(`[RT-Sync] Modification dÃ©tectÃ©e: ${key}`);
+                            console.log(`[RT-Sync] Modification détectée: ${key}`);
                         }
                     }
                     return originalSetItem.apply(this, arguments);
@@ -1645,26 +1641,26 @@ synchronise ses propres opÃ©rations spÃ©cifiques.
                 this.updateSyncStatus('syncing');
                 
                 try {
-                    console.log('[RT-Sync] DÃ©marrage synchronisation...');
+                    console.log('[RT-Sync] Démarrage synchronisation...');
                     
                     // Test connexion SeaTable
                     const connected = await this.testSeaTableConnection();
                     
                     if (connected) {
-                        // Export donnÃ©es locales (simulation car API /rows/ non fonctionnelle)
+                        // Export données locales (simulation car API /rows/ non fonctionnelle)
                         await this.exportToSeaTable();
                         
-                        // Marquer comme synchronisÃ©
+                        // Marquer comme synchronisé
                         this.lastSync = new Date();
                         localStorage.setItem(`${this.module.storageKey}_lastSync`, this.lastSync.toISOString());
                         this.pendingChanges = 0;
                         
                         this.updateSyncStatus('synced');
-                        console.log('[RT-Sync] Synchronisation rÃ©ussie');
+                        console.log('[RT-Sync] Synchronisation réussie');
                         
                         return true;
                     } else {
-                        throw new Error('Connexion SeaTable Ã©chouÃ©e');
+                        throw new Error('Connexion SeaTable échouée');
                     }
                     
                 } catch (error) {
@@ -1692,9 +1688,9 @@ synchronise ses propres opÃ©rations spÃ©cifiques.
             
             async exportToSeaTable() {
                 const data = this.getLocalData();
-                console.log(`[RT-Sync] Simulation export prÃ©visionnel vers ${this.module.table}`);
+                console.log(`[RT-Sync] Simulation export prévisionnel vers ${this.module.table}`);
                 
-                // Simulation dÃ©lai rÃ©seau
+                // Simulation délai réseau
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 return true;
@@ -1744,7 +1740,7 @@ synchronise ses propres opÃ©rations spÃ©cifiques.
             // API PUBLIQUE
             // =================================
             
-            // MÃ©thodes utilisables depuis les modules existants
+            // Méthodes utilisables depuis les modules existants
             manualSync() {
                 return this.performSync();
             }
@@ -1768,9 +1764,9 @@ synchronise ses propres opÃ©rations spÃ©cifiques.
         // INITIALISATION AUTOMATIQUE
         // =================================
 
-        // DÃ©marrer la synchronisation hybride dÃ¨s que le DOM est prÃªt
+        // Démarrer la synchronisation hybride dès que le DOM est prêt
         document.addEventListener('DOMContentLoaded', () => {
-            // VÃ©rifier que nous ne sommes pas dans l'interface de synchronisation elle-mÃªme
+            // Vérifier que nous ne sommes pas dans l'interface de synchronisation elle-même
             if (!window.location.pathname.includes('sync_system')) {
                 window.rtSync = new RTHybridSync();
                 
@@ -1781,8 +1777,8 @@ synchronise ses propres opÃ©rations spÃ©cifiques.
                     pending: () => window.rtSync.getPendingChanges()
                 };
                 
-                console.log('[RT-Sync] Synchronisation hybride initialisÃ©e - Module PrÃ©visionnel');
-                console.log('[RT-Sync] Utilisez RTSync.status() pour vÃ©rifier l\'Ã©tat');
+                console.log('[RT-Sync] Synchronisation hybride initialisée - Module Prévisionnel');
+                console.log('[RT-Sync] Utilisez RTSync.status() pour vérifier l\'état');
             }
         });
     </script>
