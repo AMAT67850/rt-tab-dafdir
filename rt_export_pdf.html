@@ -439,7 +439,7 @@
     document.getElementById('count-chr').textContent  = chrAct.length+' effectifs / '+chargesRec.length+' total';
     document.getElementById('count-prev').textContent = prevMois>0?prevMois+' mois projetés':'Non calculé';
     document.getElementById('meta-mensuel').textContent = 'Résultat courant : '+eur(tRL-tCL)+' / mois';
-    document.getElementById('btn-prev').disabled = prevMois===0;
+    document.getElementById('btn-prev').disabled = false;
 
     if(prevMois>0){
       const pm=previsionnel.projectionMensuelle;
@@ -529,27 +529,101 @@
         getVar(recettes,d6m,d12m,false), getVar(chargesRec,d6m,d12m,true));
   }
 
+  /* ---- Périodicité : ce contrat apparaît-il ce mois-ci ? ---- */
+  function doitApparaitreCeMois(item, dateMois) {
+    const m = dateMois.getMonth() + 1; // 1-12
+    if (item.moisIntervention && item.moisIntervention.trim() &&
+        item.moisIntervention.trim().toLowerCase() !== 'tous') {
+      const liste = item.moisIntervention.split(',').map(x => parseInt(x.trim()));
+      return liste.includes(m);
+    }
+    if (!item.periodicite || item.periodicite === 'MENSUEL') return true;
+    switch (item.periodicite) {
+      case 'BIMESTRIEL':   return m % 2 === 0;
+      case 'TRIMESTRIEL':  return [1,4,7,10].includes(m);
+      case 'SEMESTRIEL':   return m === 1 || m === 7;
+      case 'ANNUEL':       return m === 1;
+      default:             return true;
+    }
+  }
+
   /* ---- Construction prévisionnel ---- */
   function construireRapportPrevisionnel() {
-    if(!previsionnel?.projectionMensuelle) return;
-    const pm=previsionnel.projectionMensuelle;
-    const d=dateStr();
-    document.getElementById('rpt-prev-date').textContent=d;
-    document.getElementById('rpt-prev-footer-date').textContent='Généré le '+d;
-    document.getElementById('rpt-prev-info').innerHTML='Période : '+pm[0].mois+' → '+pm[pm.length-1].mois;
-    const tb=document.getElementById('tbody-prev'); tb.innerHTML='';
-    pm.forEach(m=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${m.mois}</td><td class="td-r">${eur(m.totalRecettes)}</td><td class="td-r">${eur(m.totalCharges)}</td><td class="td-r"><span class="${m.solde>=0?'prev-pos':'prev-neg'}">${eur(m.solde)}</span></td><td class="td-r"><span class="${m.soldeCumule>=0?'prev-pos':'prev-neg'}">${eur(m.soldeCumule)}</span></td>`;
+    // Lecture soldeInitial et operationsSpecifiques depuis localStorage
+    // (seules données non recalculables — le reste est recalculé proprement)
+    let soldeInitial = 0;
+    let operationsSpecifiques = {};
+    try {
+      const prev = JSON.parse(localStorage.getItem('previsionnel12moisRT') || 'null');
+      if (prev) {
+        soldeInitial = prev.soldeInitial || 0;
+        operationsSpecifiques = prev.operationsSpecifiques || {};
+      }
+    } catch(e) {}
+
+    // Calcul des 12 mois glissants depuis aujourd'hui
+    // avec filtrage entrant/sortant PAR MOIS (estActifA) + périodicité (doitApparaitreCeMois)
+    const projection = [];
+    for (let i = 0; i < 12; i++) {
+      const moisCourant = new Date(today.getFullYear(), today.getMonth() + i, 1);
+      const moisCle = `${moisCourant.getFullYear()}-${String(moisCourant.getMonth()+1).padStart(2,'0')}`;
+      const moisNom = moisCourant.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})
+                                  .replace(/^\w/, c => c.toUpperCase());
+
+      let tR = 0, tC = 0;
+
+      recettes.filter(r => r.statut === 'ACTIF').forEach(r => {
+        if (estActifA(r, moisCourant) && doitApparaitreCeMois(r, moisCourant))
+          tR += r.montantHT;
+      });
+
+      chargesRec.filter(c => c.statut === 'ACTIF').forEach(c => {
+        if (estActifA(c, moisCourant) && doitApparaitreCeMois(c, moisCourant))
+          tC += Math.abs(c.montantHT);
+      });
+
+      // Ajout des opérations spécifiques saisies manuellement
+      if (operationsSpecifiques[moisCle]) {
+        operationsSpecifiques[moisCle].forEach(op => {
+          if (op.type === 'recette') tR += op.montant;
+          else                       tC += op.montant;
+        });
+      }
+
+      const solde = tR - tC;
+      const soldeCumule = i === 0 ? soldeInitial + solde
+                                  : projection[i-1].soldeCumule + solde;
+      projection.push({ mois: moisNom, totalRecettes: tR, totalCharges: tC, solde, soldeCumule });
+    }
+
+    // Affichage
+    const d = dateStr();
+    document.getElementById('rpt-prev-date').textContent = d;
+    document.getElementById('rpt-prev-footer-date').textContent = 'Généré le '+d;
+    document.getElementById('rpt-prev-info').innerHTML =
+      'Période : '+projection[0].mois+' → '+projection[11].mois;
+
+    const tb = document.getElementById('tbody-prev'); tb.innerHTML = '';
+    projection.forEach(m => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${m.mois}</td>
+        <td class="td-r">${eur(m.totalRecettes)}</td>
+        <td class="td-r">${eur(m.totalCharges)}</td>
+        <td class="td-r"><span class="${m.solde>=0?'prev-pos':'prev-neg'}">${eur(m.solde)}</span></td>
+        <td class="td-r"><span class="${m.soldeCumule>=0?'prev-pos':'prev-neg'}">${eur(m.soldeCumule)}</span></td>`;
       tb.appendChild(tr);
     });
-    const tR=pm.reduce((s,m)=>s+m.totalRecettes,0),tC=pm.reduce((s,m)=>s+m.totalCharges,0),res=tR-tC;
-    const sF=pm[pm.length-1].soldeCumule,sI=previsionnel.soldeInitial||(sF-res);
-    document.getElementById('sum-rec-ann').textContent=eur(tR);
-    document.getElementById('sum-chr-ann').textContent=eur(tC);
-    document.getElementById('sum-solde-init').textContent=eur(sI);
-    document.getElementById('sum-solde-fin').textContent=eur(sF);
-    const el=document.getElementById('sum-res-ann'); el.textContent=eur(res); el.style.color=res>=0?'#1a7a40':'#b71c1c'; el.style.fontWeight='bold';
+
+    const tR = projection.reduce((s,m)=>s+m.totalRecettes,0);
+    const tC = projection.reduce((s,m)=>s+m.totalCharges,0);
+    const res = tR - tC;
+    const sF  = projection[11].soldeCumule;
+    document.getElementById('sum-rec-ann').textContent    = eur(tR);
+    document.getElementById('sum-chr-ann').textContent    = eur(tC);
+    document.getElementById('sum-solde-init').textContent = eur(soldeInitial);
+    document.getElementById('sum-solde-fin').textContent  = eur(sF);
+    const el = document.getElementById('sum-res-ann');
+    el.textContent = eur(res); el.style.color = res>=0?'#1a7a40':'#b71c1c'; el.style.fontWeight='bold';
   }
 
   /* ---- Exports ---- */
@@ -572,7 +646,6 @@
     el.style.cssText=v?'display:none':'display:block;background:#fff;color:#000;padding:24px;margin-top:24px;border-radius:8px;font-size:11px;font-family:Arial,sans-serif';
   }
   function previsualiserPrevisionnel() {
-    if(!previsionnel?.projectionMensuelle){ alert('Données prévisionnelles introuvables.'); return; }
     construireRapportPrevisionnel();
     const el=document.getElementById('report-previsionnel');
     const v=el.style.display==='block';
