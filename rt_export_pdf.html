@@ -63,38 +63,34 @@
       /* Sections */
       .rpt-section { margin-bottom: 7pt; page-break-inside: avoid; }
       .rpt-section-title { font-size: 9.5pt; font-weight: bold; background: #222; color: #fff; padding: 2.5pt 5pt; margin-bottom: 3pt; }
+      .rpt-section-title-green { font-size: 10pt; font-weight: bold; background: #1a6b3a; color: #fff; padding: 4pt 7pt; margin-bottom: 4pt; letter-spacing: 0.3pt; }
 
       /* Tableau comparatif 4 horizons */
-      .tbl-horizons { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 4pt; }
-      .tbl-horizons th { background: #333; color: #fff; padding: 3pt 6pt; text-align: center; border: 0.5pt solid #444; font-size: 8pt; }
-      .tbl-horizons th.th-label { text-align: left; background: #555; }
-      .tbl-horizons td { padding: 3pt 6pt; border: 0.5pt solid #ccc; }
-      .tbl-horizons td.td-label { font-weight: bold; font-size: 8pt; background: #f5f5f5; }
-      .tbl-horizons td.td-val  { text-align: right; white-space: nowrap; }
-      .tbl-horizons td.td-diff { text-align: right; font-size: 7pt; color: #666; white-space: nowrap; }
-      .tbl-horizons tr.tr-resultat td { font-weight: bold; background: #f0f0f0; }
+      .tbl-horizons { width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 5pt; }
+      .tbl-horizons th { color: #fff; padding: 5pt 7pt; text-align: center; border: 0.5pt solid rgba(255,255,255,0.25); font-size: 8.5pt; font-weight: bold; }
+      .tbl-horizons th.th-label    { text-align: left; background: #444; }
+      .tbl-horizons th.th-actuelle { background: #1a6b3a; }
+      .tbl-horizons th.th-proj     { background: #1e4d8c; }
+      .tbl-horizons td { padding: 4pt 7pt; border: 0.5pt solid #ccc; vertical-align: middle; }
+      .tbl-horizons td.td-label { font-weight: bold; font-size: 8.5pt; background: #f5f5f5; border-right: 1pt solid #aaa; }
+      .tbl-horizons td.td-val      { text-align: right; white-space: nowrap; font-size: 11pt; font-weight: bold; }
+      .tbl-horizons td.td-val-act  { background: #edf7f1; }
+      .tbl-horizons td.td-val-proj { background: #eef2fb; }
+      .tbl-horizons tr.tr-resultat td { border-top: 1.5pt solid #666; }
+      .tbl-horizons tr.tr-resultat td.td-val { font-size: 13pt; }
+      .tbl-horizons tr.tr-resultat td.td-val-act  { background: #d6f0e2; }
+      .tbl-horizons tr.tr-resultat td.td-val-proj { background: #dde8f8; }
       .pos { color: #1a7a40; }
       .neg { color: #b91c1c; }
       .neu { color: #555; }
 
-      /* KPIs actuels */
-      .kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5pt; margin-bottom: 5pt; }
-      .kpi-cell { border: 0.5pt solid #bbb; padding: 4pt 5pt; text-align: center; }
-      .kpi-label { font-size: 7pt; color: #555; margin-bottom: 2pt; }
-      .kpi-value { font-size: 13pt; font-weight: bold; }
-      .kpi-sub   { font-size: 7pt; color: #777; margin-top: 1pt; }
-
-      /* Variations */
+      /* Variations — même style que tableaux détail */
       .var-block { margin-bottom: 5pt; page-break-inside: avoid; }
-      .var-title { font-size: 8pt; font-weight: bold; background: #eee; border: 0.4pt solid #bbb; padding: 2pt 5pt; margin-bottom: 2pt; display: flex; justify-content: space-between; }
+      .var-title { font-size: 8pt; font-weight: bold; background: #dde; border: 0.4pt solid #aab; padding: 3pt 6pt; margin-bottom: 2pt; display: flex; justify-content: space-between; color: #223; }
       .var-impact { font-size: 7.5pt; font-style: italic; }
-      table.var-tbl { width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-bottom: 2pt; }
-      table.var-tbl th { background: #666; color: #fff; padding: 1.5pt 4pt; font-size: 7pt; border: 0.3pt solid #777; }
-      table.var-tbl td { padding: 1.5pt 4pt; border: 0.3pt solid #ddd; vertical-align: top; }
-      table.var-tbl tr:nth-child(even) td { background: #fafafa; }
-      .var-tbl-title { font-size: 7.5pt; font-weight: bold; color: #333; padding: 2pt 0 1pt; }
-      .var-subtotal { text-align: right; font-size: 7.5pt; font-weight: bold; padding: 2pt 5pt; border-top: 0.5pt solid #999; background: #f5f5f5; }
-      .var-net { text-align: right; font-size: 8pt; font-weight: bold; padding: 3pt 5pt; border-top: 1pt solid #555; background: #eee; }
+      .var-tbl-title { font-size: 8pt; font-weight: bold; color: #fff; background: #555; padding: 2pt 5pt; margin: 3pt 0 0; }
+      .var-subtotal { text-align: right; font-size: 8pt; font-weight: bold; padding: 2pt 5pt; border-top: 0.5pt solid #999; background: #f0f0f0; }
+      /* var-tbl hérite de detail-tbl */
 
       /* Tableaux détail */
       table.detail-tbl { width: 100%; border-collapse: collapse; font-size: 8pt; table-layout: fixed; }
@@ -197,17 +193,17 @@
 
   <!-- SYNTHÈSE ANALYTIQUE -->
   <div class="rpt-section no-break">
-    <div class="rpt-section-title">📊 SYNTHÈSE ANALYTIQUE — Situation actuelle et projections</div>
+    <div class="rpt-section-title-green">📊 SYNTHÈSE ANALYTIQUE — Situation actuelle et projections</div>
 
     <!-- Tableau comparatif 4 horizons -->
     <table class="tbl-horizons" id="tbl-horizons">
       <thead>
         <tr>
-          <th class="th-label">Indicateur</th>
-          <th>📸 Situation actuelle</th>
-          <th>⏰ À 3 mois</th>
-          <th>📆 À 6 mois</th>
-          <th>📅 À 12 mois</th>
+          <th class="th-label" style="width:24%">Indicateur</th>
+          <th class="th-actuelle" style="width:19%">📸 Situation actuelle</th>
+          <th class="th-proj"    style="width:19%">⏰ À 3 mois</th>
+          <th class="th-proj"    style="width:19%">📆 À 6 mois</th>
+          <th class="th-proj"    style="width:19%">📅 À 12 mois</th>
         </tr>
       </thead>
       <tbody id="tbody-horizons"></tbody>
@@ -368,7 +364,7 @@
 
     if (varRec.length > 0) {
       html += `<div class="var-tbl-title">RECETTES</div>
-      <table class="var-tbl">
+      <table class="detail-tbl">
         <thead><tr><th style="width:22%">Client</th><th style="width:15%">Type</th><th style="width:30%">Libellé</th><th style="width:10%">Date</th><th style="width:10%">Motif</th><th style="width:13%" class="td-right">Impact/mois</th></tr></thead>
         <tbody>`;
       varRec.forEach(v=>{
@@ -380,7 +376,7 @@
 
     if (varChr.length > 0) {
       html += `<div class="var-tbl-title">CHARGES</div>
-      <table class="var-tbl">
+      <table class="detail-tbl">
         <thead><tr><th style="width:22%">Fournisseur</th><th style="width:15%">Type</th><th style="width:30%">Libellé</th><th style="width:10%">Date</th><th style="width:10%">Motif</th><th style="width:13%" class="td-right">Impact/mois</th></tr></thead>
         <tbody>`;
       varChr.forEach(v=>{
@@ -462,24 +458,24 @@
     tbody.innerHTML = `
       <tr>
         <td class="td-label">Recettes HT lissées / mois</td>
-        <td class="td-val pos">${eur(s0.recettes)}</td>
-        <td class="td-val ${cls(s3.recettes)}">${eur(s3.recettes)}<br><span style="font-size:7pt;color:#888">${diff(s0.recettes,s3.recettes)}</span></td>
-        <td class="td-val ${cls(s6.recettes)}">${eur(s6.recettes)}<br><span style="font-size:7pt;color:#888">${diff(s3.recettes,s6.recettes)}</span></td>
-        <td class="td-val ${cls(s12.recettes)}">${eur(s12.recettes)}<br><span style="font-size:7pt;color:#888">${diff(s6.recettes,s12.recettes)}</span></td>
+        <td class="td-val td-val-act pos">${eur(s0.recettes)}</td>
+        <td class="td-val td-val-proj">${eur(s3.recettes)}<br><span style="font-size:7pt;font-weight:normal">${diff(s0.recettes,s3.recettes)}</span></td>
+        <td class="td-val td-val-proj">${eur(s6.recettes)}<br><span style="font-size:7pt;font-weight:normal">${diff(s3.recettes,s6.recettes)}</span></td>
+        <td class="td-val td-val-proj">${eur(s12.recettes)}<br><span style="font-size:7pt;font-weight:normal">${diff(s6.recettes,s12.recettes)}</span></td>
       </tr>
       <tr>
         <td class="td-label">Charges HT lissées / mois</td>
-        <td class="td-val neg">${eur(s0.charges)}</td>
-        <td class="td-val">${eur(s3.charges)}<br><span style="font-size:7pt;color:#888">${diff(s0.charges,s3.charges)}</span></td>
-        <td class="td-val">${eur(s6.charges)}<br><span style="font-size:7pt;color:#888">${diff(s3.charges,s6.charges)}</span></td>
-        <td class="td-val">${eur(s12.charges)}<br><span style="font-size:7pt;color:#888">${diff(s6.charges,s12.charges)}</span></td>
+        <td class="td-val td-val-act neg">${eur(s0.charges)}</td>
+        <td class="td-val td-val-proj neg">${eur(s3.charges)}<br><span style="font-size:7pt;font-weight:normal">${diff(s0.charges,s3.charges)}</span></td>
+        <td class="td-val td-val-proj neg">${eur(s6.charges)}<br><span style="font-size:7pt;font-weight:normal">${diff(s3.charges,s6.charges)}</span></td>
+        <td class="td-val td-val-proj neg">${eur(s12.charges)}<br><span style="font-size:7pt;font-weight:normal">${diff(s6.charges,s12.charges)}</span></td>
       </tr>
       <tr class="tr-resultat">
         <td class="td-label">Résultat mensuel HT</td>
-        <td class="td-val ${cls(s0.resultat)}">${eur(s0.resultat)}</td>
-        <td class="td-val ${cls(s3.resultat)}">${eur(s3.resultat)}<br><span style="font-size:7pt">${diff(s0.resultat,s3.resultat)}</span></td>
-        <td class="td-val ${cls(s6.resultat)}">${eur(s6.resultat)}<br><span style="font-size:7pt">${diff(s3.resultat,s6.resultat)}</span></td>
-        <td class="td-val ${cls(s12.resultat)}">${eur(s12.resultat)}<br><span style="font-size:7pt">${diff(s6.resultat,s12.resultat)}</span></td>
+        <td class="td-val td-val-act ${cls(s0.resultat)}">${eur(s0.resultat)}</td>
+        <td class="td-val td-val-proj ${cls(s3.resultat)}">${eur(s3.resultat)}<br><span style="font-size:7pt;font-weight:normal">${diff(s0.resultat,s3.resultat)}</span></td>
+        <td class="td-val td-val-proj ${cls(s6.resultat)}">${eur(s6.resultat)}<br><span style="font-size:7pt;font-weight:normal">${diff(s3.resultat,s6.resultat)}</span></td>
+        <td class="td-val td-val-proj ${cls(s12.resultat)}">${eur(s12.resultat)}<br><span style="font-size:7pt;font-weight:normal">${diff(s6.resultat,s12.resultat)}</span></td>
       </tr>`;
 
     // ---- Variations entre périodes ----
