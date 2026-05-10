@@ -206,7 +206,7 @@
 
   <!-- Texte intro -->
   <div class="rpt-intro">
-    Sur la base des contrats de recettes et des charges récurrentes effectivement actifs à ce jour, le résultat mensuel lissé de Rocket Tower s'établit comme présenté ci-dessous. Ces chiffres reflètent la situation contractuelle réelle — les entrées dont la date d'arrivée est future et les sorties déjà effectives sont exclues du calcul. Les variations connues (entrées et sorties planifiées) permettent d'anticiper l'évolution de ce résultat à 3, 6 et 12 mois. Le détail des recettes et charges enregistrées dans le tableau de bord financier figure ci-dessous.
+    Sur la base des contrats de recettes et des charges récurrentes effectivement actifs à ce jour, le résultat mensuel lissé de Rocket Tower s'établit comme présenté ci-dessous. Ces chiffres reflètent la situation contractuelle réelle — les entrées dont la date d'arrivée est future et les sorties déjà effectives sont exclues du calcul. Les variations connues (entrées et sorties planifiées) permettent d'anticiper l'évolution de ce résultat à 3, 6, 12 mois et au-delà. Le détail des recettes et charges enregistrées dans le tableau de bord financier figure ci-dessous.
   </div>
 
   <!-- ==================== SYNTHÈSE ANALYTIQUE ==================== -->
@@ -220,6 +220,7 @@
           <th class="th-proj">⏰ À 3 mois</th>
           <th class="th-proj">📆 À 6 mois</th>
           <th class="th-proj">📅 À 12 mois</th>
+          <th class="th-proj">🔭 Long terme</th>
         </tr>
       </thead>
       <tbody id="tbody-horizons"></tbody>
@@ -322,6 +323,7 @@
   const d3m  = new Date(today); d3m.setMonth(d3m.getMonth()+3);
   const d6m  = new Date(today); d6m.setMonth(d6m.getMonth()+6);
   const d12m = new Date(today); d12m.setMonth(d12m.getMonth()+12);
+  const dLT  = new Date(today); dLT.setFullYear(dLT.getFullYear()+20); // au-delà : tout connu
 
   /* ---- Un contrat est-il actif à une date donnée ? ---- */
   function estActifA(r, date) {
@@ -461,10 +463,11 @@
     document.getElementById('rpt-men-counts').textContent = recAct.length+' recettes · '+chrAct.length+' charges';
 
     /* ---- 4 situations ---- */
-    const s0=calcSit(recettes,chargesRec,today);
-    const s3=calcSit(recettes,chargesRec,d3m);
-    const s6=calcSit(recettes,chargesRec,d6m);
-    const s12=calcSit(recettes,chargesRec,d12m);
+    const s0  = calcSit(recettes,chargesRec,today);
+    const s3  = calcSit(recettes,chargesRec,d3m);
+    const s6  = calcSit(recettes,chargesRec,d6m);
+    const s12 = calcSit(recettes,chargesRec,d12m);
+    const sLT = calcSit(recettes,chargesRec,dLT);
 
     const diff=(a,b)=>{ const d=b-a; if(Math.abs(d)<0.5) return ''; const s=d>0?'+':''; const cl=d>0?'c-pos':'c-neg'; return `<span class="c-diff ${cl}">${s}${eur(d)}</span>`; };
     const cl=v=>v>0?'c-pos':v<0?'c-neg':'c-neu';
@@ -476,6 +479,7 @@
         <td class="td-proj c-pos">${eur(s3.r)}${diff(s0.r,s3.r)}</td>
         <td class="td-proj c-pos">${eur(s6.r)}${diff(s3.r,s6.r)}</td>
         <td class="td-proj c-pos">${eur(s12.r)}${diff(s6.r,s12.r)}</td>
+        <td class="td-proj c-pos">${eur(sLT.r)}${diff(s12.r,sLT.r)}</td>
       </tr>
       <tr>
         <td class="td-lbl">Charges HT lissées / mois</td>
@@ -483,6 +487,7 @@
         <td class="td-proj c-neg">${eur(s3.c)}${diff(s0.c,s3.c)}</td>
         <td class="td-proj c-neg">${eur(s6.c)}${diff(s3.c,s6.c)}</td>
         <td class="td-proj c-neg">${eur(s12.c)}${diff(s6.c,s12.c)}</td>
+        <td class="td-proj c-neg">${eur(sLT.c)}${diff(s12.c,sLT.c)}</td>
       </tr>
       <tr class="tr-res">
         <td class="td-lbl">Résultat mensuel HT</td>
@@ -490,6 +495,7 @@
         <td class="td-proj ${cl(s3.res)}">${eur(s3.res)}${diff(s0.res,s3.res)}</td>
         <td class="td-proj ${cl(s6.res)}">${eur(s6.res)}${diff(s3.res,s6.res)}</td>
         <td class="td-proj ${cl(s12.res)}">${eur(s12.res)}${diff(s6.res,s12.res)}</td>
+        <td class="td-proj ${cl(sLT.res)}">${eur(sLT.res)}${diff(s12.res,sLT.res)}</td>
       </tr>`;
 
     /* ---- Tableau recettes ---- */
@@ -526,7 +532,9 @@
       buildVar(`VARIATIONS CONNUES — 3 mois (${fmtH(d3m)}) → 6 mois (${fmtH(d6m)})`,
         getVar(recettes,d3m,d6m,false), getVar(chargesRec,d3m,d6m,true)) +
       buildVar(`VARIATIONS CONNUES — 6 mois (${fmtH(d6m)}) → 12 mois (${fmtH(d12m)})`,
-        getVar(recettes,d6m,d12m,false), getVar(chargesRec,d6m,d12m,true));
+        getVar(recettes,d6m,d12m,false), getVar(chargesRec,d6m,d12m,true)) +
+      buildVar(`VARIATIONS CONNUES — au-delà de 12 mois (après ${fmtH(d12m)})`,
+        getVar(recettes,d12m,dLT,false), getVar(chargesRec,d12m,dLT,true));
   }
 
   /* ---- Périodicité : ce contrat apparaît-il ce mois-ci ? ---- */
