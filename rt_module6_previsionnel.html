@@ -1322,16 +1322,14 @@
                 if (ecriture.type === 'specifique') {
                     const operations = operationsSpecifiques[moisCle];
                     if (operations) {
-                        // Nettoyer tous les ' 🎯' ajoutés à l'affichage avant comparaison
-                        const libelleNettoye = ecriture.libelle.replace(/ 🎯/g, '');
-                        const opIndex = operations.findIndex(op => 
-                            op.type === type && op.libelle === libelleNettoye
+                        // Nettoyer les ' 🎯' des deux côtés avant comparaison
+                        // (le libellé affiché a des 🎯 ajoutés, le libellé stocké peut en contenir)
+                        const libelleNettoye = ecriture.libelle.replace(/ 🎯/g, '').trim();
+                        operationsSpecifiques[moisCle] = operations.filter(op => 
+                            !(op.type === type && op.libelle.replace(/ 🎯/g, '').trim() === libelleNettoye)
                         );
-                        if (opIndex !== -1) {
-                            operations.splice(opIndex, 1);
-                            if (operations.length === 0) {
-                                delete operationsSpecifiques[moisCle];
-                            }
+                        if (operationsSpecifiques[moisCle].length === 0) {
+                            delete operationsSpecifiques[moisCle];
                         }
                     }
                 } else {
