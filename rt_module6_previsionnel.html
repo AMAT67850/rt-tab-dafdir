@@ -1264,8 +1264,10 @@
                 if (ecriture.type === 'specifique') {
                     const operations = operationsSpecifiques[moisCle];
                     if (operations) {
+                        // Nettoyer tous les ' 🎯' ajoutés à l'affichage avant comparaison
+                        const libelleNettoye = ecriture.libelle.replace(/ 🎯/g, '');
                         const opIndex = operations.findIndex(op => 
-                            op.type === type && op.libelle === ecriture.libelle.replace(' 🎯', '')
+                            op.type === type && op.libelle === libelleNettoye
                         );
                         if (opIndex !== -1) {
                             operations[opIndex].montant = montant;
@@ -1320,8 +1322,10 @@
                 if (ecriture.type === 'specifique') {
                     const operations = operationsSpecifiques[moisCle];
                     if (operations) {
+                        // Nettoyer tous les ' 🎯' ajoutés à l'affichage avant comparaison
+                        const libelleNettoye = ecriture.libelle.replace(/ 🎯/g, '');
                         const opIndex = operations.findIndex(op => 
-                            op.type === type && op.libelle === ecriture.libelle.replace(' 🎯', '')
+                            op.type === type && op.libelle === libelleNettoye
                         );
                         if (opIndex !== -1) {
                             operations.splice(opIndex, 1);
