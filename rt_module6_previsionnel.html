@@ -865,7 +865,7 @@
                         const debutMois = new Date(dateMois);
                         debutMois.setDate(1);
                         debutMois.setHours(0, 0, 0, 0);
-                        if (dateDepart <= debutMois) return; // déjà parti ce mois
+                        if (dateDepart < debutMois) return; // déjà parti ce mois (le mois de départ est inclus)
                     }
 
                     if (doitApparaitreCeMois(recette, dateMois)) {
@@ -916,7 +916,7 @@
                         const debutMois = new Date(dateMois);
                         debutMois.setDate(1);
                         debutMois.setHours(0, 0, 0, 0);
-                        if (dateDepart <= debutMois) return; // déjà résiliée ce mois
+                        if (dateDepart < debutMois) return; // déjà résiliée ce mois (le mois de départ est inclus)
                     }
 
                     if (doitApparaitreCeMois(charge, dateMois)) {
