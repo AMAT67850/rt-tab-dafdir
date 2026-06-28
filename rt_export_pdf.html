@@ -547,7 +547,7 @@
     }
     if (!item.periodicite || item.periodicite === 'MENSUEL') return true;
     switch (item.periodicite) {
-      case 'BIMESTRIEL':   return m % 2 === 0;
+      case 'BIMESTRIEL':   return [1,3,5,7,9,11].includes(m); // mois impairs, aligné sur module 6
       case 'TRIMESTRIEL':  return [1,4,7,10].includes(m);
       case 'SEMESTRIEL':   return m === 1 || m === 7;
       case 'ANNUEL':       return m === 1;
@@ -557,20 +557,25 @@
 
   /* ---- Construction prévisionnel ---- */
   function construireRapportPrevisionnel() {
-    // Lecture soldeInitial et operationsSpecifiques depuis localStorage
-    // (seules données non recalculables — le reste est recalculé proprement)
+    // Lecture de toutes les données de personnalisation depuis localStorage
     let soldeInitial = 0;
     let operationsSpecifiques = {};
+    let overridesTemporaires = {};
+    let suppressionsTemporaires = {};
     try {
       const prev = JSON.parse(localStorage.getItem('previsionnel12moisRT') || 'null');
       if (prev) {
-        soldeInitial = prev.soldeInitial || 0;
-        operationsSpecifiques = prev.operationsSpecifiques || {};
+        soldeInitial            = prev.soldeInitial            || 0;
+        operationsSpecifiques   = prev.operationsSpecifiques   || {};
+        overridesTemporaires    = prev.overridesTemporaires    || {};
+        suppressionsTemporaires = prev.suppressionsTemporaires || {};
       }
     } catch(e) {}
 
-    // Calcul des 12 mois glissants depuis aujourd'hui
-    // avec filtrage entrant/sortant PAR MOIS (estActifA) + périodicité (doitApparaitreCeMois)
+    // Filtre identique à celui du module 6 (inclut les items sans statut)
+    const recActives = recettes.filter(r => !r.statut || r.statut === 'ACTIF');
+    const chrActives = chargesRec.filter(c => !c.statut || c.statut === 'ACTIF');
+
     const projection = [];
     for (let i = 0; i < 12; i++) {
       const moisCourant = new Date(today.getFullYear(), today.getMonth() + i, 1);
@@ -580,17 +585,39 @@
 
       let tR = 0, tC = 0;
 
-      recettes.filter(r => r.statut === 'ACTIF').forEach(r => {
-        if (estActifA(r, moisCourant) && doitApparaitreCeMois(r, moisCourant))
-          tR += r.montantHT;
+      recActives.forEach((r, rIndex) => {
+        if (!estActifA(r, moisCourant) || !doitApparaitreCeMois(r, moisCourant)) return;
+
+        // Suppression temporaire ?
+        const supprRec = suppressionsTemporaires[moisCle]?.recettes || [];
+        if (supprRec.some(s => s.index === rIndex)) return;
+
+        // Override temporaire ?
+        let montant = r.montantHT;
+        const overRec = overridesTemporaires[moisCle]?.recettes || [];
+        const ov = overRec.find(o => o.index === rIndex);
+        if (ov) montant = ov.nouveauMontant;
+
+        tR += montant;
       });
 
-      chargesRec.filter(c => c.statut === 'ACTIF').forEach(c => {
-        if (estActifA(c, moisCourant) && doitApparaitreCeMois(c, moisCourant))
-          tC += Math.abs(c.montantHT);
+      chrActives.forEach((c, cIndex) => {
+        if (!estActifA(c, moisCourant) || !doitApparaitreCeMois(c, moisCourant)) return;
+
+        // Suppression temporaire ?
+        const supprChr = suppressionsTemporaires[moisCle]?.charges || [];
+        if (supprChr.some(s => s.index === cIndex)) return;
+
+        // Override temporaire ?
+        let montant = Math.abs(c.montantHT);
+        const overChr = overridesTemporaires[moisCle]?.charges || [];
+        const ov = overChr.find(o => o.index === cIndex);
+        if (ov) montant = ov.nouveauMontant;
+
+        tC += montant;
       });
 
-      // Ajout des opérations spécifiques saisies manuellement
+      // Opérations spécifiques saisies manuellement
       if (operationsSpecifiques[moisCle]) {
         operationsSpecifiques[moisCle].forEach(op => {
           if (op.type === 'recette') tR += op.montant;
