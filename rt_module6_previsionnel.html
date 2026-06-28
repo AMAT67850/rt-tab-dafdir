@@ -490,45 +490,99 @@
         
         /* Impression */
         @media print {
-            body {
-                background: white;
-                font-size: 12px;
-            }
-            
-            .container {
-                box-shadow: none;
-                background: white;
-            }
-            
-            .header {
-                background: #2c3e50 !important;
-                -webkit-print-color-adjust: exact;
-            }
-            
-            .config-section {
-                display: none;
-            }
-            
-            .accordion-content {
-                display: block !important;
-            }
-            
-            .accordion-header {
-                background: #f8f9fa !important;
-                -webkit-print-color-adjust: exact;
-            }
-            
-            .chart-container {
-                height: 300px;
-            }
-            
-            .btn {
-                display: none;
-            }
-            
-            .print-info {
-                display: block !important;
-            }
+            body { background: white; font-size: 12px; }
+            .container { box-shadow: none; background: white; }
+            .header { background: #2c3e50 !important; -webkit-print-color-adjust: exact; }
+            .config-section, .note-solde, .stats-grid, .chart-section,
+            #accordeonContainer, .btn { display: none !important; }
+            .print-info { display: block !important; }
+            #tableauImpression { display: block !important; }
+        }
+
+        /* Tableau d'impression — masqué à l'écran */
+        #tableauImpression {
+            display: none;
+            padding: 20px 0;
+        }
+
+        #tableauImpression .print-period {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        #tableauImpression table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            margin-bottom: 25px;
+        }
+
+        #tableauImpression th {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 12px;
+            text-align: right;
+            font-weight: 600;
+            -webkit-print-color-adjust: exact;
+        }
+
+        #tableauImpression th:first-child { text-align: left; }
+
+        #tableauImpression td {
+            padding: 8px 12px;
+            text-align: right;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        #tableauImpression td:first-child {
+            text-align: left;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        #tableauImpression tr:nth-child(even) td {
+            background: #f8f9fa;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .solde-positif { color: #28a745; font-weight: 600; }
+        .solde-negatif { color: #dc3545; font-weight: 600; }
+
+        #tableauImpression .recapitulatif {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            -webkit-print-color-adjust: exact;
+        }
+
+        #tableauImpression .recapitulatif h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        #tableauImpression .recap-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.9em;
+        }
+
+        #tableauImpression .recap-total {
+            font-weight: 700;
+            color: #28a745;
+            font-size: 1em;
+            border-top: 2px solid #dee2e6;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+
+        #tableauImpression .footer-print {
+            margin-top: 20px;
+            font-size: 0.78em;
+            color: #999;
+            text-align: center;
         }
         
         .print-info {
@@ -598,9 +652,9 @@
             <!-- Note solde initial -->
             <div class="note-solde">
                 <strong>ℹ️ Note sur le Solde Initial</strong>
-                <p>Le solde cumulé est calculé à partir du solde initial renseigné ci-dessus.</p>
-                <p>⚠️ Le solde bancaire au 1er du mois peut déjà inclure des recettes du mois en cours (paiements anticipés, prélèvements automatiques avancés avant WE/férié) — recettes par ailleurs déjà comptées dans le prévisionnel. Le saisir entraînerait un double comptage : <strong>utiliser 0 reste l'approche la plus fiable.</strong></p>
-                <p>Avec un solde initial à 0, le solde cumulé reflète le <strong>cash-flow structurel sur 12 mois glissants</strong> : la richesse générée si le portefeuille clients reste stable.</p>
+                <p>Le solde cumulé est calculé à partir du solde initial renseigné ci-dessus, qui est celui du compte <strong>CMDP (épargne/BFR)</strong>.</p>
+                <p>⚠️ Il n'inclut pas les soldes des comptes BP, qui sont trop fluctuants et peuvent déjà inclure des recettes du mois en cours (paiements anticipés, prélèvements automatiques avancés avant WE/férié) — recettes par ailleurs déjà comptées dans le prévisionnel. Les inclure entraînerait un double comptage.</p>
+                <p>En ne comptant que le solde de la CMDP, le solde cumulé reflète le <strong>cash-flow structurel sur 12 mois glissants</strong> : la richesse générée si le portefeuille clients reste stable et sans compter d'éventuelles dépenses ponctuelles non prévues.</p>
             </div>
 
             <!-- Note données projetées -->
@@ -644,12 +698,36 @@
                 <!-- Généré dynamiquement -->
             </div>
 
-            <!-- INFORMATIONS POUR IMPRESSION - MASQUÉES À L'ÉCRAN -->
-            <div class="print-info">
+            <!-- TABLEAU D'IMPRESSION - MASQUÉ À L'ÉCRAN, VISIBLE EN PDF -->
+            <div id="tableauImpression">
+                <p class="print-period">
+                    🌐 Projection mensuelle — générée le <span id="dateImpression"></span> à <span id="heureImpression"></span><br>
+                    Période : <span id="periodeImpression"></span><br>
+                    Données sources : Recettes + Charges récurrentes • Généré automatiquement
+                </p>
+                <table id="printTable">
+                    <thead>
+                        <tr>
+                            <th>Mois</th>
+                            <th>Recettes HT</th>
+                            <th>Charges HT</th>
+                            <th>Solde mensuel</th>
+                            <th>Solde cumulé</th>
+                        </tr>
+                    </thead>
+                    <tbody id="printTableBody">
+                        <!-- Généré dynamiquement -->
+                    </tbody>
+                </table>
+                <div class="recapitulatif" id="printRecap">
+                    <!-- Généré dynamiquement -->
+                </div>
+                <p class="footer-print">🚀 Rocket Tower — Prévisionnel 12 Mois • Généré le <span id="dateImpressionFooter"></span></p>
+            </div>
+
+            <!-- INFORMATIONS IMPRESSION LEGACY - conservé pour compatibilité -->
+            <div class="print-info" style="display:none;">
                 <p><strong>🚀 ROCKET TOWER - PRÉVISIONNEL 12 MOIS</strong></p>
-                <p>Rapport généré le <span id="dateImpression"></span> à <span id="heureImpression"></span></p>
-                <p>Période : <span id="periodeImpression">Août 2025 - Juillet 2026</span></p>
-                <p>Données sources : Recettes + Charges récurrentes • Généré automatiquement</p>
             </div>
         </div>
     </div>
@@ -992,6 +1070,7 @@
             afficherStats();
             afficherAccordeons();
             mettreAJourGraphique();
+            mettreAJourTableauImpression();
             sauvegarderPrevisionnel();
             
             console.log('✅ === FIN CALCUL PRÉVISIONNEL ===');
@@ -1350,22 +1429,66 @@
         }
 
         // ===================================
+        // TABLEAU D'IMPRESSION
+        // ===================================
+
+        function mettreAJourTableauImpression() {
+            if (!projectionMensuelle || projectionMensuelle.length === 0) return;
+
+            const maintenant = new Date();
+            const dateStr = maintenant.toLocaleDateString('fr-FR');
+            const heureStr = maintenant.toLocaleTimeString('fr-FR');
+
+            // Dates
+            document.getElementById('dateImpression').textContent = dateStr;
+            document.getElementById('heureImpression').textContent = heureStr;
+            document.getElementById('dateImpressionFooter').textContent = dateStr;
+
+            // Période
+            const premierMois = projectionMensuelle[0].mois;
+            const dernierMois = projectionMensuelle[projectionMensuelle.length - 1].mois;
+            document.getElementById('periodeImpression').textContent = `${premierMois} → ${dernierMois}`;
+
+            // Lignes du tableau
+            const tbody = document.getElementById('printTableBody');
+            tbody.innerHTML = projectionMensuelle.map(m => {
+                const soldeClass = m.solde >= 0 ? 'solde-positif' : 'solde-negatif';
+                const cumuleClass = m.soldeCumule >= 0 ? 'solde-positif' : 'solde-negatif';
+                return `<tr>
+                    <td>${m.mois}</td>
+                    <td>${Math.round(m.totalRecettes).toLocaleString('fr-FR')} €</td>
+                    <td>${Math.round(m.totalCharges).toLocaleString('fr-FR')} €</td>
+                    <td class="${soldeClass}">${Math.round(m.solde).toLocaleString('fr-FR')} €</td>
+                    <td class="${cumuleClass}">${Math.round(m.soldeCumule).toLocaleString('fr-FR')} €</td>
+                </tr>`;
+            }).join('');
+
+            // Récapitulatif annuel
+            const totalRec = projectionMensuelle.reduce((s, m) => s + m.totalRecettes, 0);
+            const totalCha = projectionMensuelle.reduce((s, m) => s + m.totalCharges, 0);
+            const resultat = totalRec - totalCha;
+            const soldeInitial = parseFloat(document.getElementById('soldeInitial').value) || 0;
+            const soldeFinal = projectionMensuelle[projectionMensuelle.length - 1].soldeCumule;
+
+            document.getElementById('printRecap').innerHTML = `
+                <h3>Récapitulatif annuel</h3>
+                <div class="recap-row"><span>Total recettes annuelles HT</span><span>${Math.round(totalRec).toLocaleString('fr-FR')} €</span></div>
+                <div class="recap-row"><span>Total charges annuelles HT</span><span>${Math.round(totalCha).toLocaleString('fr-FR')} €</span></div>
+                <div class="recap-row recap-total"><span>Résultat annuel</span><span>${Math.round(resultat).toLocaleString('fr-FR')} €</span></div>
+                <div class="recap-row" style="margin-top:8px"><span>Solde initial</span><span>${Math.round(soldeInitial).toLocaleString('fr-FR')} €</span></div>
+                <div class="recap-row"><span>Solde final projeté</span><span>${Math.round(soldeFinal).toLocaleString('fr-FR')} €</span></div>
+            `;
+        }
+
+        // ===================================
         // EXPORT PDF
         // ===================================
 
         function exporterPDF() {
-            // Mise à jour des informations d'impression
-            const maintenant = new Date();
-            document.getElementById('dateImpression').textContent = maintenant.toLocaleDateString('fr-FR');
-            document.getElementById('heureImpression').textContent = maintenant.toLocaleTimeString('fr-FR');
-            
-            // Ouvrir tous les accordéons pour l'impression
-            const accordeonHeaders = document.querySelectorAll('.accordion-header');
-            const accordeonContents = document.querySelectorAll('.accordion-content');
-            
-            accordeonHeaders.forEach(header => header.classList.add('active'));
-            accordeonContents.forEach(content => content.classList.add('active'));
-            
+            // CORRECTION : recalculer depuis les données fraîches AVANT d'imprimer
+            // Garantit que le PDF = exactement ce qu'affiche l'onglet
+            calculerPrevisionnel();
+
             // Instructions pour l'utilisateur
             const confirmation = confirm(
                 '🖨️ Export PDF - Instructions :\n\n' +
@@ -1377,10 +1500,9 @@
             );
 
             if (confirmation) {
-                // Déclencher l'impression
                 setTimeout(() => {
                     window.print();
-                }, 500);
+                }, 300);
             }
         }
 
