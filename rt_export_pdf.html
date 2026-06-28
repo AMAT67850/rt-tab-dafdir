@@ -368,10 +368,8 @@
   /* ---- Construction HTML d'un bloc variation ---- */
   function buildVar(titre, varRec, varChr) {
     const totImpR = varRec.reduce((s,v)=>s+v.impR,0);
-    // Pour résultat : entrée charge = impC positif = résultat se dégrade → contribution négative
-    // résiliation charge = impC négatif = résultat s'améliore → contribution positive
-    const totImpC = varChr.reduce((s,v)=>s+v.impC,0);  // hausse charges si positif
-    const net = totImpR - totImpC;                       // impact net sur résultat
+    const totImpC = varChr.reduce((s,v)=>s+v.impC,0);
+    const net = totImpR - totImpC;
     const netSign = net>0?'+':''; const netCls = net>0?'c-pos':net<0?'c-neg':'c-neu';
 
     let html = `<div class="rpt-section sec-variations no-break">
@@ -380,7 +378,6 @@
     if (varRec.length===0 && varChr.length===0) {
       html += `<p style="font-size:8pt;color:#666;padding:4pt 0;font-style:italic;">Aucune variation connue sur cette période.</p>`;
     } else {
-      // Tableau recettes (si présent)
       if (varRec.length > 0) {
         html += `<table class="data-tbl">
           <colgroup><col style="width:24%"><col style="width:14%"><col style="width:28%"><col style="width:12%"><col style="width:10%"><col style="width:12%"></colgroup>
@@ -394,7 +391,6 @@
         });
         html += `</tbody></table>`;
       }
-      // Tableau charges (si présent)
       if (varChr.length > 0) {
         html += `<table class="data-tbl" style="margin-top:2pt">
           <colgroup><col style="width:24%"><col style="width:14%"><col style="width:28%"><col style="width:12%"><col style="width:10%"><col style="width:12%"></colgroup>
@@ -403,7 +399,6 @@
             <th class="td-c">Date</th><th class="td-c">Motif</th><th class="td-r">Impact/mois</th>
           </tr></thead><tbody>`;
         varChr.forEach(v=>{
-          // Impact sur résultat : résiliation = améliore résultat (+), démarrage = dégrade (-)
           const impResult = -v.impC;
           const cl = impResult>0?'c-pos':'c-neg';
           html += `<tr><td>${v.label}</td><td>${v.type}</td><td>${v.element}</td><td class="td-c">${fmtD(v.date)}</td><td class="td-c">${v.motif}</td><td class="td-r ${cl}">${impResult>0?'+':''}${eur(impResult)}</td></tr>`;
@@ -462,7 +457,6 @@
     document.getElementById('rpt-men-footer-date').textContent = 'Généré le '+d;
     document.getElementById('rpt-men-counts').textContent = recAct.length+' recettes · '+chrAct.length+' charges';
 
-    /* ---- 4 situations ---- */
     const s0  = calcSit(recettes,chargesRec,today);
     const s3  = calcSit(recettes,chargesRec,d3m);
     const s6  = calcSit(recettes,chargesRec,d6m);
@@ -498,7 +492,6 @@
         <td class="td-proj ${cl(sLT.res)}">${eur(sLT.res)}${diff(s12.res,sLT.res)}</td>
       </tr>`;
 
-    /* ---- Tableau recettes ---- */
     const tbR=document.getElementById('tbody-recettes'); tbR.innerHTML='';
     let tRN=0,tRL=0;
     recAct.forEach(r=>{
@@ -512,7 +505,6 @@
     document.getElementById('total-rec-nominal').textContent=eur(tRN);
     document.getElementById('total-rec-lisse').textContent=eur(tRL);
 
-    /* ---- Tableau charges ---- */
     const tbC=document.getElementById('tbody-charges-rec'); tbC.innerHTML='';
     let tCN=0,tCL=0;
     chargesRec.filter(c=>estActifA(c,today)).forEach(c=>{
@@ -524,7 +516,6 @@
     document.getElementById('total-chr-nominal').textContent=eur(tCN);
     document.getElementById('total-chr-lisse').textContent=eur(tCL);
 
-    /* ---- Variations ---- */
     const fmtH = d=>d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
     document.getElementById('section-variations').innerHTML =
       buildVar(`VARIATIONS CONNUES — aujourd'hui (${fmtH(today)}) → 3 mois (${fmtH(d3m)})`,
