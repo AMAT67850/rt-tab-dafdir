@@ -306,6 +306,24 @@
             font-weight: 700;
         }
 
+        /* AUDIT — Point 4 : mois de facturation/prélèvement réels */
+        .mois-intervention-group {
+            background: #fff8e1;
+            border: 2px solid #ffca28;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .mois-intervention-group label { font-weight: 600; color: #7a5b00; }
+        .mois-checkboxes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .mois-checkboxes label {
+            display: flex; align-items: center; gap: 4px;
+            font-weight: 400; font-size: 0.85em;
+            background: #fff; padding: 4px 9px; border-radius: 6px;
+            border: 1px solid #ffe082; cursor: pointer; color: #333;
+        }
+        .mois-checkboxes input[type="checkbox"] { cursor: pointer; }
+
         /* Checkbox Entrant */
         .checkbox-group-entrant {
             display: flex;
@@ -793,7 +811,7 @@
 
                     <div class="form-group">
                         <label for="periodicite">Périodicité *</label>
-                        <select id="periodicite" required onchange="calculerLisse()">
+                        <select id="periodicite" required onchange="calculerLisse(); toggleMoisIntervention();">
                             <option value="">Choisir</option>
                             <option value="MENSUEL">Mensuel</option>
                             <option value="BIMESTRIEL">Bimestriel</option>
@@ -801,6 +819,30 @@
                             <option value="SEMESTRIEL">Semestriel</option>
                             <option value="ANNUEL">Annuel</option>
                         </select>
+                    </div>
+
+                    <!-- AUDIT — Point 4 (ajout validé le 18/07/2026) : mois de facturation/prélèvement
+                         réels, pour les charges dont la périodicité s'écarte du calendrier civil standard
+                         (ex. Allianz Prévoyance, ES Electricité selon le cycle du compteur). Visible
+                         seulement si la périodicité n'est pas Mensuel. Aucune case cochée = calendrier
+                         par défaut de la périodicité (comportement inchangé si jamais utilisé). -->
+                    <div class="form-group mois-intervention-group" id="moisInterventionGroup" style="display: none;">
+                        <label>📆 Mois de prélèvement/facturation réels (si différents du calendrier standard)</label>
+                        <div class="mois-checkboxes">
+                            <label><input type="checkbox" class="moisInterventionCb" value="1"> Janv.</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="2"> Févr.</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="3"> Mars</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="4"> Avr.</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="5"> Mai</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="6"> Juin</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="7"> Juil.</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="8"> Août</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="9"> Sept.</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="10"> Oct.</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="11"> Nov.</label>
+                            <label><input type="checkbox" class="moisInterventionCb" value="12"> Déc.</label>
+                        </div>
+                        <small style="color:#888;">Ne cochez que si cette charge déroge au calendrier standard (ex. Allianz Prévoyance). Sinon, laissez tout décoché.</small>
                     </div>
 
                     <!-- Charge Entrante : démarrage différé -->
@@ -1159,6 +1201,39 @@
             document.getElementById('totalSortants').textContent = totalSortants;
         }
 
+        // AUDIT — Point 4 : affiche/masque le bloc "mois de facturation réels" selon la périodicité
+        function toggleMoisIntervention() {
+            try {
+                const periodicite = document.getElementById('periodicite').value;
+                const groupe = document.getElementById('moisInterventionGroup');
+                if (!periodicite || periodicite === 'MENSUEL') {
+                    groupe.style.display = 'none';
+                    document.querySelectorAll('.moisInterventionCb').forEach(cb => cb.checked = false);
+                } else {
+                    groupe.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erreur toggleMoisIntervention:', error);
+            }
+        }
+
+        // Lit les cases cochées et renvoie la liste au format "3,6,9,12" (ou '' si aucune case cochée)
+        function getMoisInterventionSaisi() {
+            const mois = Array.from(document.querySelectorAll('.moisInterventionCb'))
+                .filter(cb => cb.checked)
+                .map(cb => parseInt(cb.value, 10))
+                .sort((a, b) => a - b);
+            return mois.join(',');
+        }
+
+        // Coche les cases correspondant à une valeur existante (ex. "3,6,9,12")
+        function setMoisInterventionSaisi(valeur) {
+            const mois = (valeur || '').split(',').map(x => x.trim()).filter(Boolean);
+            document.querySelectorAll('.moisInterventionCb').forEach(cb => {
+                cb.checked = mois.includes(cb.value);
+            });
+        }
+
         // Gestion Modal
         function nouvelleCharge() {
             chargeEnEdition = null;
@@ -1171,6 +1246,8 @@
             document.getElementById('sortant').checked = false;
             document.getElementById('dateDepartGroup').style.display = 'none';
             document.getElementById('dateDepart').required = false;
+            setMoisInterventionSaisi('');
+            toggleMoisIntervention();
             document.getElementById('chargeModal').style.display = 'block';
         }
 
@@ -1188,6 +1265,7 @@
             document.getElementById('montantTTC').value = charge.montantTTC;
             document.getElementById('periodicite').value = charge.periodicite;
             document.getElementById('commentaire').value = charge.commentaire || '';
+            setMoisInterventionSaisi(charge.moisIntervention || '');
 
             // Entrant
             const entrantChecked = !!(charge.entrant && charge.dateEntree);
@@ -1203,6 +1281,7 @@
             document.getElementById('dateDepart').value = charge.dateDepart || '';
             document.getElementById('dateDepart').required = sortantChecked;
 
+            toggleMoisIntervention();
             calculerLisse();
             document.getElementById('chargeModal').style.display = 'block';
         }
@@ -1239,7 +1318,9 @@
                 entrant: document.getElementById('entrant').checked,
                 dateEntree: document.getElementById('entrant').checked ? document.getElementById('dateEntree').value : null,
                 sortant: document.getElementById('sortant').checked,
-                dateDepart: document.getElementById('sortant').checked ? document.getElementById('dateDepart').value : null
+                dateDepart: document.getElementById('sortant').checked ? document.getElementById('dateDepart').value : null,
+                // AUDIT — Point 4 : mois de prélèvement/facturation réels ('' = calendrier par défaut)
+                moisIntervention: document.getElementById('periodicite').value === 'MENSUEL' ? '' : getMoisInterventionSaisi()
             };
 
             if (chargeEnEdition !== null) {
