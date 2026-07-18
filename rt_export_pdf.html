@@ -172,9 +172,9 @@
         <tr>
           <th class="th-lbl">Indicateur</th>
           <th class="th-actuelle">📸 Situation actuelle</th>
-          <th class="th-proj">⏰ À 3 mois</th>
-          <th class="th-proj">📆 À 6 mois</th>
-          <th class="th-proj">📅 À 12 mois</th>
+          <th class="th-proj" id="th-3m">⏰ À 3 mois</th>
+          <th class="th-proj" id="th-6m">📆 À 6 mois</th>
+          <th class="th-proj" id="th-12m">📅 À 12 mois</th>
           <th class="th-proj">🔭 Long terme</th>
         </tr>
       </thead>
@@ -262,9 +262,21 @@
   const lisse = (m,p) => m/(FACT[(p||'').toUpperCase()]||1);
 
   const today = new Date(); today.setHours(0,0,0,0);
-  const d3m  = new Date(today); d3m.setMonth(d3m.getMonth()+3);
-  const d6m  = new Date(today); d6m.setMonth(d6m.getMonth()+6);
-  const d12m = new Date(today); d12m.setMonth(d12m.getMonth()+12);
+
+  /* AUDIT 14/07/2026 — Point 6 (validé le 18/07/2026) : les horizons "à 3/6/12 mois"
+     sont désormais ancrés sur des fins de mois civiles plutôt que sur un décalage
+     jour pour jour depuis aujourd'hui. Convention retenue : mois en cours = mois 0
+     (ex. rapport généré en juillet -> "à 3 mois" = fin octobre, et non le 14/17/28 octobre
+     selon le jour de génération). "Long terme" (dLT, +20 ans) n'est pas concerné par ce
+     changement — non validé, laissé à l'identique. */
+  function finMoisCivil(offsetMois) {
+    const d = new Date(today.getFullYear(), today.getMonth() + offsetMois + 1, 0);
+    d.setHours(23,59,59,999);
+    return d;
+  }
+  const d3m  = finMoisCivil(3);
+  const d6m  = finMoisCivil(6);
+  const d12m = finMoisCivil(12);
   const dLT  = new Date(today); dLT.setFullYear(dLT.getFullYear()+20);
 
   /* estActifA : utilisé uniquement pour le rapport mensuel (situation actuelle) */
@@ -366,6 +378,15 @@
     document.getElementById('rpt-men-date').textContent = d;
     document.getElementById('rpt-men-footer-date').textContent = 'Généré le '+d;
     document.getElementById('rpt-men-counts').textContent = recAct.length+' recettes · '+chrAct.length+' charges';
+
+    /* AUDIT — Point 6/2 : affichage des vraies dates de fin de mois retenues pour
+       chaque horizon, déduites automatiquement de la date du jour (plus de libellé
+       "à 3 mois" seul, sans repère temporel précis). */
+    const fmtMoisAnnee = d => d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+    document.getElementById('th-3m').innerHTML  = `⏰ À 3 mois<br><span style="font-size:0.7em;font-weight:400;">(fin ${fmtMoisAnnee(d3m)})</span>`;
+    document.getElementById('th-6m').innerHTML  = `📆 À 6 mois<br><span style="font-size:0.7em;font-weight:400;">(fin ${fmtMoisAnnee(d6m)})</span>`;
+    document.getElementById('th-12m').innerHTML = `📅 À 12 mois<br><span style="font-size:0.7em;font-weight:400;">(fin ${fmtMoisAnnee(d12m)})</span>`;
+
     const s0=calcSit(recettes,chargesRec,today), s3=calcSit(recettes,chargesRec,d3m), s6=calcSit(recettes,chargesRec,d6m), s12=calcSit(recettes,chargesRec,d12m), sLT=calcSit(recettes,chargesRec,dLT);
     const diff=(a,b)=>{ const d=b-a; if(Math.abs(d)<0.5) return ''; const s=d>0?'+':''; const cl=d>0?'c-pos':'c-neg'; return `<span class="c-diff ${cl}">${s}${eur(d)}</span>`; };
     const cl=v=>v>0?'c-pos':v<0?'c-neg':'c-neu';
