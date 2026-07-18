@@ -330,6 +330,21 @@
         return d > auj();
     }
 
+    /* AUDIT 14/07/2026 — Point 3 (validé le 18/07/2026) : la "situation actuelle" de ce
+       dashboard ne vérifiait pas la date de sortie (dateDepart) des contrats, contrairement
+       à rt_export_pdf.html (fonction estActifA), qui exclut un contrat dès que sa date de
+       sortie est passée. Résultat avant correction : un contrat sorti mais encore marqué
+       ACTIF restait compté ici, alors qu'il ne l'était plus dans le Rapport financier PDF.
+       Cette fonction réplique la même règle que estActifA, pour aligner les deux moteurs. */
+    function estActifAujourdhui(item) {
+        if (item.entrant === true && estFutur(item.dateEntree)) return false;
+        if (item.sortant === true && item.dateDepart) {
+            const dd = new Date(item.dateDepart); dd.setHours(0,0,0,0);
+            if (dd < auj()) return false;
+        }
+        return true;
+    }
+
     function fmtDate(dateStr) {
         if (!dateStr) return '';
         return new Date(dateStr).toLocaleDateString('fr-FR');
@@ -351,9 +366,9 @@
         console.log('🔢 Calcul des projections...');
 
         // ── Situation actuelle ────────────────────────────────────
-        // Recettes effectives aujourd'hui : toutes SAUF celles dont dateEntree est dans le futur
-        const recActuelles = recettes.filter(r => !r.entrant || !estFutur(r.dateEntree));
-        const chActuelles  = charges.filter(c  => !c.entrant || !estFutur(c.dateEntree));
+        // Recettes effectives aujourd'hui : entrée pas future ET sortie pas déjà passée (point 3)
+        const recActuelles = recettes.filter(estActifAujourdhui);
+        const chActuelles  = charges.filter(estActifAujourdhui);
 
         const recBase = recActuelles.reduce((s,r) => s + lisse(r), 0);
         const chBase  = chActuelles.reduce((s,c)  => s + lisse(c), 0);
@@ -542,7 +557,7 @@
     function renderRepartitions() {
         // Recettes base actuelle
         const mapR = {};
-        recettes.filter(r => !r.entrant || !estFutur(r.dateEntree)).forEach(r => {
+        recettes.filter(estActifAujourdhui).forEach(r => {
             const t = r.type || 'Non catégorisé';
             if (!mapR[t]) mapR[t] = { count:0, total:0 };
             mapR[t].count++; mapR[t].total += lisse(r);
@@ -557,7 +572,7 @@
 
         // Charges base actuelle
         const mapC = {};
-        charges.filter(c => !c.entrant || !estFutur(c.dateEntree)).forEach(c => {
+        charges.filter(estActifAujourdhui).forEach(c => {
             const t = c.type || 'Non catégorisé';
             if (!mapC[t]) mapC[t] = { count:0, total:0 };
             mapC[t].count++; mapC[t].total += lisse(c);
