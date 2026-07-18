@@ -498,13 +498,16 @@
 
         .modal-content {
             background-color: white;
-            margin: 5% auto 60px; /* marge basse pour ne pas coller au bord en cas de défilement */
+            margin: 5% auto;
             padding: 0;
             border-radius: 12px;
             width: 90%;
             max-width: 600px;
+            max-height: 85vh; /* correctif scroll : la fenêtre ne dépasse plus jamais l'écran */
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-header {
@@ -512,6 +515,7 @@
             color: white;
             padding: 20px 30px;
             border-bottom: none;
+            flex-shrink: 0; /* l'en-tête reste toujours visible, ne défile pas */
         }
 
         .modal-header h2 {
@@ -535,6 +539,8 @@
 
         .modal-body {
             padding: 30px;
+            overflow-y: auto; /* correctif : c'est ce bloc qui défile désormais, jusqu'au bouton Sauvegarder */
+            flex: 1 1 auto;
         }
 
         .form-group {
