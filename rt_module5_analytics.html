@@ -183,7 +183,7 @@
         </div>
         <div class="variations-body" id="var-3m"></div>
     </div>
-    <div class="situation-label">⏰ SITUATION À 3 MOIS</div>
+    <div class="situation-label">⏰ SITUATION À 3 MOIS <span id="date-3m"></span></div>
     <div class="situation-bloc" id="bloc-3m"></div>
     <div class="divider"></div>
 
@@ -197,7 +197,7 @@
         </div>
         <div class="variations-body" id="var-6m"></div>
     </div>
-    <div class="situation-label">📆 SITUATION À 6 MOIS</div>
+    <div class="situation-label">📆 SITUATION À 6 MOIS <span id="date-6m"></span></div>
     <div class="situation-bloc" id="bloc-6m"></div>
     <div class="divider"></div>
 
@@ -211,7 +211,7 @@
         </div>
         <div class="variations-body" id="var-12m"></div>
     </div>
-    <div class="situation-label">📅 SITUATION À 12 MOIS</div>
+    <div class="situation-label">📅 SITUATION À 12 MOIS <span id="date-12m"></span></div>
     <div class="situation-bloc" id="bloc-12m"></div>
     <div class="divider"></div>
 
@@ -299,14 +299,28 @@
     // ─────────────────────────────────────────────────────────────
     const auj = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
 
-    function dansIntervalle(dateStr, joursMin, joursMax) {
-        // joursMin inclus, joursMax exclus (sauf last bucket = inclus)
+    /* AUDIT 14/07/2026 — Point 6 (validé le 18/07/2026) : les paliers "3/6/12 mois" de ce
+       dashboard étaient calculés en jours fixes glissants (0-90 / 90-180 / 180-365 / >365),
+       ce qui divergeait de rt_export_pdf.html (Constat A de l'audit). Ils sont désormais
+       ancrés sur les mêmes fins de mois civiles que le Rapport financier, avec la même
+       convention : mois en cours = mois 0 (ex. généré en juillet -> "à 3 mois" = fin octobre). */
+    function finMoisCivil(offsetMois) {
+        const ref = auj();
+        const d = new Date(ref.getFullYear(), ref.getMonth() + offsetMois + 1, 0);
+        d.setHours(23,59,59,999);
+        return d;
+    }
+    function fmtFinMois(d) {
+        return 'fin ' + d.toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
+    }
+
+    function dansIntervalle(dateStr, borneMin, borneMax) {
+        // borneMin exclu, borneMax inclus (sauf dernier palier = borneMax null -> au-delà)
         if (!dateStr) return false;
         const d = new Date(dateStr);
         if (isNaN(d)) return false;
-        const diff = (d - auj()) / 86400000;
-        if (joursMax === null) return diff > joursMin;   // au-delà
-        return diff > joursMin && diff <= joursMax;
+        if (borneMax === null) return d > borneMin;   // au-delà
+        return d > borneMin && d <= borneMax;
     }
 
     function estFutur(dateStr) {
@@ -344,12 +358,13 @@
         const recBase = recActuelles.reduce((s,r) => s + lisse(r), 0);
         const chBase  = chActuelles.reduce((s,c)  => s + lisse(c), 0);
 
-        // ── Calcul des variations par période ────────────────────
+        // ── Calcul des variations par période (bornes = fins de mois civiles, point 6) ──
+        const bornes = { actuel: auj(), m3: finMoisCivil(3), m6: finMoisCivil(6), m12: finMoisCivil(12) };
         const periodes = [
-            { label:'0→3m',   min:0,   max:90  },
-            { label:'3→6m',   min:90,  max:180 },
-            { label:'6→12m',  min:180, max:365 },
-            { label:'>12m',   min:365, max:null },
+            { label:'0→3m',   min: bornes.actuel, max: bornes.m3  },
+            { label:'3→6m',   min: bornes.m3,      max: bornes.m6  },
+            { label:'6→12m',  min: bornes.m6,      max: bornes.m12 },
+            { label:'>12m',   min: bornes.m12,     max: null },
         ];
 
         // Pour chaque période : recettes qui entrent (+) ou sortent (−)
@@ -557,6 +572,12 @@
     }
 
     function afficher() {
+        // Point 6 : dates de fin de mois affichées, déduites de la date du jour
+        const p = niveaux.periodes;
+        document.getElementById('date-3m').textContent  = `(${fmtFinMois(p[0].max)})`;
+        document.getElementById('date-6m').textContent  = `(${fmtFinMois(p[1].max)})`;
+        document.getElementById('date-12m').textContent = `(${fmtFinMois(p[2].max)})`;
+
         // Situations
         renderSituationBloc('bloc-actuel', niveaux[0], null);
         renderSituationBloc('bloc-3m',    niveaux[1], niveaux[0]);
