@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rocket Tower - Système de Synchronisation</title>
+    <title>Rocket Tower - Sauvegarde et données</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -134,10 +134,6 @@
 
         .btn-import {
             background: linear-gradient(135deg, #fdcb6e, #e17055);
-        }
-
-        .btn-compare {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
         }
 
         .btn-reset {
@@ -354,13 +350,13 @@
                     <!-- Header -->
                     <div class="sync-header">
                         <h1>🚀 Rocket Tower</h1>
-                        <p>Système de Synchronisation Multi-Utilisateurs</p>
+                        <p>Sauvegarde et gestion des données locales</p>
                     </div>
 
                     <!-- Status -->
                     <div class="status-container">
                         <div id="syncStatus" class="status-indicator status-pending">
-                            ⏳ Vérification de l'état de synchronisation...
+                            ⏳ Vérification de l'état de la sauvegarde...
                         </div>
                         
                         <div class="stats-grid" id="statsGrid">
@@ -370,7 +366,7 @@
 
                     <!-- Actions -->
                     <div class="actions-container">
-                        <h4 class="mb-4">🎛️ Actions de Synchronisation</h4>
+                        <h4 class="mb-4">🎛️ Sauvegarde des données</h4>
                         
                         <div class="row">
                             <div class="col-md-6 text-center">
@@ -390,20 +386,11 @@
                         <hr class="my-4">
 
                         <div class="row">
-                            <div class="col-md-4 text-center">
-                                <button id="syncButton" class="action-btn" onclick="lancerSynchronisation()">
-                                    ⚡ Synchroniser
-                                </button>
-                            </div>
-                            <div class="col-md-4 text-center">
-                                <button class="action-btn btn-compare" onclick="syncCompare()">
-                                    🔍 Comparer
-                                </button>
-                            </div>
-                            <div class="col-md-4 text-center">
+                            <div class="col-md-12 text-center">
                                 <button class="action-btn btn-reset" onclick="resetLocal()">
-                                    🗑️ Reset Local
+                                    🗑️ Réinitialiser les données locales
                                 </button>
+                                <br><small class="text-muted">Efface recettes, charges récurrentes et charges périodiques de ce navigateur</small>
                             </div>
                         </div>
                     </div>
@@ -454,23 +441,12 @@
     <script>
         // ========== ÉTAT DE SYNCHRONISATION ==========
         let syncState = {
-            status: 'idle', // idle, syncing, synced, error
-            lastSync: null,
             local: {
                 recettes: 0,
                 chargesRecurrentes: 0,
                 chargesPeriodiques: 0
             },
-            cloud: {
-                recettes: 0,
-                chargesRecurrentes: 0,
-                chargesPeriodiques: 0
-            },
-            pending: {
-                recettes: 0,
-                chargesRecurrentes: 0,
-                chargesPeriodiques: 0
-            }
+            derniereSauvegarde: null
         };
 
         // ========== FONCTIONS UTILITAIRES ==========
@@ -502,78 +478,63 @@
                     chargesRecurrentes: chargesRecurrentes.length,
                     chargesPeriodiques: chargesPeriodiques.length
                 };
-                
-                // Simulation données cloud (dans un vrai scénario, ça viendrait de SeaTable)
-                syncState.cloud = { ...syncState.local };
-                syncState.pending = { recettes: 0, chargesRecurrentes: 0, chargesPeriodiques: 0 };
-                
-                // Charger timestamp dernière sync
-                const lastSyncStored = localStorage.getItem('lastSyncRT');
-                if (lastSyncStored) {
-                    syncState.lastSync = new Date(lastSyncStored);
-                }
+
+                // Horodatage du dernier export réussi
+                const derniere = localStorage.getItem('derniereSauvegardeRT');
+                syncState.derniereSauvegarde = derniere ? new Date(derniere) : null;
                 
             } catch (error) {
                 addLog(`❌ Erreur chargement données : ${error.message}`, 'error');
             }
         }
 
-        async function testerConnexionSeaTable() {
-            // Simulation test connexion
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    // Dans un vrai scénario, ici on testerait la connexion API SeaTable
-                    resolve(Math.random() > 0.3); // 70% de succès simulé
-                }, 1000);
-            });
+        function formaterAnciennete(date) {
+            const jours = Math.floor((Date.now() - date.getTime()) / 86400000);
+            if (jours <= 0) return "aujourd'hui";
+            if (jours === 1) return 'hier';
+            return 'il y a ' + jours + ' jours';
         }
 
         function mettreAJourInterface() {
-            // Mettre à jour le statut
             const statusElement = document.getElementById('syncStatus');
-            const now = new Date();
-            
-            if (syncState.status === 'synced' && syncState.lastSync) {
-                const timeDiff = now - syncState.lastSync;
-                const minutes = Math.floor(timeDiff / 60000);
-                statusElement.className = 'status-indicator status-synced';
-                statusElement.innerHTML = `✅ Synchronisé (il y a ${minutes} min)`;
-            } else if (syncState.status === 'pending') {
+            const total = syncState.local.recettes
+                        + syncState.local.chargesRecurrentes
+                        + syncState.local.chargesPeriodiques;
+
+            if (total === 0) {
                 statusElement.className = 'status-indicator status-pending';
-                statusElement.innerHTML = '⏳ Synchronisation requise';
-            } else if (syncState.status === 'error') {
+                statusElement.innerHTML = '📭 Aucune donnée dans ce navigateur';
+            } else if (!syncState.derniereSauvegarde) {
                 statusElement.className = 'status-indicator status-error';
-                statusElement.innerHTML = '❌ Erreur de synchronisation';
+                statusElement.innerHTML = '⚠️ Jamais sauvegardé — les données ne sont que dans ce navigateur';
             } else {
-                statusElement.className = 'status-indicator status-pending';
-                statusElement.innerHTML = '⏳ Vérification...';
+                const jours = Math.floor((Date.now() - syncState.derniereSauvegarde.getTime()) / 86400000);
+                const quand = formaterAnciennete(syncState.derniereSauvegarde)
+                            + ' (' + syncState.derniereSauvegarde.toLocaleDateString('fr-FR') + ')';
+                if (jours > 30) {
+                    statusElement.className = 'status-indicator status-error';
+                    statusElement.innerHTML = '⚠️ Dernière sauvegarde ' + quand;
+                } else if (jours > 7) {
+                    statusElement.className = 'status-indicator status-pending';
+                    statusElement.innerHTML = '⏳ Dernière sauvegarde ' + quand;
+                } else {
+                    statusElement.className = 'status-indicator status-synced';
+                    statusElement.innerHTML = '✅ Dernière sauvegarde ' + quand;
+                }
             }
 
-            // Mettre à jour les statistiques
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-box">
                     <div class="stat-number">${syncState.local.recettes}</div>
-                    <div class="stat-label">Recettes (local)</div>
+                    <div class="stat-label">Recettes</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-number">${syncState.local.chargesRecurrentes}</div>
-                    <div class="stat-label">Charges Réc. (local)</div>
+                    <div class="stat-label">Charges récurrentes</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-number">${syncState.local.chargesPeriodiques}</div>
-                    <div class="stat-label">Charges Pér. (local)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">${syncState.pending.recettes}</div>
-                    <div class="stat-label">Recettes (à sync)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">${syncState.pending.chargesRecurrentes}</div>
-                    <div class="stat-label">Charges Réc. (à sync)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">${syncState.pending.chargesPeriodiques}</div>
-                    <div class="stat-label">Charges Pér. (à sync)</div>
+                    <div class="stat-label">Charges périodiques</div>
                 </div>
             `;
         }
@@ -619,6 +580,10 @@
                 // Nettoyer l'URL
                 URL.revokeObjectURL(link.href);
                 
+                localStorage.setItem('derniereSauvegardeRT', new Date().toISOString());
+                chargerDonneesLocales();
+                mettreAJourInterface();
+
                 addLog(`✅ Export réussi ! Fichier téléchargé (${Math.round(blob.size / 1024)} KB)`, 'success');
                 
             } catch (error) {
@@ -671,9 +636,6 @@
                         localStorage.setItem('chargesRecurrentesRT', JSON.stringify(donnees.chargesRecurrentes || []));
                         localStorage.setItem('chargesPeriodiquesRT', JSON.stringify(donnees.chargesPeriodiques || []));
                         
-                        // Mettre à jour timestamp
-                        localStorage.setItem('lastSyncRT', new Date().toISOString());
-                        
                         // Calculer statistiques import
                         const totalImporte = (donnees.recettes?.length || 0) + (donnees.chargesRecurrentes?.length || 0) + (donnees.chargesPeriodiques?.length || 0);
                         
@@ -710,89 +672,16 @@
 
         // ========== AUTRES FONCTIONS (CONSERVÉES INTÉGRALEMENT) ==========
         
-        async function lancerSynchronisation() {
-            const button = document.getElementById('syncButton');
-            button.disabled = true;
-            button.innerHTML = '⏳ Synchronisation...';
-            
-            try {
-                addLog('🚀 Démarrage synchronisation complète...', 'info');
-                
-                // Test connexion
-                const connected = await testerConnexionSeaTable();
-                
-                if (connected) {
-                    // Simulation export (car API /rows/ non fonctionnelle)
-                    addLog('📤 Simulation export vers SeaTable...', 'warning');
-                    
-                    // Dans un vrai scénario, ici on exporterait via CSV ou autres méthodes
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    
-                    // Mise à jour état
-                    syncState.cloud = { ...syncState.local };
-                    syncState.pending = { recettes: 0, chargesRecurrentes: 0, chargesPeriodiques: 0 };
-                    syncState.status = 'synced';
-                    syncState.lastSync = new Date();
-                    
-                    // Sauvegarder timestamp de dernière sync
-                    localStorage.setItem('lastSyncRT', syncState.lastSync.toISOString());
-                    
-                    addLog('✅ Synchronisation simulée réussie !', 'success');
-                    
-                } else {
-                    addLog('⚠️ Mode local maintenu - Synchronisation différée', 'warning');
-                    syncState.status = 'error';
-                }
-                
-            } catch (error) {
-                addLog(`❌ Erreur synchronisation : ${error.message}`, 'error');
-                syncState.status = 'error';
-            } finally {
-                button.disabled = false;
-                button.innerHTML = '⚡ Synchroniser';
-                mettreAJourInterface();
-            }
-        }
-
-        async function syncCompare() {
-            addLog('🔍 Comparaison des données...', 'info');
-            const comparison = `
-Comparaison Données :
-
-LOCAL :
-- Recettes : ${syncState.local.recettes}
-- Charges Récurrentes : ${syncState.local.chargesRecurrentes}  
-- Charges Périodiques : ${syncState.local.chargesPeriodiques}
-
-CLOUD (SeaTable) :
-- Recettes : ${syncState.cloud.recettes}
-- Charges Récurrentes : ${syncState.cloud.chargesRecurrentes}
-- Charges Périodiques : ${syncState.cloud.chargesPeriodiques}
-
-À SYNCHRONISER :
-- Recettes : ${syncState.pending.recettes}
-- Charges Récurrentes : ${syncState.pending.chargesRecurrentes}
-- Charges Périodiques : ${syncState.pending.chargesPeriodiques}
-            `;
-            alert(comparison);
-        }
-
         async function resetLocal() {
             if (confirm('⚠️ ATTENTION !\n\nCette action va supprimer TOUTES vos données locales.\n\nÊtes-vous certain de vouloir continuer ?')) {
                 try {
                     localStorage.removeItem('recettesRT');
                     localStorage.removeItem('chargesRecurrentesRT');
                     localStorage.removeItem('chargesPeriodiquesRT');
-                    localStorage.removeItem('lastSyncRT');
-                    
                     addLog('🗑️ Données locales supprimées', 'warning');
-                    
-                    // Réinitialiser l'état
+
                     syncState.local = { recettes: 0, chargesRecurrentes: 0, chargesPeriodiques: 0 };
-                    syncState.pending = { recettes: 0, chargesRecurrentes: 0, chargesPeriodiques: 0 };
-                    syncState.status = 'idle';
-                    syncState.lastSync = null;
-                    
+
                     mettreAJourInterface();
                     
                     addLog('✅ Reset terminé - Vous pouvez importer de nouvelles données', 'info');
@@ -1082,8 +971,8 @@ CLOUD (SeaTable) :
 
         // ========== INITIALISATION ==========
         document.addEventListener('DOMContentLoaded', function() {
-            addLog('🚀 Interface de synchronisation initialisée', 'success');
-            addLog('💡 Export/Import automatique activé !', 'info');
+            addLog('🚀 Interface de sauvegarde initialisée', 'success');
+            addLog('💡 Les données ne quittent ce navigateur que par un export manuel', 'info');
             chargerDonneesLocales();
             mettreAJourInterface();
             afficherTypesRecettes();

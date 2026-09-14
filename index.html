@@ -34,6 +34,7 @@
             position: relative;
         }
 
+        /* Indicateur de sauvegarde (ancien indicateur de synchronisation, réemployé) */
         .sync-indicator {
             position: absolute;
             top: 20px;
@@ -229,11 +230,6 @@
             color: #155724;
         }
 
-        .status-sync {
-            background: rgba(0, 123, 255, 0.2);
-            color: #004085;
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -272,14 +268,14 @@
     </style>
 </head>
 <body>
-    <!-- HEADER AVEC SYNCHRONISATION -->
+    <!-- HEADER AVEC INDICATEUR DE SAUVEGARDE -->
     <div class="header">
         <div class="sync-indicator">
-            <div class="sync-status" id="syncStatus">
-                <div class="sync-dot sync-orange" id="syncDot"></div>
-                <span id="syncText">Vérification...</span>
+            <div class="sync-status" id="sauvegardeStatus">
+                <div class="sync-dot sync-orange" id="sauvegardeDot"></div>
+                <span id="sauvegardeText">Vérification...</span>
             </div>
-            <a href="rocket_tower_sync_system.html" class="sync-link">⚡ Gérer Sync</a>
+            <a href="rocket_tower_sync_system.html" class="sync-link">💾 Sauvegarder</a>
         </div>
 
         <h1>🚀 ROCKET TOWER</h1>
@@ -319,7 +315,6 @@
                 <p class="section-description">Système complet avec contrats clients réels intégrés, lissage automatique des périodicités et persistance localStorage.</p>
                 <a href="rt_module2_recettes_crud_final.html" class="btn btn-success">💵 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
-                <span class="status-badge status-sync">🔄 Sync Hybride</span>
             </div>
 
             <!-- CHARGES RÉCURRENTES -->
@@ -328,7 +323,6 @@
                 <p class="section-description">Système complet avec charges réelles intégrées, lissage automatique des périodicités et persistance localStorage.</p>
                 <a href="rt_module3_charges_crud.html" class="btn btn-danger">💰 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
-                <span class="status-badge status-sync">🔄 Sync Hybride</span>
             </div>
 
             <!-- CHARGES PÉRIODIQUES -->
@@ -337,7 +331,6 @@
                 <p class="section-description">Gestion complète des charges 1-2 fois par an avec CRUD localStorage, calculs automatiques et persistance.</p>
                 <a href="rt_Module4_charges-periodiques_crud.html" class="btn btn-warning">📅 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
-                <span class="status-badge status-sync">🔄 Sync Hybride</span>
             </div>
 
             <!-- ANALYTICS DASHBOARD -->
@@ -364,82 +357,79 @@
                 <span class="status-badge status-operational">✅ Opérationnel</span>
             </div>
 
-            <!-- ADMINISTRATION SYNC -->
+            <!-- SAUVEGARDE ET DONNÉES -->
             <div class="section-card">
-                <h2 class="section-title">⚙️ Administration Synchronisation</h2>
-                <p class="section-description">Interface de monitoring et diagnostic avancés de la synchronisation hybride multi-utilisateurs.</p>
-                <a href="rocket_tower_sync_system.html" class="btn btn-info">⚙️ Accéder à l'Interface</a>
+                <h2 class="section-title">💾 Sauvegarde et Données</h2>
+                <p class="section-description">Export et import du fichier de sauvegarde JSON, gestion des types de recettes, réinitialisation des données locales.</p>
+                <a href="rocket_tower_sync_system.html" class="btn btn-info">💾 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
             </div>
         </div>
     </div>
 
     <script>
-        // Système de synchronisation hybride - Indicateur Dashboard
-        let syncStatus = 'checking';
-        let isOnline = navigator.onLine;
+        // ==========================================================
+        // INDICATEUR DE SAUVEGARDE
+        // Les données ne vivent que dans le stockage local de ce
+        // navigateur. La seule protection est l'export JSON manuel,
+        // depuis rocket_tower_sync_system.html. Cet indicateur
+        // rappelle la date du dernier export réussi.
+        // ==========================================================
 
-        function updateSyncIndicator(status) {
-            const dot = document.getElementById('syncDot');
-            const text = document.getElementById('syncText');
-            
-            // Supprimer toutes les classes de couleur
+        const SEUIL_ALERTE_JOURS   = 7;   // au-delà : orange
+        const SEUIL_CRITIQUE_JOURS = 30;  // au-delà : rouge
+
+        function joursDepuis(dateISO) {
+            const d = new Date(dateISO);
+            if (isNaN(d.getTime())) return null;
+            return Math.floor((Date.now() - d.getTime()) / 86400000);
+        }
+
+        function afficherEtatSauvegarde() {
+            const dot  = document.getElementById('sauvegardeDot');
+            const text = document.getElementById('sauvegardeText');
+            if (!dot || !text) return;
+
+            let donneesPresentes = false;
+            let derniere = null;
+            try {
+                donneesPresentes = !!(localStorage.getItem('recettesRT')
+                    || localStorage.getItem('chargesRecurrentesRT')
+                    || localStorage.getItem('chargesPeriodiquesRT'));
+                derniere = localStorage.getItem('derniereSauvegardeRT');
+            } catch (e) {
+                dot.className = 'sync-dot sync-red';
+                text.textContent = 'Stockage local inaccessible';
+                return;
+            }
+
             dot.className = 'sync-dot';
-            
-            switch (status) {
-                case 'synced':
-                    dot.classList.add('sync-green');
-                    text.textContent = 'Synchronisé';
-                    break;
-                case 'pending':
-                    dot.classList.add('sync-orange');
-                    text.textContent = 'Sync en attente';
-                    break;
-                case 'syncing':
-                    dot.classList.add('sync-blue');
-                    text.textContent = 'Synchronisation...';
-                    break;
-                case 'offline':
-                    dot.classList.add('sync-red');
-                    text.textContent = 'Mode local';
-                    break;
-                default:
-                    dot.classList.add('sync-orange');
-                    text.textContent = 'Vérification...';
+
+            if (!donneesPresentes) {
+                dot.classList.add('sync-orange');
+                text.textContent = 'Aucune donnée dans ce navigateur';
+                return;
             }
+
+            const jours = derniere ? joursDepuis(derniere) : null;
+
+            if (jours === null) {
+                dot.classList.add('sync-red');
+                text.textContent = 'Jamais sauvegardé';
+                return;
+            }
+
+            if (jours > SEUIL_CRITIQUE_JOURS)    dot.classList.add('sync-red');
+            else if (jours > SEUIL_ALERTE_JOURS) dot.classList.add('sync-orange');
+            else                                 dot.classList.add('sync-green');
+
+            if (jours <= 0)      text.textContent = 'Sauvegarde du jour';
+            else if (jours === 1) text.textContent = 'Sauvegarde d\'hier';
+            else                  text.textContent = 'Sauvegarde il y a ' + jours + ' jours';
         }
 
-        function checkSyncStatus() {
-            // Vérifier l'état des données localStorage
-            const recettes = localStorage.getItem('recettesRT');
-            const charges = localStorage.getItem('chargesRecurrentesRT');
-            const chargesPer = localStorage.getItem('chargesPeriodiquesRT');
-            
-            if (recettes || charges || chargesPer) {
-                updateSyncIndicator('synced');
-            } else {
-                updateSyncIndicator('pending');
-            }
-        }
-
-        // Surveillance réseau
-        window.addEventListener('online', () => {
-            isOnline = true;
-            checkSyncStatus();
-        });
-
-        window.addEventListener('offline', () => {
-            isOnline = false;
-            updateSyncIndicator('offline');
-        });
-
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(checkSyncStatus, 1000);
-        });
-
-        // Vérification périodique
-        setInterval(checkSyncStatus, 30000);
+        document.addEventListener('DOMContentLoaded', afficherEtatSauvegarde);
+        window.addEventListener('focus', afficherEtatSauvegarde);
     </script>
 </body>
 </html>
