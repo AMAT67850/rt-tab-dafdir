@@ -487,7 +487,9 @@
         if (!doitApparaitreCeMois(r, moisCourant)) return;
         const supprRec = suppressionsTemporaires[moisCle]?.recettes || [];
         if (supprRec.some(s => memeFiche(s.id, r.id))) return;
-        let montant = r.montantHT;
+        // CORRECTION 14/09/2026 — constat D.4 : garde-fou ajouté, une fiche sans montant
+        // rendait le total du mois NaN, puis le solde cumulé de tous les mois suivants.
+        let montant = r.montantHT || 0;
         const ov = (overridesTemporaires[moisCle]?.recettes || []).find(o => memeFiche(o.id, r.id));
         if (ov) montant = ov.nouveauMontant;
         tR += montant;
@@ -507,7 +509,7 @@
         if (!doitApparaitreCeMois(c, moisCourant)) return;
         const supprChr = suppressionsTemporaires[moisCle]?.charges || [];
         if (supprChr.some(s => memeFiche(s.id, c.id))) return;
-        let montant = Math.abs(c.montantHT);
+        let montant = Math.abs(c.montantHT || 0);   // même garde-fou, constat D.4
         const ov = (overridesTemporaires[moisCle]?.charges || []).find(o => memeFiche(o.id, c.id));
         if (ov) montant = ov.nouveauMontant;
         tC += montant;

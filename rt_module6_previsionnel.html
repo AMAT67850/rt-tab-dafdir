@@ -737,7 +737,7 @@
                     </div>
                     <div class="form-group">
                         <label>Montant HT (€)</label>
-                        <input type="number" id="operationMontant" required step="0.01" placeholder="0.00">
+                        <input type="number" id="operationMontant" required step="0.01" min="0" placeholder="0.00">
                     </div>
                     <div class="form-group">
                         <label>Commentaire (optionnel)</label>
@@ -936,7 +936,11 @@
                         const estSupprimee = suppressions.some(s => memeFiche(s.id, recette.id));
                         
                         if (!estSupprimee) {
-                            let montant = Math.abs(recette.montantHT || 0);
+                            // CORRECTION 14/09/2026 — constat D.4 : la valeur absolue était
+                            // sans effet sur une recette normale, enregistrée en positif, mais
+                            // transformait un avoir saisi en négatif en recette du même montant.
+                            // Les deux moteurs de prévisionnel lisent désormais la même chose.
+                            let montant = recette.montantHT || 0;
                             
                             // Vérifier si modifiée temporairement
                             const overrides = window.overridesTemporaires?.[moisCle]?.recettes || [];
@@ -1056,12 +1060,23 @@
                 });
             }
             
+            // CORRECTION 14/09/2026 — l'enregistrement était placé APRÈS le tracé du graphique.
+            // Chart.js étant chargé depuis un CDN, une absence de connexion faisait échouer le
+            // tracé et, avec lui, l'enregistrement : solde initial, opérations spécifiques et
+            // ajustements saisis dans la session étaient perdus à la fermeture, sans message.
+            // On enregistre désormais AVANT d'afficher, et le tracé est isolé pour qu'une
+            // erreur de rendu ne puisse plus rien empêcher.
+            sauvegarderPrevisionnel();
+
             afficherStats();
             afficherAccordeons();
-            mettreAJourGraphique();
             mettreAJourTableauImpression();
-            sauvegarderPrevisionnel();
-            
+            try {
+                mettreAJourGraphique();
+            } catch (error) {
+                console.error('❌ Le graphique n\'a pas pu être tracé (les données sont enregistrées) :', error);
+            }
+
             console.log('✅ === FIN CALCUL PRÉVISIONNEL ===');
             console.log('📊 Totaux finaux:', {
                 totalRecettesAnnuel: projectionMensuelle.reduce((sum, m) => sum + m.totalRecettes, 0),
@@ -1183,8 +1198,29 @@
         }
 
         function mettreAJourGraphique() {
-            const ctx = document.getElementById('prevChart').getContext('2d');
-            
+            const canvas = document.getElementById('prevChart');
+
+            // Chart.js vient d'un CDN : sans connexion, il est simplement absent. On le dit,
+            // plutôt que de laisser un cadre vide qui ferait douter des chiffres.
+            if (typeof Chart === 'undefined') {
+                canvas.style.display = 'none';
+                if (!document.getElementById('prevChartIndispo')) {
+                    const msg = document.createElement('div');
+                    msg.id = 'prevChartIndispo';
+                    msg.style.cssText = 'padding:18px;text-align:center;color:#8a6d3b;background:#fcf8e3;' +
+                                        'border:1px solid #faebcc;border-radius:8px;font-size:14px;line-height:1.5;';
+                    msg.textContent = "Graphique indisponible : la bibliothèque de tracé n'a pas pu être chargée, " +
+                                      "faute de connexion internet. Les chiffres du tableau et l'enregistrement " +
+                                      "de vos données ne sont pas affectés.";
+                    canvas.parentNode.insertBefore(msg, canvas);
+                }
+                return;
+            }
+            const ancienMessage = document.getElementById('prevChartIndispo');
+            if (ancienMessage) { ancienMessage.remove(); canvas.style.display = ''; }
+
+            const ctx = canvas.getContext('2d');
+
             if (prevChart) {
                 prevChart.destroy();
             }
@@ -1290,7 +1326,18 @@
             const libelle = document.getElementById('operationLibelle').value;
             const montant = parseFloat(document.getElementById('operationMontant').value);
             const commentaire = document.getElementById('operationCommentaire').value;
-            
+
+            // AJOUT 14/09/2026 — constat D.4. Le sens de l'opération est porté par le type,
+            // recette ou charge ; un montant négatif ferait donc dire au formulaire l'inverse
+            // de ce qu'il affiche. Un avoir client se saisit en charge, un remboursement
+            // reçu d'un fournisseur en recette.
+            if (montant < 0) {
+                alert("Le montant d'une opération ne peut pas être négatif.\n\n" +
+                      "C'est le type choisi — recette ou charge — qui donne le sens de l'opération.\n" +
+                      "Un avoir client se saisit en charge ; un remboursement reçu, en recette.");
+                return;
+            }
+
             if (!operationsSpecifiques[moisCle]) {
                 operationsSpecifiques[moisCle] = [];
             }

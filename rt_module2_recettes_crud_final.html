@@ -798,7 +798,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="montantHT">Montant HT (€) *</label>
-                            <input type="number" id="montantHT" step="0.01" required oninput="calculerTTC(); calculerLisse()">
+                            <input type="number" id="montantHT" step="0.01" min="0" required oninput="calculerTTC(); calculerLisse()">
                         </div>
 
                         <div class="form-group">
@@ -1523,6 +1523,19 @@
             e.preventDefault();
             
             try {
+                // AJOUT 14/09/2026 — constat D.4. Une recette récurrente négative n'a pas de
+                // sens : une ligne récurrente décrit un encaissement mensuel. Un avoir ou un
+                // remboursement est un événement ponctuel, qui se saisit dans le prévisionnel
+                // en opération spécifique de type « charge ». Le signe est donc porté par la
+                // nature de l'écriture, jamais par le montant.
+                const saisiHT = parseFloat(document.getElementById('montantHT').value);
+                if (saisiHT < 0) {
+                    alert("Le montant d'une recette ne peut pas être négatif.\n\n" +
+                          "Pour un avoir ou un remboursement client, ajoutez une opération " +
+                          "spécifique de type « charge » sur le mois concerné, dans l'onglet Prévisionnel.");
+                    return;
+                }
+
                 const nouvelleRecette = {
                     client: document.getElementById('client').value,
                     type: document.getElementById('type').value,
