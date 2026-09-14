@@ -896,20 +896,11 @@
         let chargeEnEdition = null;
         let draggedElement = null;
 
-        // DONNÃ‰ES DE DÃ‰MONSTRATION pour test des filtres par type charges
-        const donneesDemo = [
-            { id: 1, fournisseur: "Banque Principale", type: "emprunts", element: "Emprunt immobilier local", montantHT: -2500, montantTTC: -3000, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Financement bureau principal" },
-            { id: 2, fournisseur: "CrÃ©dit Agricole", type: "frais bancaires", element: "Frais de tenue de compte", montantHT: -15, montantTTC: -18, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Compte professionnel principal" },
-            { id: 3, fournisseur: "SCI Immobilier", type: "loyers", element: "Loyer bureau centre-ville", montantHT: -1800, montantTTC: -2160, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Local commercial 150mÂ²" },
-            { id: 4, fournisseur: "Orange Business", type: "tÃ©lÃ©comm.", element: "Abonnement internet fibre", montantHT: -89, montantTTC: -106.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Fibre 1Gb symÃ©trique" },
-            { id: 5, fournisseur: "AXA Pro", type: "assurances", element: "Assurance responsabilitÃ© civile", montantHT: -250, montantTTC: -300, periodicite: "ANNUEL", statut: "ACTIF", commentaire: "Couverture activitÃ© coworking" },
-            { id: 6, fournisseur: "Peugeot Lease", type: "véhicules", element: "Leasing vÃ©hicule utilitaire", montantHT: -320, montantTTC: -384, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Partner Ã©lectrique" },
-            { id: 7, fournisseur: "Adobe", type: "abonnements", element: "Creative Cloud Ã‰quipe", montantHT: -59, montantTTC: -70.8, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "5 licences design" },
-            { id: 8, fournisseur: "Paie RH", type: "rémunérations", element: "Salaire gestionnaire", montantHT: -2800, montantTTC: -2800, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Temps plein 35h" },
-            { id: 9, fournisseur: "Expert Comptable", type: "ES", element: "Expertise comptable", montantHT: -180, montantTTC: -216, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Tenue comptabilitÃ©" },
-            { id: 10, fournisseur: "Formation Pro", type: "abonnements", element: "Plateforme e-learning", montantHT: -99, montantTTC: -118.8, periodicite: "ANNUEL", statut: "INACTIF", commentaire: "Suspendu temporairement" },
-            { id: 11, fournisseur: "Divers", type: "autres", element: "Frais divers bureau", montantHT: -50, montantTTC: -60, periodicite: "MENSUEL", statut: "ACTIF", commentaire: "Petites fournitures" }
-        ];
+        // CORRECTION 14/09/2026 — constat A.1 de l'audit : un jeu de onze charges
+        // fictives était chargé dès que le stockage était vide ou illisible, sans que
+        // rien à l'écran ne le distingue de données réelles. Il a été supprimé : une
+        // liste vide reste vide.
+        let chargementEchoue = false;
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
@@ -920,27 +911,37 @@
 
         // Gestion des données
         function chargerCharges() {
+            const donneesLocales = localStorage.getItem('chargesRecurrentesRT');
+
+            if (!donneesLocales) {
+                charges = [];
+                console.log('ℹ️ Aucune charge enregistrée dans ce navigateur.');
+                return;
+            }
+
             try {
-                const donneesLocales = localStorage.getItem('chargesRecurrentesRT');
-                if (donneesLocales) {
-                    charges = JSON.parse(donneesLocales);
-                    console.log('🔥 Charges chargées depuis localStorage:', charges.length);
-                    
-                    // PAS DE MIGRATION AUTOMATIQUE - l'utilisateur ajoutera manuellement
-                    console.log('ℹ️ Pas de migration automatique - types Ã  ajouter manuellement');
-                } else {
-                    // UTILISER DONNÃ‰ES DE DÃ‰MONSTRATION si pas de localStorage
-                    charges = [...donneesDemo];
-                    console.log('🔥 Données de démonstration chargées pour test des filtres:', charges.length);
-                }
+                charges = JSON.parse(donneesLocales);
+                console.log('✅ ' + charges.length + ' charges chargées');
             } catch (error) {
-                console.error('❌ Erreur chargement:', error);
-                charges = [...donneesDemo];
-                console.log('🔥 Données de démonstration chargées (fallback):', charges.length);
+                // Les données existent mais sont illisibles. On n'invente rien et on
+                // bloque l'enregistrement : une modification écraserait des données
+                // corrompues qu'une sauvegarde plus ancienne permet peut-être de récupérer.
+                charges = [];
+                chargementEchoue = true;
+                console.error('❌ Données de charges illisibles :', error);
+                alert("Les charges enregistrées dans ce navigateur sont illisibles.\n\n" +
+                      "Rien n'est affiché et l'enregistrement est bloqué, pour ne pas écraser " +
+                      "des données peut-être récupérables.\n\n" +
+                      "Restaurez un fichier de sauvegarde depuis la page Sauvegarde et données.");
             }
         }
 
         function sauvegarderCharges() {
+            if (chargementEchoue) {
+                alert("Enregistrement bloqué : les charges de ce navigateur n'ont pas pu être lues.\n\n" +
+                      "Restaurez une sauvegarde avant toute modification.");
+                return;
+            }
             try {
                 localStorage.setItem('chargesRecurrentesRT', JSON.stringify(charges));
                 console.log('💾 Charges sauvegardées');
@@ -1297,7 +1298,7 @@
             const charge = charges.find(c => (c.id || charges.indexOf(c)) === index);
             if (!charge) return;
 
-            if (confirm(`ÃŠtes-vous sÃ»r de vouloir supprimer la charge "${charge.fournisseur} - ${charge.element}" ?`)) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer la charge "${charge.fournisseur} - ${charge.element}" ?`)) {
                 charges = charges.filter(c => (c.id || charges.indexOf(c)) !== index);
                 sauvegarderCharges();
                 afficherCharges();
@@ -1353,7 +1354,7 @@
             }
         });
 
-        // Fermeture modal en cliquant Ã  l'extÃ©rieur
+        // Fermeture modal en cliquant à l'extérieur
         window.addEventListener('click', function(e) {
             if (e.target === document.getElementById('chargeModal')) {
                 fermerModal();

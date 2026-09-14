@@ -450,15 +450,15 @@
         <!-- Stats Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3 id="totalNominalHT">5 427€</h3>
+                <h3 id="totalNominalHT">0€</h3>
                 <p>Total Nominal HT</p>
             </div>
             <div class="stat-card">
-                <h3 id="totalNominalTTC">5 779€</h3>
+                <h3 id="totalNominalTTC">0€</h3>
                 <p>Total Nominal TTC</p>
             </div>
             <div class="stat-card">
-                <h3 id="provisionMensuelle">482€</h3>
+                <h3 id="provisionMensuelle">0€</h3>
                 <p>Provision Mensuelle (TTC/12)</p>
             </div>
         </div>
@@ -595,34 +595,10 @@
         let chargeEnModification = null;
 
         // Données d'exemple (26 charges périodiques réelles)
-        const donneesExemples = [
-            { id: 1, centre: 'GÉNÉRAL', categorie: 'Impôts/taxes/redevances', element: 'Impôt foncier', fournisseur: 'Trésor Public', montantHT: -1250.00, montantTTC: -1250.00, periodicite: 'ANNUEL', prochaine: '2024-10-15', commentaire: 'Échéance annuelle' },
-            { id: 2, centre: 'GÉNÉRAL', categorie: 'Abonnements annuels', element: 'Logiciel comptabilité', fournisseur: 'ComptaPro', montantHT: -480.00, montantTTC: -576.00, periodicite: 'ANNUEL', prochaine: '2024-12-01', commentaire: 'Licence annuelle' },
-            { id: 3, centre: 'GARE', categorie: 'Banques', element: 'Frais de tenue de compte professionnel', fournisseur: 'Crédit Agricole', montantHT: -120.00, montantTTC: -120.00, periodicite: 'ANNUEL', prochaine: '2024-01-15', commentaire: 'Compte principal' },
-            { id: 4, centre: 'WISSEMBOURG', categorie: 'FUEL', element: 'Assurance véhicule', fournisseur: 'MAIF', montantHT: -340.00, montantTTC: -340.00, periodicite: 'ANNUEL', prochaine: '2024-06-30', commentaire: 'Véhicule société' },
-            { id: 5, centre: 'GÉNÉRAL', categorie: 'URSSAF', element: 'Médecine du travail', fournisseur: 'Service Santé Travail 67', montantHT: -180.00, montantTTC: -180.00, periodicite: 'ANNUEL', prochaine: '2024-09-01', commentaire: 'Visite obligatoire' },
-            { id: 6, centre: 'GARE', categorie: 'LOYERS', element: 'Charges syndic', fournisseur: 'Syndic IMMOBEL', montantHT: -450.00, montantTTC: -450.00, periodicite: 'ANNUEL', prochaine: '2024-03-31', commentaire: 'Charges copropriété' },
-            { id: 7, centre: 'GÉNÉRAL', categorie: 'Autre', element: 'Audit comptable', fournisseur: 'Cabinet AUDIT+', montantHT: -800.00, montantTTC: -960.00, periodicite: 'ANNUEL', prochaine: '2024-11-15', commentaire: 'Certification annuelle' },
-            { id: 8, centre: 'WISSEMBOURG', categorie: 'Impôts/taxes/redevances', element: 'Taxe déchets professionnels', fournisseur: 'CC Wissembourg', montantHT: -95.00, montantTTC: -95.00, periodicite: 'ANNUEL', prochaine: '2024-04-30', commentaire: 'Collecte spécialisée' },
-            { id: 9, centre: 'GÉNÉRAL', categorie: 'Abonnements annuels', element: 'Hébergement site web', fournisseur: 'OVH', montantHT: -89.00, montantTTC: -106.80, periodicite: 'ANNUEL', prochaine: '2024-08-15', commentaire: 'Serveur dédié' },
-            { id: 10, centre: 'GARE', categorie: 'Banques', element: 'Assurance crédit professionnel', fournisseur: 'AXA Banque', montantHT: -240.00, montantTTC: -240.00, periodicite: 'ANNUEL', prochaine: '2024-05-01', commentaire: 'Couverture emprunt' },
-            { id: 11, centre: 'GÉNÉRAL', categorie: 'FUEL', element: 'Contrôle technique véhicule', fournisseur: 'DEKRA', montantHT: -78.00, montantTTC: -78.00, periodicite: 'ANNUEL', prochaine: '2024-07-20', commentaire: 'Contrôle réglementaire' },
-            { id: 12, centre: 'WISSEMBOURG', categorie: 'URSSAF', element: 'Adhésion syndicat professionnel', fournisseur: 'Syndicat METAL', prochaine: '2024-03-31', commentaire: 'Adhésion obligatoire', montantHT: -125.00, montantTTC: -125.00, periodicite: 'ANNUEL' },
-            { id: 13, centre: 'GÉNÉRAL', categorie: 'Abonnements annuels', element: 'Maintenance équipements', fournisseur: 'TechnoService', montantHT: -400.00, montantTTC: -480.00, periodicite: 'ANNUEL', prochaine: '2024-10-01', commentaire: 'Matériel spécialisé' },
-            { id: 14, centre: 'GÉNÉRAL', categorie: 'Impôts/taxes/redevances', element: 'Contribution audiovisuel public', fournisseur: 'France Télévisions', montantHT: -138.00, montantTTC: -138.00, periodicite: 'ANNUEL', prochaine: '2024-11-15', commentaire: 'Redevance TV' },
-            { id: 15, centre: 'GARE', categorie: 'FUEL', element: 'Assurance responsabilité civile', fournisseur: 'MAAF', montantHT: -320.00, montantTTC: -320.00, periodicite: 'ANNUEL', prochaine: '2024-05-15', commentaire: 'RC professionnelle' },
-            { id: 16, centre: 'WISSEMBOURG', categorie: 'LOYERS', element: 'Caution location équipement', fournisseur: 'EquipPro', montantHT: -200.00, montantTTC: -240.00, periodicite: 'ANNUEL', prochaine: '2024-08-01', commentaire: 'Renouvellement caution' },
-            { id: 17, centre: 'GÉNÉRAL', categorie: 'Abonnements annuels', element: 'Logiciel gestion', fournisseur: 'SoftwareXYZ', montantHT: -360.00, montantTTC: -432.00, periodicite: 'ANNUEL', prochaine: '2024-06-15', commentaire: 'Licence annuelle' },
-            { id: 18, centre: 'GARE', categorie: 'Impôts/taxes/redevances', element: 'Taxe apprentissage', fournisseur: 'URSSAF', montantHT: -180.00, montantTTC: -180.00, periodicite: 'ANNUEL', prochaine: '2024-09-15', commentaire: 'Formation professionnelle' },
-            { id: 19, centre: 'GÉNÉRAL', categorie: 'Banques', element: 'Commission découvert', fournisseur: 'BNP Paribas', montantHT: -150.00, montantTTC: -150.00, periodicite: 'SEMESTRIEL', prochaine: '2024-06-30', commentaire: 'Frais bancaires' },
-            { id: 20, centre: 'WISSEMBOURG', categorie: 'Autre', element: 'Formation obligatoire sécurité', fournisseur: 'FormaPro', montantHT: -180.00, montantTTC: -216.00, periodicite: 'ANNUEL', prochaine: '2024-11-01', commentaire: 'Recyclage personnel' },
-            { id: 21, centre: 'GÉNÉRAL', categorie: 'URSSAF', element: 'Cotisation retraite dirigeant', fournisseur: 'CIPAV', montantHT: -280.00, montantTTC: -280.00, periodicite: 'TRIMESTRIEL', prochaine: '2024-03-31', commentaire: 'Cotisation obligatoire' },
-            { id: 22, centre: 'GARE', categorie: 'Abonnements annuels', element: 'Maintenance climatisation', fournisseur: 'ClimaTech', montantHT: -89.00, montantTTC: -106.80, periodicite: 'ANNUEL', prochaine: '2024-04-15', commentaire: 'Contrat maintenance' },
-            { id: 23, centre: 'GÉNÉRAL', categorie: 'FUEL', element: 'Contrôle pollution véhicule', fournisseur: 'Auto Contrôle 67', montantHT: -45.00, montantTTC: -45.00, periodicite: 'ANNUEL', prochaine: '2024-08-30', commentaire: 'Contrôle environnemental' },
-            { id: 24, centre: 'WISSEMBOURG', categorie: 'Impôts/taxes/redevances', element: 'Redevance assainissement', fournisseur: 'Commune Wissembourg', montantHT: -120.00, montantTTC: -120.00, periodicite: 'ANNUEL', prochaine: '2024-12-31', commentaire: 'Taxe municipale' },
-            { id: 25, centre: 'GÉNÉRAL', categorie: 'Banques', element: 'Cotisation carte bancaire', fournisseur: 'Crédit Mutuel', montantHT: -48.00, montantTTC: -48.00, periodicite: 'ANNUEL', prochaine: '2024-02-28', commentaire: 'Carte professionnelle' },
-            { id: 26, centre: 'GARE', categorie: 'Autre', element: 'Expertise comptable annuelle', fournisseur: 'Cabinet COMPTA67', montantHT: -650.00, montantTTC: -780.00, periodicite: 'ANNUEL', prochaine: '2024-12-15', commentaire: 'Bilan annuel' }
-        ];
+        // CORRECTION 14/09/2026 — constat A.2 de l'audit : un jeu de vingt-six charges
+        // fictives était non seulement affiché mais ENREGISTRÉ dans le stockage dès la
+        // première ouverture du module, sans action de l'utilisateur. Il a été supprimé.
+        let chargementEchoue = false;
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
@@ -633,6 +609,11 @@
 
         // Sauvegarde et chargement
         function sauvegarderDonnees() {
+            if (chargementEchoue) {
+                alert("Enregistrement bloqué : les charges périodiques de ce navigateur n'ont pas pu être lues.\n\n" +
+                      "Restaurez une sauvegarde avant toute modification.");
+                return false;
+            }
             try {
                 localStorage.setItem('chargesPeriodiquesRT', JSON.stringify(chargesPeriodiques));
                 console.log('💾 Charges périodiques sauvegardées:', chargesPeriodiques.length);
@@ -645,21 +626,27 @@
         }
 
         function chargerDonnees() {
+            const donneesLocales = localStorage.getItem('chargesPeriodiquesRT');
+
+            if (!donneesLocales) {
+                chargesPeriodiques = [];
+                console.log('ℹ️ Aucune charge périodique enregistrée dans ce navigateur.');
+                return;
+            }
+
             try {
-                const donneesLocales = localStorage.getItem('chargesPeriodiquesRT');
-                if (donneesLocales) {
-                    chargesPeriodiques = JSON.parse(donneesLocales);
-                    console.log('📥 Charges périodiques chargées:', chargesPeriodiques.length);
-                } else {
-                    // Initialiser avec les données d'exemple
-                    chargesPeriodiques = [...donneesExemples];
-                    sauvegarderDonnees();
-                    console.log('📥 Données d\'exemple initialisées:', chargesPeriodiques.length);
-                }
+                chargesPeriodiques = JSON.parse(donneesLocales);
+                console.log('✅ ' + chargesPeriodiques.length + ' charges périodiques chargées');
             } catch (error) {
-                console.error('❌ Erreur chargement:', error);
-                chargesPeriodiques = [...donneesExemples];
-                sauvegarderDonnees();
+                // Données présentes mais illisibles : on n'invente rien et on bloque
+                // l'enregistrement, pour ne pas écraser ce qui est peut-être récupérable.
+                chargesPeriodiques = [];
+                chargementEchoue = true;
+                console.error('❌ Données de charges périodiques illisibles :', error);
+                alert("Les charges périodiques enregistrées dans ce navigateur sont illisibles.\n\n" +
+                      "Rien n'est affiché et l'enregistrement est bloqué, pour ne pas écraser " +
+                      "des données peut-être récupérables.\n\n" +
+                      "Restaurez un fichier de sauvegarde depuis la page Sauvegarde et données.");
             }
         }
 
@@ -791,10 +778,15 @@
 
         function supprimerChargePeriodique(id) {
             if (confirm('Êtes-vous sûr de vouloir supprimer cette charge périodique ?')) {
+                const avant = chargesPeriodiques;
                 chargesPeriodiques = chargesPeriodiques.filter(c => c.id !== id);
-                sauvegarderDonnees();
-                afficherCharges();
-                calculerTotaux();
+                if (sauvegarderDonnees()) {
+                    afficherCharges();
+                    calculerTotaux();
+                } else {
+                    // L'enregistrement a été refusé : l'affichage ne doit pas mentir
+                    chargesPeriodiques = avant;
+                }
             }
         }
 
