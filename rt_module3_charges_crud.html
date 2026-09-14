@@ -1162,8 +1162,8 @@
                         <td>${badgeEntrant}</td>
                         <td>${badgeSortant}</td>
                         <td class="actions">
-                            <button class="btn-action btn-edit" onclick="modifierCharge(${charge.id || index})">✏️</button>
-                            <button class="btn-action btn-delete" onclick="supprimerCharge(${charge.id || index})">🗑️</button>
+                            <button class="btn-action btn-edit" onclick="modifierCharge(${charge.id})">✏️</button>
+                            <button class="btn-action btn-delete" onclick="supprimerCharge(${charge.id})">🗑️</button>
                         </td>
                     </tr>
                 `;
@@ -1310,11 +1310,21 @@
             document.getElementById('chargeModal').style.display = 'block';
         }
 
-        function modifierCharge(index) {
-            const charge = charges.find(c => (c.id || charges.indexOf(c)) === index);
+        // CORRECTION 14/09/2026 — constat C.3 de l'audit.
+        // Les boutons transmettaient l'identifiant s'il existait, et à défaut le rang de la
+        // ligne DANS LA LISTE AFFICHÉE, tandis que la recherche se faisait sur le rang dans
+        // la liste COMPLÈTE. Sous filtre ou sous recherche, une fiche ancienne dépourvue
+        // d'identifiant était donc modifiée ou supprimée à la place d'une autre.
+        // Le repérage se fait désormais par le seul identifiant.
+        function modifierCharge(id) {
+            if (id === undefined || id === null) {
+                alert("Cette fiche n'a pas d'identifiant et ne peut pas être modifiée de façon fiable.\nRecréez-la, ou restaurez une sauvegarde.");
+                return;
+            }
+            const charge = charges.find(c => c.id === id);
             if (!charge) return;
 
-            chargeEnEdition = index;
+            chargeEnEdition = id;
             document.getElementById('modalTitle').textContent = 'Modifier Charge';
 
             document.getElementById('fournisseur').value = charge.fournisseur;
@@ -1345,12 +1355,16 @@
             document.getElementById('chargeModal').style.display = 'block';
         }
 
-        function supprimerCharge(index) {
-            const charge = charges.find(c => (c.id || charges.indexOf(c)) === index);
+        function supprimerCharge(id) {
+            if (id === undefined || id === null) {
+                alert("Cette fiche n'a pas d'identifiant et ne peut pas être supprimée de façon fiable.\nRecréez-la, ou restaurez une sauvegarde.");
+                return;
+            }
+            const charge = charges.find(c => c.id === id);
             if (!charge) return;
 
             if (confirm(`Êtes-vous sûr de vouloir supprimer la charge "${charge.fournisseur} - ${charge.element}" ?`)) {
-                charges = charges.filter(c => (c.id || charges.indexOf(c)) !== index);
+                charges = charges.filter(c => c.id !== id);
                 sauvegarderCharges();
                 afficherCharges();
                 mettreAJourStats();
@@ -1383,7 +1397,7 @@
             };
 
             if (chargeEnEdition !== null) {
-                const index = charges.findIndex(c => (c.id || charges.indexOf(c)) === chargeEnEdition);
+                const index = charges.findIndex(c => c.id === chargeEnEdition);
                 if (index !== -1) {
                     charges[index] = { ...charges[index], ...nouvelleCharge };
                 }

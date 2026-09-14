@@ -241,6 +241,27 @@
             gap: 5px;
         }
 
+        /* Réorganisation des lignes — repris des modules Recettes et Charges récurrentes */
+        tbody tr.dragging {
+            opacity: 0.5;
+            background: #e3f2fd;
+        }
+
+        tbody tr.drag-over {
+            border-top: 3px solid #f39c12;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            font-size: 16px;
+            color: #adb5bd;
+            margin-right: 6px;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
         .btn-small {
             padding: 6px 10px;
             font-size: 0.75em;
@@ -659,10 +680,17 @@
                 return;
             }
 
-            tbody.innerHTML = chargesPeriodiques.map(charge => {
-                return `
-                    <tr>
-                        <td><span class="centre ${charge.centre.toLowerCase()}">${charge.centre}</span></td>
+            tbody.innerHTML = chargesPeriodiques.map((charge, index) => ligneCharge(charge, index)).join('');
+            initDragAndDrop();
+        }
+
+        // AJOUT 14/09/2026 — réorganisation des lignes, comme aux modules Recettes et
+        // Charges récurrentes. Une seule fonction de rendu sert l'affichage complet et
+        // l'affichage filtré, pour que les deux ne puissent plus diverger.
+        function ligneCharge(charge, index) {
+            return `
+                    <tr draggable="true" data-index="${index}">
+                        <td><span class="drag-handle">☰</span><span class="centre ${charge.centre.toLowerCase()}">${charge.centre}</span></td>
                         <td>${charge.categorie}</td>
                         <td><strong>${charge.element}</strong></td>
                         <td>${charge.fournisseur}</td>
@@ -677,7 +705,98 @@
                         </td>
                     </tr>
                 `;
-            }).join('');
+        }
+
+        function filtresActifs() {
+            return document.getElementById('filtreCentre').value !== 'tous'
+                || document.getElementById('filtreCategorie').value !== 'toutes'
+                || document.getElementById('filtrePeriodicite').value !== 'toutes';
+        }
+
+        // Réorganisation des lignes par glisser-déposer
+        let draggedRow = null;
+        let draggedIndex = null;
+
+        function initDragAndDrop() {
+            try {
+                const rows = document.querySelectorAll('#listeCharges tr[draggable="true"]');
+                rows.forEach(row => {
+                    row.addEventListener('dragstart', handleDragStart);
+                    row.addEventListener('dragover',  handleDragOver);
+                    row.addEventListener('dragleave', handleDragLeave);
+                    row.addEventListener('drop',      handleDrop);
+                    row.addEventListener('dragend',   handleDragEnd);
+                });
+                console.log('🎯 Glisser-déposer initialisé sur ' + rows.length + ' lignes');
+            } catch (error) {
+                console.error('❌ Erreur init glisser-déposer :', error);
+            }
+        }
+
+        function handleDragStart(e) {
+            draggedRow = this;
+            draggedIndex = parseInt(this.dataset.index);
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', String(draggedIndex));
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (this !== draggedRow) this.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            this.classList.remove('drag-over');
+
+            try {
+                if (draggedRow === this) return false;
+
+                // Sous filtre, l'ordre affiché n'est pas l'ordre réel : on refuse
+                // le déplacement plutôt que de déplacer la mauvaise ligne.
+                if (filtresActifs()) {
+                    alert('⚠️ Désactivez les filtres pour réorganiser les charges périodiques.');
+                    return false;
+                }
+
+                const targetIndex = parseInt(this.dataset.index);
+                if (isNaN(draggedIndex) || isNaN(targetIndex)) return false;
+
+                const ordreAvant = [...chargesPeriodiques];
+                const ligne = chargesPeriodiques[draggedIndex];
+                chargesPeriodiques.splice(draggedIndex, 1);
+                chargesPeriodiques.splice(targetIndex, 0, ligne);
+
+                // Si l'enregistrement est refusé, on rétablit l'ordre précédent
+                // pour que l'écran ne montre pas un état non enregistré.
+                if (!sauvegarderDonnees()) {
+                    chargesPeriodiques = ordreAvant;
+                    afficherCharges();
+                    return false;
+                }
+
+                afficherCharges();
+                calculerTotaux();
+                console.log('✅ Ligne déplacée du rang ' + draggedIndex + ' au rang ' + targetIndex);
+            } catch (error) {
+                console.error('❌ Erreur lors du déplacement :', error);
+            }
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('#listeCharges tr').forEach(row => row.classList.remove('drag-over'));
+            draggedRow = null;
+            draggedIndex = null;
         }
 
         // Filtres
@@ -706,25 +825,10 @@
 
             // Mettre à jour l'affichage avec les données filtrées
             const tbody = document.getElementById('listeCharges');
-            tbody.innerHTML = chargesFiltrees.map(charge => {
-                return `
-                    <tr>
-                        <td><span class="centre ${charge.centre.toLowerCase()}">${charge.centre}</span></td>
-                        <td>${charge.categorie}</td>
-                        <td><strong>${charge.element}</strong></td>
-                        <td>${charge.fournisseur}</td>
-                        <td class="montant negatif">${Math.abs(charge.montantHT).toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                        <td class="montant negatif">${Math.abs(charge.montantTTC).toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                        <td><span class="periodicite ${charge.periodicite.toLowerCase()}">${charge.periodicite}</span></td>
-                        <td>${charge.prochaine || '-'}</td>
-                        <td>${charge.commentaire || '-'}</td>
-                        <td class="actions">
-                            <button onclick="modifierChargePeriodique(${charge.id})" class="btn btn-warning btn-small">✏️</button>
-                            <button onclick="supprimerChargePeriodique(${charge.id})" class="btn btn-danger btn-small">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = chargesFiltrees.length
+                ? chargesFiltrees.map(charge => ligneCharge(charge, chargesPeriodiques.indexOf(charge))).join('')
+                : '<tr><td colspan="10" class="no-data">Aucune charge périodique ne correspond aux filtres</td></tr>';
+            initDragAndDrop();
 
             calculerTotaux(chargesFiltrees);
         }

@@ -156,12 +156,12 @@
 
     <div class="header-controls">
         <div class="nav-links">
-            <a href="index.html" class="btn btn-secondary">🏠 Accueil</a>
+            <a href="index.html" class="btn btn-secondary">🏠 Dashboard</a>
             <a href="rt_module2_recettes_crud_final.html" class="btn btn-secondary">💵 Recettes</a>
-            <a href="rt_module3_charges_crud_drag_drop_FINAL.html" class="btn btn-secondary">💰 Charges</a>
+            <a href="rt_module3_charges_crud.html" class="btn btn-secondary">💰 Charges</a>
         </div>
         <div class="nav-links">
-            <button class="btn refresh-btn" onclick="actualiserDonnees()">🔄 Actualiser</button>
+            <button class="btn refresh-btn" onclick="actualiserDonnees(this)">🔄 Actualiser</button>
             <button class="btn pdf-btn" onclick="window.print()">📄 Imprimer</button>
         </div>
     </div>
@@ -633,11 +633,14 @@
     // ─────────────────────────────────────────────────────────────
     // ACTUALISER
     // ─────────────────────────────────────────────────────────────
-    function actualiserDonnees() {
+    /* CORRECTION 14/09/2026 — constat C.7 : la fonction lisait « event.target » sans que
+       l'événement lui soit transmis. Ce recours à la variable globale « event » fonctionne
+       sous Chrome et Safari, mais échoue sous Firefox. Le bouton se passe désormais lui-même. */
+    function actualiserDonnees(btn) {
         charger();
         calculer();
         afficher();
-        const btn = event.target;
+        if (!btn) return;
         const orig = btn.textContent;
         btn.textContent = '✅ Actualisé'; btn.style.background = '#0d6efd';
         setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);

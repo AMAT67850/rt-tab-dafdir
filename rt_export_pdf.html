@@ -201,9 +201,12 @@
   <div class="rpt-section sec-charges no-break">
     <div class="rpt-h1 charges">💰 CHARGES RÉCURRENTES — Actives aujourd'hui</div>
     <table class="data-tbl">
-      <colgroup><col style="width:19%"><col style="width:13%"><col style="width:13%"><col style="width:25%"><col style="width:10%"><col style="width:12%"><col style="width:8%"></colgroup>
+      <!-- CORRECTION 14/09/2026 — constat C.4 : la colonne « Catégorie » affichait un tiret
+           sur toutes les lignes, le module 3 n'enregistrant pas ce champ. Colonne retirée,
+           sa largeur redistribuée sur Fournisseur et Libellé. -->
+      <colgroup><col style="width:25%"><col style="width:15%"><col style="width:30%"><col style="width:10%"><col style="width:12%"><col style="width:8%"></colgroup>
       <thead><tr>
-        <th>Fournisseur</th><th>Catégorie</th><th>Type</th><th>Libellé</th>
+        <th>Fournisseur</th><th>Type</th><th>Libellé</th>
         <th class="td-r">Montant HT</th><th class="td-c">Périodicité</th><th class="td-r">Lissé/mois</th>
       </tr></thead>
       <tbody id="tbody-charges-rec"></tbody>
@@ -401,7 +404,7 @@
     recAct.forEach(r=>{ const l=lisse(r.montantHT,r.periodicite); tRN+=r.montantHT; tRL+=l; const isSortant=r.sortant===true&&r.dateDepart&&estActifA(r,today); const tag=isSortant?`<span class="tag-sortant">↗ sortant ${fmtD(r.dateDepart)}</span>`:''; const tr=document.createElement('tr'); if(isSortant)tr.className='row-sortant'; tr.innerHTML=`<td>${r.client||'—'} ${tag}</td><td>${r.centre||'—'}</td><td>${r.type||'—'}</td><td>${r.element||'—'}</td><td class="td-r">${eur(r.montantHT)}</td><td class="td-c"><span class="badge-per">${r.periodicite||'—'}</span></td><td class="td-r">${eur(l)}</td><td class="td-c">${r.statut||'—'}</td>`; tbR.appendChild(tr); });
     document.getElementById('total-rec-nominal').textContent=eur(tRN); document.getElementById('total-rec-lisse').textContent=eur(tRL);
     const tbC=document.getElementById('tbody-charges-rec'); tbC.innerHTML=''; let tCN=0,tCL=0;
-    chargesRec.filter(c=>estActifA(c,today)).forEach(c=>{ const m=Math.abs(c.montantHT),l=lisse(m,c.periodicite); tCN+=m; tCL+=l; const tr=document.createElement('tr'); tr.innerHTML=`<td>${c.fournisseur||'—'}</td><td>${c.categorie||'—'}</td><td>${c.type||'—'}</td><td>${c.element||'—'}</td><td class="td-r">${eur(m)}</td><td class="td-c"><span class="badge-per">${c.periodicite||'—'}</span></td><td class="td-r">${eur(l)}</td>`; tbC.appendChild(tr); });
+    chargesRec.filter(c=>estActifA(c,today)).forEach(c=>{ const m=Math.abs(c.montantHT),l=lisse(m,c.periodicite); tCN+=m; tCL+=l; const tr=document.createElement('tr'); tr.innerHTML=`<td>${c.fournisseur||'—'}</td><td>${c.type||'—'}</td><td>${c.element||'—'}</td><td class="td-r">${eur(m)}</td><td class="td-c"><span class="badge-per">${c.periodicite||'—'}</span></td><td class="td-r">${eur(l)}</td>`; tbC.appendChild(tr); });
     document.getElementById('total-chr-nominal').textContent=eur(tCN); document.getElementById('total-chr-lisse').textContent=eur(tCL);
     const fmtH=d=>d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
     document.getElementById('section-variations').innerHTML =

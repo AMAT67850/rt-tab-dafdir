@@ -673,7 +673,7 @@
 
             <div class="controls-right">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Rechercher..." oninput="afficherRecettes()">
+                    <input type="text" id="searchInput" placeholder="🔍 Rechercher..." oninput="appliquerFiltres()">
                     <span class="search-icon">🔍</span>
                 </div>
             </div>
@@ -1295,8 +1295,8 @@
                             <td>${badgeEntrant}</td>
                             <td>${badgeSortant}</td>
                             <td class="actions">
-                                <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id || index})">✏️</button>
-                                <button class="btn-action btn-delete" onclick="supprimerRecette(${recette.id || index})">🗑️</button>
+                                <button class="btn-action btn-edit" onclick="modifierRecette(${recette.id})">✏️</button>
+                                <button class="btn-action btn-delete" onclick="supprimerRecette(${recette.id})">🗑️</button>
                             </td>
                         </tr>
                     `;
@@ -1452,12 +1452,22 @@
             }
         }
 
-        function modifierRecette(index) {
+        // CORRECTION 14/09/2026 — constat C.3 de l'audit.
+        // Les boutons transmettaient l'identifiant s'il existait, et à défaut le rang de la
+        // ligne DANS LA LISTE AFFICHÉE, tandis que la recherche se faisait sur le rang dans
+        // la liste COMPLÈTE. Sous filtre ou sous recherche, une fiche ancienne dépourvue
+        // d'identifiant était donc modifiée ou supprimée à la place d'une autre.
+        // Le repérage se fait désormais par le seul identifiant.
+        function modifierRecette(id) {
             try {
-                const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
+                if (id === undefined || id === null) {
+                    alert("Cette fiche n'a pas d'identifiant et ne peut pas être modifiée de façon fiable.\nRecréez-la, ou restaurez une sauvegarde.");
+                    return;
+                }
+                const recette = recettes.find(r => r.id === id);
                 if (!recette) return;
 
-                recetteEnEdition = index;
+                recetteEnEdition = id;
                 document.getElementById('modalTitle').textContent = 'Modifier Recette';
                 
                 document.getElementById('client').value = recette.client;
@@ -1484,13 +1494,17 @@
             }
         }
 
-        function supprimerRecette(index) {
+        function supprimerRecette(id) {
             try {
-                const recette = recettes.find(r => (r.id || recettes.indexOf(r)) === index);
+                if (id === undefined || id === null) {
+                    alert("Cette fiche n'a pas d'identifiant et ne peut pas être supprimée de façon fiable.\nRecréez-la, ou restaurez une sauvegarde.");
+                    return;
+                }
+                const recette = recettes.find(r => r.id === id);
                 if (!recette) return;
 
                 if (confirm(`Êtes-vous sûr de vouloir supprimer la recette "${recette.client} - ${recette.element}" ?`)) {
-                    recettes = recettes.filter(r => (r.id || recettes.indexOf(r)) !== index);
+                    recettes = recettes.filter(r => r.id !== id);
                     sauvegarderRecettes();
                     afficherRecettes();
                     mettreAJourStats();
@@ -1528,7 +1542,7 @@
                 };
 
                 if (recetteEnEdition !== null) {
-                    const index = recettes.findIndex(r => (r.id || recettes.indexOf(r)) === recetteEnEdition);
+                    const index = recettes.findIndex(r => r.id === recetteEnEdition);
                     if (index !== -1) {
                         recettes[index] = { ...recettes[index], ...nouvelleRecette };
                     }

@@ -948,7 +948,10 @@
                             totalRecettes += montant;
                             detailRecettes.push({
                                 id: recette.id,
-                                libelle: `${recette.client} - ${recette.libelle}${override ? ' ✏️' : ''}`,
+                                // CORRECTION 14/09/2026 — constat C.1 : le module 2 enregistre le
+                                // libellé dans « element », jamais dans « libelle ». Chaque ligne de
+                                // recette du détail mensuel s'affichait donc « CLIENT - undefined ».
+                                libelle: `${recette.client} - ${recette.element}${override ? ' ✏️' : ''}`,
                                 montant: montant,
                                 type: 'recurrente',
                                 periodicite: recette.periodicite
