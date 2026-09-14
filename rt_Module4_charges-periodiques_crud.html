@@ -412,6 +412,25 @@
                 font-size: 1.8rem;
             }
         }
+
+        /* Encadré de rappel de la convention de saisie — compact, lisible sans occuper de place */
+        .note-saisie {
+            background: #eef3fa;
+            border-left: 4px solid #3d6fa5;
+            border-radius: 0 6px 6px 0;
+            padding: 11px 16px 12px;
+            margin-bottom: 18px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #33445c;
+        }
+
+        .note-saisie strong {
+            display: block;
+            margin-bottom: 3px;
+            color: #24456e;
+            font-size: 13.5px;
+        }
     </style>
 </head>
 <body>
@@ -419,6 +438,12 @@
         <div class="header">
             <h1>📅 Gestion des Charges Périodiques</h1>
             <p>Charges 1 à 2 fois par an - chiffrage de la provision mensuelle</p>
+        </div>
+
+        <!-- Rappel de la convention de saisie (validé le 14/09/2026) -->
+        <div class="note-saisie">
+            <strong>📌 Une ligne = un décaissement, qui revient une fois par an</strong>
+            Une charge réglée en plusieurs fois dans l'année occupe autant de lignes que d'échéances : quatre acomptes d'IS, quatre appels URSSAF, quatre arrêtés de compte. La provision mensuelle est la somme des montants TTC divisée par douze. Les charges réglées tous les mois n'ont pas leur place ici : elles relèvent de l'onglet Charges récurrentes.
         </div>
 
         <div class="controls">
