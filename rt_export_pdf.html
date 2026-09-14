@@ -281,7 +281,10 @@
 
   /* estActifA : utilisé uniquement pour le rapport mensuel (situation actuelle) */
   function estActifA(r, date) {
-    if (r.statut !== 'ACTIF') return false;
+    // CORRECTION 14/09/2026 — constat B.4 : filtre de statut aligné sur celui du
+    // prévisionnel (statut absent ou ACTIF), pour qu'une fiche sans statut ne soit
+    // plus comptée par un moteur et ignorée par l'autre.
+    if (r.statut && r.statut !== 'ACTIF') return false;
     if (r.entrant === true && r.dateEntree && new Date(r.dateEntree) > date) return false;
     if (r.sortant === true && r.dateDepart) {
       const dd = new Date(r.dateDepart); dd.setHours(0,0,0,0);
@@ -298,7 +301,7 @@
 
   function getVar(items, pStart, pEnd, isCharge) {
     const out=[];
-    items.filter(r=>r.statut==='ACTIF').forEach(r=>{
+    items.filter(r=>!r.statut||r.statut==='ACTIF').forEach(r=>{
       if (r.entrant===true && r.dateEntree) {
         const de=new Date(r.dateEntree);
         if (de>pStart && de<=pEnd) {

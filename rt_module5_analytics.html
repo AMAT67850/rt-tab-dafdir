@@ -280,8 +280,13 @@
     // ─────────────────────────────────────────────────────────────
     function charger() {
         try {
+            // CORRECTION 14/09/2026 — constat B.4 : le filtre de statut était strict côté
+            // recettes et indulgent côté charges. Une recette dépourvue du champ statut —
+            // fiche ancienne, ou restaurée depuis une sauvegarde au format 1.0 — était donc
+            // écartée ici en silence alors que le prévisionnel la comptait. Règle unifiée :
+            // statut absent ou ACTIF.
             const rj = localStorage.getItem('recettesRT');
-            recettes = rj ? JSON.parse(rj).filter(r => r.statut === 'ACTIF') : [];
+            recettes = rj ? JSON.parse(rj).filter(r => !r.statut || r.statut === 'ACTIF') : [];
 
             const cj = localStorage.getItem('chargesRecurrentesRT');
             charges  = cj ? JSON.parse(cj).filter(c => !c.statut || c.statut === 'ACTIF') : [];

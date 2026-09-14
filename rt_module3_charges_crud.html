@@ -646,6 +646,25 @@
             color: #999;
             font-style: italic;
         }
+    
+        /* Encadré de rappel de la convention de saisie — compact, lisible sans occuper de place */
+        .note-saisie {
+            background: #eef3fa;
+            border-left: 4px solid #3d6fa5;
+            border-radius: 0 6px 6px 0;
+            padding: 11px 16px 12px;
+            margin-bottom: 18px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #33445c;
+        }
+
+        .note-saisie strong {
+            display: block;
+            margin-bottom: 3px;
+            color: #24456e;
+            font-size: 13.5px;
+        }
     </style>
 </head>
 <body>
@@ -655,6 +674,12 @@
     </div>
 
     <div class="container">
+        <!-- Rappel de la convention de saisie des dates (validé le 14/09/2026) -->
+        <div class="note-saisie">
+            <strong>📌 Démarrage ou résiliation en cours de mois</strong>
+            Les dates de démarrage et de fin d'une charge récurrente sont toujours un premier ou un dernier jour de mois : elles marquent le début et la fin du plein tarif. Une charge qui démarre le 20 septembre est saisie avec un démarrage au 1<sup>er</sup> octobre ; une charge résiliée le 20 septembre, avec une fin au 31 août. Dans les deux cas, le prorata de septembre est ajouté en opération ponctuelle dans le prévisionnel, et la date réelle se note dans le commentaire de la fiche.
+        </div>
+
         <div class="controls">
             <div class="controls-left">
                 <button class="btn btn-primary" onclick="nouvelleCharge()">
@@ -962,6 +987,31 @@
             } catch (e) { return false; }
         }
 
+        // CORRECTION 14/09/2026 — constats B.3 et B.4 de l'audit.
+        // Règle unique « charge en cours », identique à celle du module 2, du module 5
+        // et des rapports : démarrage non futur, résiliation non dépassée (le jour de
+        // résiliation reste compté), statut absent ou ACTIF.
+        function estDejaSorti(item) {
+            try {
+                if (!item.sortant || !item.dateDepart) return false;
+                const depart = new Date(item.dateDepart);
+                if (isNaN(depart.getTime())) return false;
+                depart.setHours(0, 0, 0, 0);
+                const maintenant = new Date();
+                maintenant.setHours(0, 0, 0, 0);
+                return depart < maintenant;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function estActifAujourdhui(item) {
+            if (estEntrantFutur(item.dateEntree)) return false;
+            if (estDejaSorti(item)) return false;
+            if (item.statut && item.statut !== 'ACTIF') return false;
+            return true;
+        }
+
         function estEntrantProche(dateEntree) {
             try {
                 if (!dateEntree) return false;
@@ -1191,10 +1241,11 @@
             }
 
             // Charges dont le démarrage est déjà effectif (pas entrants futurs)
-            const chargesActives = chargesFiltrees.filter(c => !estEntrantFutur(c.dateEntree));
+            // Charges en cours : ni démarrage futur, ni résiliation dépassée, ni statut inactif
+            const chargesActives = chargesFiltrees.filter(estActifAujourdhui);
             const totalEntrants = chargesFiltrees.filter(c => estEntrantFutur(c.dateEntree)).length;
-            // Sortants prévus (date de fin renseignée)
-            const totalSortants = chargesFiltrees.filter(c => c.sortant && c.dateDepart).length;
+            // Sortants prévus : résiliation renseignée et pas encore intervenue
+            const totalSortants = chargesFiltrees.filter(c => c.sortant && c.dateDepart && !estDejaSorti(c)).length;
 
             const totalCharges = chargesFiltrees.length;
             const totalMontantHT = chargesActives.reduce((sum, c) => sum + Math.abs(c.montantHT), 0);

@@ -630,6 +630,25 @@
                 font-size: 0.9em;
             }
         }
+    
+        /* Encadré de rappel de la convention de saisie — compact, lisible sans occuper de place */
+        .note-saisie {
+            background: #eef3fa;
+            border-left: 4px solid #3d6fa5;
+            border-radius: 0 6px 6px 0;
+            padding: 11px 16px 12px;
+            margin-bottom: 18px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #33445c;
+        }
+
+        .note-saisie strong {
+            display: block;
+            margin-bottom: 3px;
+            color: #24456e;
+            font-size: 13.5px;
+        }
     </style>
 </head>
 <body>
@@ -639,6 +658,12 @@
     </div>
 
     <div class="container">
+        <!-- Rappel de la convention de saisie des dates (validé le 14/09/2026) -->
+        <div class="note-saisie">
+            <strong>📌 Entrée ou départ en cours de mois</strong>
+            Les dates d'entrée et de sortie d'une fiche récurrente sont toujours un premier ou un dernier jour de mois : elles marquent le début et la fin du plein tarif. Un client qui arrive le 20 septembre est saisi avec une entrée au 1<sup>er</sup> octobre ; un client qui part le 20 septembre, avec une sortie au 31 août. Dans les deux cas, le prorata de septembre est ajouté en opération ponctuelle dans le prévisionnel, et la date réelle se note dans le commentaire de la fiche.
+        </div>
+
         <!-- Contrôles et Boutons -->
         <div class="controls">
             <div class="controls-left">
@@ -978,6 +1003,34 @@
             } catch (e) {
                 return false;
             }
+        }
+
+        // CORRECTION 14/09/2026 — constats B.3 et B.4 de l'audit.
+        // Les totaux excluaient les entrées futures mais comptaient encore les contrats
+        // dont la date de sortie était dépassée, et n'appliquaient aucun filtre de statut.
+        // Ils affichaient donc davantage que l'Analytics et les rapports PDF pour les
+        // mêmes données. Règle unique, identique à celle du module 5 et des rapports :
+        // entrée non future, sortie non dépassée (le jour de sortie reste compté),
+        // statut absent ou ACTIF.
+        function estDejaSorti(item) {
+            try {
+                if (!item.sortant || !item.dateDepart) return false;
+                const depart = new Date(item.dateDepart);
+                if (isNaN(depart.getTime())) return false;
+                depart.setHours(0, 0, 0, 0);
+                const maintenant = new Date();
+                maintenant.setHours(0, 0, 0, 0);
+                return depart < maintenant;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function estActifAujourdhui(item) {
+            if (estEntrantFutur(item.dateEntree)) return false;
+            if (estDejaSorti(item)) return false;
+            if (item.statut && item.statut !== 'ACTIF') return false;
+            return true;
         }
 
         // Vérifier si un client arrive dans les 90 prochains jours
@@ -1352,18 +1405,18 @@
                     );
                 }
 
-                // Recettes dont l'entrée est déjà effective (pas futures)
-                const recettesActives = recettesFiltrees.filter(r => !estEntrantFutur(r.dateEntree));
+                // Contrats en cours : ni entrée future, ni sortie dépassée, ni statut inactif
+                const recettesActives = recettesFiltrees.filter(estActifAujourdhui);
                 // Entrants à venir (date d'entrée dans le futur)
                 const totalEntrants = recettesFiltrees.filter(r => estEntrantFutur(r.dateEntree)).length;
-                // Sortants prévus (date de départ renseignée)
-                const totalSortants = recettesFiltrees.filter(r => r.sortant && r.dateDepart).length;
+                // Sortants prévus : départ renseigné et pas encore intervenu
+                const totalSortants = recettesFiltrees.filter(r => r.sortant && r.dateDepart && !estDejaSorti(r)).length;
 
                 const totalRecettes = recettesFiltrees.length;
                 const totalMontantHT = recettesActives.reduce((sum, r) => sum + (r.montantHT || 0), 0);
                 const totalMontantLisse = recettesActives.reduce((sum, r) => sum + calculerMontantLisse(r), 0);
 
-                console.log(`Stats: ${totalRecettes} recettes (${totalEntrants} entrants futurs exclus des totaux), ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé`);
+                console.log(`Stats: ${totalRecettes} fiches affichées, ${recettesActives.length} contrats en cours, ${totalMontantHT}€ HT, ${totalMontantLisse}€ lissé`);
 
                 document.getElementById('totalRecettes').textContent = totalRecettes;
                 document.getElementById('totalMontantHT').textContent = totalMontantHT.toLocaleString('fr-FR') + '€';
