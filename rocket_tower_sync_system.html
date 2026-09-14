@@ -551,19 +551,28 @@
                 addLog('🚀 Démarrage export automatique...', 'info');
                 
                 // Récupérer toutes les données localStorage
+                // CORRECTION 14/09/2026 — constat A.3 de l'audit : la sauvegarde
+                // n'emportait que les trois jeux de contrats. Le prévisionnel et les
+                // types de recettes personnalisés, qui ne se reconstituent pas à partir
+                // des contrats, en étaient absents. Format porté à la version 2.0.
                 const donnees = {
-                    version: "1.0",
+                    version: "2.0",
                     dateExport: new Date().toISOString(),
                     systeme: "Rocket Tower",
                     recettes: JSON.parse(localStorage.getItem('recettesRT') || '[]'),
                     chargesRecurrentes: JSON.parse(localStorage.getItem('chargesRecurrentesRT') || '[]'),
-                    chargesPeriodiques: JSON.parse(localStorage.getItem('chargesPeriodiquesRT') || '[]')
+                    chargesPeriodiques: JSON.parse(localStorage.getItem('chargesPeriodiquesRT') || '[]'),
+                    previsionnel: JSON.parse(localStorage.getItem('previsionnel12moisRT') || 'null'),
+                    typesRecettes: JSON.parse(localStorage.getItem('typesRecettesRT') || 'null')
                 };
-                
-                // Calculer statistiques
+
                 const totalEnregistrements = donnees.recettes.length + donnees.chargesRecurrentes.length + donnees.chargesPeriodiques.length;
-                
-                addLog(`📊 Données préparées : ${totalEnregistrements} enregistrements au total`, 'info');
+                const nbOperations = donnees.previsionnel
+                    ? Object.values(donnees.previsionnel.operationsSpecifiques || {}).reduce((s, a) => s + a.length, 0)
+                    : 0;
+                const nbTypes = Array.isArray(donnees.typesRecettes) ? donnees.typesRecettes.length : 0;
+
+                addLog(`📊 ${totalEnregistrements} enregistrements · prévisionnel ${donnees.previsionnel ? 'inclus' : 'absent (jamais calculé)'} · ${nbOperations} opérations spécifiques · ${nbTypes} types de recettes`, 'info');
                 
                 // Créer le fichier et forcer le téléchargement
                 const blob = new Blob([JSON.stringify(donnees, null, 2)], {
@@ -622,23 +631,33 @@
                             throw new Error('Structure de fichier invalide');
                         }
                         
-                        addLog('✅ Fichier JSON valide, import en cours...', 'info');
-                        
-                        // Sauvegarder les données actuelles (backup)
-                        const backup = {
-                            recettes: localStorage.getItem('recettesRT'),
-                            chargesRecurrentes: localStorage.getItem('chargesRecurrentesRT'),
-                            chargesPeriodiques: localStorage.getItem('chargesPeriodiquesRT')
-                        };
-                        
-                        // Importer les nouvelles données
+                        addLog(`✅ Fichier valide (format ${donnees.version}), import en cours...`, 'info');
+
+                        // Les trois jeux de contrats sont présents dans tous les formats
                         localStorage.setItem('recettesRT', JSON.stringify(donnees.recettes || []));
                         localStorage.setItem('chargesRecurrentesRT', JSON.stringify(donnees.chargesRecurrentes || []));
                         localStorage.setItem('chargesPeriodiquesRT', JSON.stringify(donnees.chargesPeriodiques || []));
-                        
-                        // Calculer statistiques import
+
+                        // CORRECTION 14/09/2026 — constat A.3 : le prévisionnel et les types
+                        // de recettes ne sont restaurés que si le fichier les contient. Un
+                        // fichier au format 1.0 laisse donc l'existant en place plutôt que
+                        // de l'effacer.
+                        if (donnees.previsionnel) {
+                            localStorage.setItem('previsionnel12moisRT', JSON.stringify(donnees.previsionnel));
+                            addLog('✅ Prévisionnel restauré (solde initial, opérations spécifiques, ajustements)', 'success');
+                        } else {
+                            addLog('⚠️ Ce fichier ne contient pas le prévisionnel : celui de ce navigateur est conservé tel quel, et se rapporte donc aux données précédentes', 'warning');
+                        }
+
+                        if (Array.isArray(donnees.typesRecettes) && donnees.typesRecettes.length) {
+                            localStorage.setItem('typesRecettesRT', JSON.stringify(donnees.typesRecettes));
+                            addLog(`✅ ${donnees.typesRecettes.length} types de recettes restaurés`, 'success');
+                        } else {
+                            addLog('⚠️ Ce fichier ne contient pas les types de recettes : ceux de ce navigateur sont conservés', 'warning');
+                        }
+
                         const totalImporte = (donnees.recettes?.length || 0) + (donnees.chargesRecurrentes?.length || 0) + (donnees.chargesPeriodiques?.length || 0);
-                        
+
                         addLog(`✅ Import réussi ! ${totalImporte} enregistrements importés`, 'success');
                         addLog('🔄 Actualisation de l\'interface...', 'info');
                         
@@ -672,23 +691,50 @@
 
         // ========== AUTRES FONCTIONS (CONSERVÉES INTÉGRALEMENT) ==========
         
+        // CORRECTION 14/09/2026 — constats A.3 et A.4 de l'audit.
+        // La réinitialisation n'effaçait que les trois jeux de contrats tout en
+        // annonçant « TOUTES vos données », laissant derrière elle un prévisionnel
+        // et des types de recettes qui ne correspondaient plus à rien. Elle efface
+        // désormais l'ensemble, en énonçant exactement ce qu'elle efface, et propose
+        // d'exporter avant.
         async function resetLocal() {
-            if (confirm('⚠️ ATTENTION !\n\nCette action va supprimer TOUTES vos données locales.\n\nÊtes-vous certain de vouloir continuer ?')) {
-                try {
-                    localStorage.removeItem('recettesRT');
-                    localStorage.removeItem('chargesRecurrentesRT');
-                    localStorage.removeItem('chargesPeriodiquesRT');
-                    addLog('🗑️ Données locales supprimées', 'warning');
+            const avertissement =
+                '⚠️ RÉINITIALISATION\n\n' +
+                'Cette action va effacer, dans ce navigateur :\n\n' +
+                '• les recettes récurrentes\n' +
+                '• les charges récurrentes\n' +
+                '• les charges périodiques\n' +
+                '• le prévisionnel : solde initial, opérations spécifiques, ajustements mensuels\n' +
+                '• les types de recettes personnalisés\n' +
+                '• la date de dernière sauvegarde\n\n' +
+                'Les fichiers de sauvegarde déjà téléchargés sur votre disque ne sont pas concernés.\n\n' +
+                'Continuer ?';
 
-                    syncState.local = { recettes: 0, chargesRecurrentes: 0, chargesPeriodiques: 0 };
+            if (!confirm(avertissement)) {
+                addLog('Réinitialisation annulée', 'info');
+                return;
+            }
 
-                    mettreAJourInterface();
-                    
-                    addLog('✅ Reset terminé - Vous pouvez importer de nouvelles données', 'info');
-                    
-                } catch (error) {
-                    addLog(`❌ Erreur reset : ${error.message}`, 'error');
-                }
+            if (confirm('Exporter une sauvegarde avant d\'effacer ?\n\nOK : exporter, puis effacer.\nAnnuler : effacer sans exporter.')) {
+                await syncExport();
+            }
+
+            try {
+                ['recettesRT', 'chargesRecurrentesRT', 'chargesPeriodiquesRT',
+                 'previsionnel12moisRT', 'typesRecettesRT', 'derniereSauvegardeRT']
+                    .forEach(cle => localStorage.removeItem(cle));
+
+                addLog('🗑️ Données locales effacées : contrats, prévisionnel, types de recettes', 'warning');
+
+                syncState.local = { recettes: 0, chargesRecurrentes: 0, chargesPeriodiques: 0 };
+                syncState.derniereSauvegarde = null;
+
+                mettreAJourInterface();
+
+                addLog('✅ Réinitialisation terminée. Vous pouvez importer un fichier de sauvegarde.', 'info');
+
+            } catch (error) {
+                addLog(`❌ Erreur lors de la réinitialisation : ${error.message}`, 'error');
             }
         }
 
