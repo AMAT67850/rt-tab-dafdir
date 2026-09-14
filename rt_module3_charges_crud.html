@@ -663,6 +663,14 @@
         .badge-centre.mixte       { background: #fff3e0; color: #ef6c00; }
         .badge-centre.vide        { background: #f8f9fa; color: #6c757d; font-weight: 500; }
 
+        .aide-centre {
+            margin-top: 7px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #55627a;
+        }
+        .aide-centre strong { color: #24456e; }
+
         /* Encadré de rappel de la convention de saisie — compact, lisible sans occuper de place */
         .note-saisie {
             background: #eef3fa;
@@ -731,8 +739,8 @@
                         <option value="tous">Tous les centres</option>
                         <option value="gare">Gare</option>
                         <option value="wissembourg">Wissembourg</option>
-                        <option value="general">Général</option>
                         <option value="mixte">Mixte</option>
+                        <option value="general">Frais généraux</option>
                         <option value="vide">Non précisé</option>
                     </select>
                 </div>
@@ -868,9 +876,16 @@
                             <option value="">Choisir un centre</option>
                             <option value="gare">Gare</option>
                             <option value="wissembourg">Wissembourg</option>
-                            <option value="général">Général</option>
                             <option value="mixte">Mixte</option>
+                            <option value="général">Frais généraux</option>
                         </select>
+                        <div class="aide-centre">
+                            <strong>Gare</strong> et <strong>Wissembourg</strong> : charge de fonctionnement d'un seul centre.
+                            <strong>Mixte</strong> : charge d'exploitation partagée entre les deux centres, à répartir.
+                            <strong>Frais généraux</strong> : charge de la société, sans lien avec l'exploitation d'un centre —
+                            emprunts, frais bancaires, rémunérations, assurances, abonnements, provisions.
+                            Quand le partage est lisible sur la facture (deux compteurs, deux baux), saisissez plutôt deux lignes.
+                        </div>
                     </div>
 
                     <div class="form-row">
@@ -1246,7 +1261,7 @@
 
         function badgeCentre(valeur) {
             const c = classeCentre(valeur);
-            const libelles = { gare: 'Gare', wissembourg: 'Wissembourg', general: 'Général',
+            const libelles = { gare: 'Gare', wissembourg: 'Wissembourg', general: 'Frais généraux',
                                mixte: 'Mixte', vide: 'Non précisé' };
             return `<span class="badge-centre ${c}">${libelles[c]}</span>`;
         }
