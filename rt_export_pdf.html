@@ -429,6 +429,15 @@
     }
   }
 
+  /* CORRECTION 14/09/2026 — constat B.1 de l'audit, portée à l'identique
+     dans le module 6 : les ajustements ponctuels sont repérés par l'identifiant
+     de la fiche et non par son rang. La comparaison exige deux identifiants
+     définis, de sorte qu'un ajustement hérité de l'ancien format ne s'applique
+     à rien. */
+  function memeFiche(idAjustement, idFiche) {
+    return idAjustement !== undefined && idAjustement !== null && idAjustement === idFiche;
+  }
+
   /* ================================================================
      PRÉVISIONNEL — logique identique au module 6
      CORRECTION 2 : filtrage date inline (setDate(1), sans vérif statut)
@@ -458,7 +467,7 @@
 
       let tR = 0, tC = 0;
 
-      recActives.forEach((r, rIndex) => {
+      recActives.forEach((r) => {
         if (r.entrant && r.dateEntree) {
           const de = new Date(r.dateEntree); de.setDate(1); de.setHours(0,0,0,0);
           const dm = new Date(moisCourant);  dm.setDate(1); dm.setHours(0,0,0,0);
@@ -471,14 +480,14 @@
         }
         if (!doitApparaitreCeMois(r, moisCourant)) return;
         const supprRec = suppressionsTemporaires[moisCle]?.recettes || [];
-        if (supprRec.some(s => s.index === rIndex)) return;
+        if (supprRec.some(s => memeFiche(s.id, r.id))) return;
         let montant = r.montantHT;
-        const ov = (overridesTemporaires[moisCle]?.recettes || []).find(o => o.index === rIndex);
+        const ov = (overridesTemporaires[moisCle]?.recettes || []).find(o => memeFiche(o.id, r.id));
         if (ov) montant = ov.nouveauMontant;
         tR += montant;
       });
 
-      chrActives.forEach((c, cIndex) => {
+      chrActives.forEach((c) => {
         if (c.entrant && c.dateEntree) {
           const de = new Date(c.dateEntree); de.setDate(1); de.setHours(0,0,0,0);
           const dm = new Date(moisCourant);  dm.setDate(1); dm.setHours(0,0,0,0);
@@ -491,9 +500,9 @@
         }
         if (!doitApparaitreCeMois(c, moisCourant)) return;
         const supprChr = suppressionsTemporaires[moisCle]?.charges || [];
-        if (supprChr.some(s => s.index === cIndex)) return;
+        if (supprChr.some(s => memeFiche(s.id, c.id))) return;
         let montant = Math.abs(c.montantHT);
-        const ov = (overridesTemporaires[moisCle]?.charges || []).find(o => o.index === cIndex);
+        const ov = (overridesTemporaires[moisCle]?.charges || []).find(o => memeFiche(o.id, c.id));
         if (ov) montant = ov.nouveauMontant;
         tC += montant;
       });

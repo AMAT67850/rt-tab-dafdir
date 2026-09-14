@@ -864,6 +864,17 @@
             }
         }
 
+        // CORRECTION 14/09/2026 — constat B.1 de l'audit.
+        // Les ajustements ponctuels (montant modifié, ligne supprimée) étaient repérés
+        // par le RANG de la ligne, qui diffère entre la liste affichée d'un mois et la
+        // liste complète des fiches : l'ajustement tombait alors sur une autre fiche.
+        // Ils sont désormais repérés par l'identifiant de la fiche, qui ne bouge jamais.
+        // La comparaison exige deux identifiants définis : un ajustement hérité de
+        // l'ancien format, dépourvu d'identifiant, ne s'applique donc à rien.
+        function memeFiche(idAjustement, idFiche) {
+            return idAjustement !== undefined && idAjustement !== null && idAjustement === idFiche;
+        }
+
         function calculerPrevisionnel() {
             console.log('🔮 === DÉBUT CALCUL PRÉVISIONNEL ===');
             
@@ -896,7 +907,7 @@
                 let detailCharges = [];
                 
                 // Recettes récurrentes
-                recettesData.forEach((recette, recetteIndex) => {
+                recettesData.forEach((recette) => {
                     // Exclure les entrants dont la date d'entrée est postérieure au mois calculé
                     if (recette.entrant && recette.dateEntree) {
                         const dateEntree = new Date(recette.dateEntree);
@@ -922,20 +933,21 @@
                     if (doitApparaitreCeMois(recette, dateMois)) {
                         // Vérifier si supprimée temporairement
                         const suppressions = window.suppressionsTemporaires?.[moisCle]?.recettes || [];
-                        const estSupprimee = suppressions.some(s => s.index === recetteIndex);
+                        const estSupprimee = suppressions.some(s => memeFiche(s.id, recette.id));
                         
                         if (!estSupprimee) {
                             let montant = Math.abs(recette.montantHT || 0);
                             
                             // Vérifier si modifiée temporairement
                             const overrides = window.overridesTemporaires?.[moisCle]?.recettes || [];
-                            const override = overrides.find(o => o.index === recetteIndex);
+                            const override = overrides.find(o => memeFiche(o.id, recette.id));
                             if (override) {
                                 montant = override.nouveauMontant;
                             }
                             
                             totalRecettes += montant;
                             detailRecettes.push({
+                                id: recette.id,
                                 libelle: `${recette.client} - ${recette.libelle}${override ? ' ✏️' : ''}`,
                                 montant: montant,
                                 type: 'recurrente',
@@ -947,7 +959,7 @@
                 });
                 
                 // Charges récurrentes
-                chargesData.forEach((charge, chargeIndex) => {
+                chargesData.forEach((charge) => {
                     // Exclure les entrants dont la date d'entrée est postérieure au mois calculé
                     if (charge.entrant && charge.dateEntree) {
                         const dateEntree = new Date(charge.dateEntree);
@@ -973,20 +985,21 @@
                     if (doitApparaitreCeMois(charge, dateMois)) {
                         // Vérifier si supprimée temporairement
                         const suppressions = window.suppressionsTemporaires?.[moisCle]?.charges || [];
-                        const estSupprimee = suppressions.some(s => s.index === chargeIndex);
+                        const estSupprimee = suppressions.some(s => memeFiche(s.id, charge.id));
                         
                         if (!estSupprimee) {
                             let montant = Math.abs(charge.montantHT || 0);
                             
                             // Vérifier si modifiée temporairement
                             const overrides = window.overridesTemporaires?.[moisCle]?.charges || [];
-                            const override = overrides.find(o => o.index === chargeIndex);
+                            const override = overrides.find(o => memeFiche(o.id, charge.id));
                             if (override) {
                                 montant = override.nouveauMontant;
                             }
                             
                             totalCharges += montant;
                             detailCharges.push({
+                                id: charge.id,
                                 libelle: `${charge.element}${override ? ' ✏️' : ''}`,
                                 montant: montant,
                                 type: 'recurrente',
@@ -1333,23 +1346,27 @@
                     }
                     
                     const overridesArray = window.overridesTemporaires[moisCle][type === 'recette' ? 'recettes' : 'charges'];
-                    
-                    // Chercher un override existant pour ce même index
-                    const overrideExistant = overridesArray.find(o => o.index === index);
-                    
+
+                    if (ecriture.id === undefined || ecriture.id === null) {
+                        alert("Cette fiche n'a pas d'identifiant : la modification ne peut pas être rattachée de façon fiable.\nOuvrez la fiche dans le module Recettes ou Charges et enregistrez-la une fois, puis recommencez.");
+                        return;
+                    }
+
+                    // Chercher un ajustement existant pour cette même fiche
+                    const overrideExistant = overridesArray.find(o => memeFiche(o.id, ecriture.id));
+
                     if (overrideExistant) {
-                        // Mettre à jour l'override existant
                         overrideExistant.nouveauMontant = montant;
-                        console.log(`✏️ Override existant mis à jour: ${ecriture.libelle} = ${montant}€`);
+                        overrideExistant.libelle = ecriture.libelle;
+                        console.log(`✏️ Ajustement mis à jour: ${ecriture.libelle} = ${montant}€`);
                     } else {
-                        // Créer un nouvel override
                         overridesArray.push({
-                            index: index,
+                            id: ecriture.id,
                             libelle: ecriture.libelle,
                             montantOriginal: ecriture.montant,
                             nouveauMontant: montant
                         });
-                        console.log(`✏️ Nouvel override créé: ${ecriture.libelle} = ${montant}€`);
+                        console.log(`✏️ Nouvel ajustement créé: ${ecriture.libelle} = ${montant}€`);
                     }
                 }
                 
@@ -1389,11 +1406,19 @@
                     if (!window.suppressionsTemporaires[moisCle]) {
                         window.suppressionsTemporaires[moisCle] = { recettes: [], charges: [] };
                     }
-                    
-                    window.suppressionsTemporaires[moisCle][type === 'recette' ? 'recettes' : 'charges'].push({
-                        index: index,
-                        libelle: ecriture.libelle
-                    });
+
+                    if (ecriture.id === undefined || ecriture.id === null) {
+                        alert("Cette fiche n'a pas d'identifiant : la suppression ne peut pas être rattachée de façon fiable.\nOuvrez la fiche dans le module Recettes ou Charges et enregistrez-la une fois, puis recommencez.");
+                        return;
+                    }
+
+                    const suppressionsArray = window.suppressionsTemporaires[moisCle][type === 'recette' ? 'recettes' : 'charges'];
+                    if (!suppressionsArray.some(x => memeFiche(x.id, ecriture.id))) {
+                        suppressionsArray.push({
+                            id: ecriture.id,
+                            libelle: ecriture.libelle
+                        });
+                    }
                 }
                 
                 calculerPrevisionnel();
