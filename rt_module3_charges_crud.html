@@ -647,6 +647,22 @@
             font-style: italic;
         }
     
+        /* AJOUT 14/09/2026 — constat D.3 : pastille de centre. Les charges portaient déjà
+           un centre dans les données, qu'aucun écran n'affichait ni ne saisissait. */
+        .badge-centre {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 11px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-centre.gare        { background: #e8f5e9; color: #2e7d32; }
+        .badge-centre.wissembourg { background: #e3f2fd; color: #1565c0; }
+        .badge-centre.general     { background: #f3e5f5; color: #6a1b9a; }
+        .badge-centre.mixte       { background: #fff3e0; color: #ef6c00; }
+        .badge-centre.vide        { background: #f8f9fa; color: #6c757d; font-weight: 500; }
+
         /* Encadré de rappel de la convention de saisie — compact, lisible sans occuper de place */
         .note-saisie {
             background: #eef3fa;
@@ -709,6 +725,18 @@
                     </select>
                 </div>
                 
+                <div class="filter-group">
+                    <label for="filtreCentre">Centre :</label>
+                    <select id="filtreCentre" onchange="appliquerFiltres()">
+                        <option value="tous">Tous les centres</option>
+                        <option value="gare">Gare</option>
+                        <option value="wissembourg">Wissembourg</option>
+                        <option value="general">Général</option>
+                        <option value="mixte">Mixte</option>
+                        <option value="vide">Non précisé</option>
+                    </select>
+                </div>
+
                 <div class="filter-group">
                     <label for="filtreMouvements">Mouvements :</label>
                     <select id="filtreMouvements" onchange="appliquerFiltres()">
@@ -773,6 +801,7 @@
                     <tr>
                         <th>⋮⋮</th>
                         <th>Fournisseur</th>
+                        <th>Centre</th>
                         <th>Type</th>
                         <th>Élément</th>
                         <th>Montant HT</th>
@@ -786,7 +815,7 @@
                 </thead>
                 <tbody id="chargesTableBody">
                     <tr>
-                        <td colspan="11" class="loading">Chargement des données...</td>
+                        <td colspan="12" class="loading">Chargement des données...</td>
                     </tr>
                 </tbody>
             </table>
@@ -828,6 +857,20 @@
                     <div class="form-group">
                         <label for="element">Élément/Service *</label>
                         <input type="text" id="element" required>
+                    </div>
+
+                    <!-- AJOUT 14/09/2026 — constat D.3 : le centre était enregistré dans les
+                         données mais ne figurait pas au formulaire, si bien que toute charge
+                         créée ici depuis en était dépourvue. -->
+                    <div class="form-group">
+                        <label for="centre">Centre *</label>
+                        <select id="centre" required>
+                            <option value="">Choisir un centre</option>
+                            <option value="gare">Gare</option>
+                            <option value="wissembourg">Wissembourg</option>
+                            <option value="général">Général</option>
+                            <option value="mixte">Mixte</option>
+                        </select>
                     </div>
 
                     <div class="form-row">
@@ -1073,12 +1116,17 @@
             let chargesFiltrees = [...charges];
 
             const filtreType = document.getElementById('filtreType').value;
+            const filtreCentre = document.getElementById('filtreCentre').value;
             const filtreMouvements = document.getElementById('filtreMouvements').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
             if (filtreType !== 'tous') {
                 chargesFiltrees = chargesFiltrees.filter(c => c.type === filtreType);
+            }
+
+            if (filtreCentre !== 'tous') {
+                chargesFiltrees = chargesFiltrees.filter(c => classeCentre(c.centre) === filtreCentre);
             }
 
             if (filtrePeriodicite !== 'toutes') {
@@ -1098,12 +1146,13 @@
                     c.fournisseur.toLowerCase().includes(searchTerm) ||
                     c.element.toLowerCase().includes(searchTerm) ||
                     (c.type && c.type.toLowerCase().includes(searchTerm)) ||
+                    (c.centre && c.centre.toLowerCase().includes(searchTerm)) ||
                     (c.commentaire && c.commentaire.toLowerCase().includes(searchTerm))
                 );
             }
 
             if (chargesFiltrees.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="no-data">Aucune charge trouvée</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" class="no-data">Aucune charge trouvée</td></tr>';
                 return;
             }
 
@@ -1153,6 +1202,7 @@
                     <tr draggable="true" data-id="${charge.id}" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
                         <td>⋮⋮</td>
                         <td><strong>${charge.fournisseur}</strong></td>
+                        <td>${badgeCentre(charge.centre)}</td>
                         <td>${typeBadge}</td>
                         <td>${charge.element}</td>
                         <td class="montant negatif">${Math.abs(charge.montantHT).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
@@ -1173,6 +1223,32 @@
         function appliquerFiltres() {
             afficherCharges();
             setTimeout(() => mettreAJourStats(), 10); // Force la synchronisation des filtres
+        }
+
+        // AJOUT 14/09/2026 — constat D.3. Les centres étaient enregistrés en minuscules
+        // et accentués ('gare', 'wissembourg', 'général', 'mixte'). Ces trois fonctions
+        // ramènent toute graphie à une clé unique, pour que l'affichage, le filtre et le
+        // formulaire ne puissent pas diverger.
+        function classeCentre(valeur) {
+            const v = (valeur || '').toString().trim().toLowerCase();
+            if (v === 'gare') return 'gare';
+            if (v === 'wissembourg') return 'wissembourg';
+            if (v === 'général' || v === 'general') return 'general';
+            if (v === 'mixte') return 'mixte';
+            return 'vide';
+        }
+
+        // Valeur à écrire dans les données, à partir de ce qui y figure déjà
+        function normaliserCentre(valeur) {
+            const c = classeCentre(valeur);
+            return c === 'vide' ? '' : (c === 'general' ? 'général' : c);
+        }
+
+        function badgeCentre(valeur) {
+            const c = classeCentre(valeur);
+            const libelles = { gare: 'Gare', wissembourg: 'Wissembourg', general: 'Général',
+                               mixte: 'Mixte', vide: 'Non précisé' };
+            return `<span class="badge-centre ${c}">${libelles[c]}</span>`;
         }
 
         function calculerMontantLisse(charge) {
@@ -1212,6 +1288,7 @@
         // Statistiques
         function mettreAJourStats() {
             const filtreType = document.getElementById('filtreType').value;
+            const filtreCentre = document.getElementById('filtreCentre').value;
             const filtreMouvements = document.getElementById('filtreMouvements').value;
             const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -1220,6 +1297,10 @@
 
             if (filtreType !== 'tous') {
                 chargesFiltrees = chargesFiltrees.filter(c => c.type === filtreType);
+            }
+
+            if (filtreCentre !== 'tous') {
+                chargesFiltrees = chargesFiltrees.filter(c => classeCentre(c.centre) === filtreCentre);
             }
             if (filtrePeriodicite !== 'toutes') {
                 chargesFiltrees = chargesFiltrees.filter(c => c.periodicite === filtrePeriodicite);
@@ -1236,6 +1317,7 @@
                     c.fournisseur.toLowerCase().includes(searchTerm) ||
                     c.element.toLowerCase().includes(searchTerm) ||
                     (c.type && c.type.toLowerCase().includes(searchTerm)) ||
+                    (c.centre && c.centre.toLowerCase().includes(searchTerm)) ||
                     (c.commentaire && c.commentaire.toLowerCase().includes(searchTerm))
                 );
             }
@@ -1328,6 +1410,7 @@
             document.getElementById('modalTitle').textContent = 'Modifier Charge';
 
             document.getElementById('fournisseur').value = charge.fournisseur;
+            document.getElementById('centre').value = normaliserCentre(charge.centre);
             document.getElementById('type').value = charge.type || '';
             document.getElementById('element').value = charge.element;
             document.getElementById('montantHT').value = charge.montantHT;
@@ -1381,6 +1464,7 @@
 
             const nouvelleCharge = {
                 fournisseur: document.getElementById('fournisseur').value,
+                centre: document.getElementById('centre').value,
                 type: document.getElementById('type').value,
                 element: document.getElementById('element').value,
                 montantHT: parseFloat(document.getElementById('montantHT').value),
