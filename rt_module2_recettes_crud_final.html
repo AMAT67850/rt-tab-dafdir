@@ -803,7 +803,11 @@
 
                         <div class="form-group">
                             <label for="montantTTC">Montant TTC (€)</label>
-                            <input type="number" id="montantTTC" step="0.01" readonly>
+                            <!-- CORRECTION 14/09/2026 — constat D.5 : le champ était verrouillé,
+                                 imposant un taux de 20 % à toute recette. Il est désormais
+                                 modifiable comme au module 3 ; le calcul automatique ×1,2 reste
+                                 le comportement par défaut et se déclenche à la saisie du HT. -->
+                            <input type="number" id="montantTTC" step="0.01" min="0">
                         </div>
                     </div>
 
@@ -1536,12 +1540,17 @@
                     return;
                 }
 
+                // Le champ TTC étant devenu modifiable (constat D.5), il peut être vidé.
+                // On retombe alors sur le calcul par défaut plutôt que d'enregistrer NaN.
+                const saisiTTC = parseFloat(document.getElementById('montantTTC').value);
+                const ttcRetenu = Number.isFinite(saisiTTC) ? saisiTTC : Math.round(saisiHT * 1.2 * 100) / 100;
+
                 const nouvelleRecette = {
                     client: document.getElementById('client').value,
                     type: document.getElementById('type').value,
                     element: document.getElementById('element').value,
                     montantHT: parseFloat(document.getElementById('montantHT').value),
-                    montantTTC: parseFloat(document.getElementById('montantTTC').value),
+                    montantTTC: ttcRetenu,
                     periodicite: document.getElementById('periodicite').value,
                     centre: document.getElementById('centre').value,
                     statut: 'ACTIF', // conservé pour compatibilité avec les autres modules
