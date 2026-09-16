@@ -667,6 +667,24 @@
         .poignee-inactive {
             opacity: 0.25;
         }
+
+        /* AJOUT 16/09/2026 — fiches auxquelles il manque un champ obligatoire */
+        .note-incomplet {
+            background: #fdecec;
+            border-left: 4px solid #c0392b;
+            border-radius: 0 6px 6px 0;
+            padding: 9px 16px 10px;
+            margin: 0 0 18px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #7b1d13;
+        }
+
+        .badge-type-non-defini,
+        .badge-periodicite-non-définie {
+            background: #f1f3f5;
+            color: #868e96;
+        }
     </style>
     <script src="garde-navigateur.js"></script>
 </head>
@@ -766,6 +784,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- AJOUT 16/09/2026 — fiches incomplètes, signalées et non escamotées -->
+        <div id="avertissementIncomplet" class="note-incomplet" style="display:none;"></div>
 
         <!-- AJOUT 16/09/2026 — le glisser-déposer est suspendu tant qu'un tri est actif -->
         <div id="avertissementTri" class="note-tri" style="display:none;">
@@ -1142,6 +1163,7 @@
 
         function initialiserSelectsTypes() {
             try {
+                ordreTypesCache = null;   // les types viennent d'être rechargés
                 const types = chargerTypesRecettes();
                 
                 // Initialiser le filtre
@@ -1241,6 +1263,61 @@
         const ORDRE_CENTRES_TRI = ['gare', 'gare 1', 'gare 2',
                                    'wissembourg', 'wissembourg 1', 'wissembourg 2'];
 
+        // Ordre des types : celui du paramétrage (typesRecettesRT). Lu une fois
+        // par ouverture de page et non à chaque affichage — sans quoi un
+        // navigateur qui refuse le stockage local empile un message d'erreur
+        // à chaque tri. Le cache est vidé par initialiserSelectsTypes().
+        let ordreTypesCache = null;
+
+        function ordreTypesTri() {
+            if (ordreTypesCache === null) {
+                ordreTypesCache = chargerTypesRecettes()
+                    .map(t => (t || '').toString().trim().toLowerCase());
+            }
+            return ordreTypesCache;
+        }
+
+
+        // AJOUT 16/09/2026 — lecture tolérante des champs d'une fiche. Une fiche
+        // à laquelle il manque un champ ne doit pas interrompre la construction
+        // du tableau : elle s'affiche avec ses manques en clair, et le bandeau
+        // rouge la désigne. Masquer le défaut serait pire que de ne rien faire ;
+        // ici il est montré, et la fiche reste modifiable.
+        function texteChamp(valeur) {
+            return (valeur === undefined || valeur === null) ? '' : valeur.toString().trim();
+        }
+
+        function nombreChamp(valeur) {
+            const n = Number(valeur);
+            return Number.isFinite(n) ? n : 0;
+        }
+
+        const CHAMPS_OBLIGATOIRES = ['client', 'type', 'element', 'periodicite', 'montantHT'];
+
+        function champsManquants(recette) {
+            if (!recette || typeof recette !== 'object') return CHAMPS_OBLIGATOIRES.slice();
+            return CHAMPS_OBLIGATOIRES.filter(champ => champ === 'montantHT'
+                ? !Number.isFinite(Number(recette[champ]))
+                : texteChamp(recette[champ]) === '');
+        }
+
+        function majAvertissementIncomplet(fiches) {
+            const bloc = document.getElementById('avertissementIncomplet');
+            if (!bloc) return;
+            if (!fiches.length) {
+                bloc.style.display = 'none';
+                return;
+            }
+            const detail = fiches.slice(0, 8).map(r =>
+                (texteChamp(r.client) || 'fiche n° ' + r.id)
+                + ' (' + champsManquants(r).join(', ') + ')').join(' · ');
+            bloc.innerHTML = '⚠️ <strong style="font-weight:700;">'
+                + fiches.length + (fiches.length > 1 ? ' fiches incomplètes' : ' fiche incomplète')
+                + '</strong> — champ obligatoire manquant : ' + detail
+                + (fiches.length > 8 ? ' · …' : '')
+                + '. Ouvrez la fiche et complétez-la.';
+            bloc.style.display = 'block';
+        }
 
         // Rang d'une valeur dans un ordre de référence. Une valeur absente de
         // l'ordre passe après les valeurs connues ; une valeur vide, en dernier.
@@ -1280,10 +1357,7 @@
             const criteres = criteresTri();
             if (criteres.length === 0) return liste;
 
-            // Ordre des types : celui du paramétrage (typesRecettesRT), lu une
-            // seule fois par tri et non à chaque comparaison.
-            const ordreTypes = chargerTypesRecettes()
-                .map(t => (t || '').toString().trim().toLowerCase());
+            const ordreTypes = ordreTypesTri();
 
             // Type et centre se classent par leur rang dans l'ordre de référence.
             // L'élément est un texte libre : classement alphabétique français,
@@ -1364,10 +1438,10 @@
                 
                 if (searchTerm) {
                     recettesFiltrees = recettesFiltrees.filter(r => 
-                        r.client.toLowerCase().includes(searchTerm) ||
-                        r.element.toLowerCase().includes(searchTerm) ||
-                        r.type.toLowerCase().includes(searchTerm) ||
-                        (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
+                        texteChamp(r.client).toLowerCase().includes(searchTerm) ||
+                        texteChamp(r.element).toLowerCase().includes(searchTerm) ||
+                        texteChamp(r.type).toLowerCase().includes(searchTerm) ||
+                        texteChamp(r.commentaire).toLowerCase().includes(searchTerm)
                     );
                 }
 
@@ -1381,14 +1455,19 @@
                     return;
                 }
 
+                // Fiches incomplètes : signalées au-dessus du tableau, et affichées.
+                majAvertissementIncomplet(recettesFiltrees.filter(r => champsManquants(r).length));
+
                 tbody.innerHTML = recettesFiltrees.map((recette, index) => {
-                    const montantLisse = calculerMontantLisse(recette);
-                    let typeCssClass = recette.type.toLowerCase();
+                    const montantLisse = nombreChamp(calculerMontantLisse(recette));
+                    const typeRecette = texteChamp(recette.type);
+                    const periodicite = texteChamp(recette.periodicite) || 'NON DÉFINIE';
+                    let typeCssClass = 'non-defini';
                     
-                    if (recette.type === "flex +") typeCssClass = "flex-plus";
-                    else if (recette.type === "rocket pass +") typeCssClass = "rocket-pass-plus";
-                    else if (recette.type === "coworking +") typeCssClass = "coworking-plus";
-                    else typeCssClass = recette.type.replace(/\s+/g, '-').toLowerCase();
+                    if (typeRecette === "flex +") typeCssClass = "flex-plus";
+                    else if (typeRecette === "rocket pass +") typeCssClass = "rocket-pass-plus";
+                    else if (typeRecette === "coworking +") typeCssClass = "coworking-plus";
+                    else if (typeRecette) typeCssClass = typeRecette.replace(/\s+/g, '-').toLowerCase();
 
                     // Badge centre
                     const badgeCentre = recette.centre
@@ -1456,13 +1535,13 @@
                     
                     return `
                         <tr ${triActif ? '' : 'draggable="true"'} data-index="${index}">
-                            <td><span class="drag-handle${triActif ? ' poignee-inactive' : ''}">☰</span><strong>${recette.client}</strong></td>
-                            <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
-                            <td>${recette.element}</td>
+                            <td><span class="drag-handle${triActif ? ' poignee-inactive' : ''}">☰</span><strong>${texteChamp(recette.client) || '—'}</strong></td>
+                            <td><span class="badge badge-type-${typeCssClass}">${typeRecette || 'Non défini'}</span></td>
+                            <td>${texteChamp(recette.element) || '—'}</td>
                             <td>${badgeCentre}</td>
-                            <td class="montant positif">${recette.montantHT.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                            <td class="montant positif">${recette.montantTTC.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
-                            <td><span class="badge badge-periodicite-${recette.periodicite.toLowerCase()}">${recette.periodicite}</span></td>
+                            <td class="montant positif">${nombreChamp(recette.montantHT).toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                            <td class="montant positif">${nombreChamp(recette.montantTTC).toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
+                            <td><span class="badge badge-periodicite-${periodicite.toLowerCase()}">${periodicite}</span></td>
                             <td class="montant positif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2})}€</td>
                             <td>${badgeEntrant}</td>
                             <td>${badgeSortant}</td>
@@ -1503,7 +1582,7 @@
                     'ANNUEL': 12
                 };
                 
-                return recette.montantHT / (facteurs[recette.periodicite] || 1);
+                return nombreChamp(recette.montantHT) / (facteurs[recette.periodicite] || 1);
             } catch (error) {
                 console.error('❌ Erreur calcul lissé:', error);
                 return 0;
@@ -1571,10 +1650,10 @@
                 
                 if (searchTerm) {
                     recettesFiltrees = recettesFiltrees.filter(r => 
-                        r.client.toLowerCase().includes(searchTerm) ||
-                        r.element.toLowerCase().includes(searchTerm) ||
-                        r.type.toLowerCase().includes(searchTerm) ||
-                        (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
+                        texteChamp(r.client).toLowerCase().includes(searchTerm) ||
+                        texteChamp(r.element).toLowerCase().includes(searchTerm) ||
+                        texteChamp(r.type).toLowerCase().includes(searchTerm) ||
+                        texteChamp(r.commentaire).toLowerCase().includes(searchTerm)
                     );
                 }
 
