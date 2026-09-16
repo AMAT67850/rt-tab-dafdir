@@ -707,6 +707,29 @@
         .poignee-inactive {
             opacity: 0.25;
         }
+
+        /* AJOUT 16/09/2026 — fiches auxquelles il manque un champ obligatoire */
+        .note-incomplet {
+            background: #fdecec;
+            border-left: 4px solid #c0392b;
+            border-radius: 0 6px 6px 0;
+            padding: 9px 16px 10px;
+            margin: 0 0 18px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #7b1d13;
+        }
+
+        /* AJOUT 16/09/2026 — aide sous les listes de tri. Corps 13 px, aligné
+           sur l'aide de saisie du champ Centre. */
+        .aide-tri {
+            width: 100%;
+            margin: 12px 2px 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #6c757d;
+            font-style: italic;
+        }
     </style>
     <script src="garde-navigateur.js"></script>
 </head>
@@ -804,6 +827,9 @@
                         <option value="centre">Centre</option>
                     </select>
                 </div>
+
+                <!-- AJOUT 16/09/2026 — dit pourquoi le second niveau est verrouillé -->
+                <div id="aideTri" class="aide-tri" style="display:none;"></div>
             </div>
 
             <div class="controls-right">
@@ -813,6 +839,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- AJOUT 16/09/2026 — fiches incomplètes, signalées et non escamotées -->
+        <div id="avertissementIncomplet" class="note-incomplet" style="display:none;"></div>
 
         <!-- AJOUT 16/09/2026 — le glisser-déposer est suspendu tant qu'un tri est actif -->
         <div id="avertissementTri" class="note-tri" style="display:none;">
@@ -1189,6 +1218,49 @@
         const ORDRE_CENTRES_TRI = ['gare', 'wissembourg', 'mixte', 'general', 'vide'];
 
 
+        // AJOUT 16/09/2026 — lecture tolérante des champs d'une fiche. Une charge
+        // à laquelle il manque un champ ne doit pas interrompre la construction du
+        // tableau : elle s'affiche avec ses manques en clair, et le bandeau rouge
+        // la désigne. Même traitement qu'au module 2. Masquer le défaut serait
+        // pire que de ne rien faire ; ici il est montré, et la fiche reste
+        // modifiable. Le centre n'est pas dans cette liste : il a déjà son propre
+        // repérage par le filtre « Non précisé ».
+        function texteChamp(valeur) {
+            return (valeur === undefined || valeur === null) ? '' : valeur.toString().trim();
+        }
+
+        function nombreChamp(valeur) {
+            const n = Number(valeur);
+            return Number.isFinite(n) ? n : 0;
+        }
+
+        const CHAMPS_OBLIGATOIRES = ['fournisseur', 'type', 'element', 'periodicite', 'montantHT'];
+
+        function champsManquants(charge) {
+            if (!charge || typeof charge !== 'object') return CHAMPS_OBLIGATOIRES.slice();
+            return CHAMPS_OBLIGATOIRES.filter(champ => champ === 'montantHT'
+                ? !Number.isFinite(Number(charge[champ]))
+                : texteChamp(charge[champ]) === '');
+        }
+
+        function majAvertissementIncomplet(fiches) {
+            const bloc = document.getElementById('avertissementIncomplet');
+            if (!bloc) return;
+            if (!fiches.length) {
+                bloc.style.display = 'none';
+                return;
+            }
+            const detail = fiches.slice(0, 8).map(c =>
+                (texteChamp(c.fournisseur) || 'fiche n° ' + c.id)
+                + ' (' + champsManquants(c).join(', ') + ')').join(' · ');
+            bloc.innerHTML = '⚠️ <strong style="font-weight:700;">'
+                + fiches.length + (fiches.length > 1 ? ' fiches incomplètes' : ' fiche incomplète')
+                + '</strong> — champ obligatoire manquant : ' + detail
+                + (fiches.length > 8 ? ' · …' : '')
+                + '. Ouvrez la fiche et complétez-la.';
+            bloc.style.display = 'block';
+        }
+
         // Rang d'une valeur dans un ordre de référence. Une valeur absente de
         // l'ordre passe après les valeurs connues ; une valeur vide, en dernier.
         function rangDansOrdre(valeur, ordre) {
@@ -1235,6 +1307,20 @@
             appliquerFiltres();
         }
 
+        // Aide affichée sous les listes de tri tant que le second niveau est
+        // verrouillé. Un deuxième niveau sans premier n'a pas de sens : le verrou
+        // reste, mais il dit désormais ce qu'il attend.
+        function majAideTri() {
+            const bloc = document.getElementById('aideTri');
+            const n1 = document.getElementById('triNiveau1');
+            if (!bloc || !n1) return;
+            const texte = (n1.value === 'manuel')
+                ? "Choisissez d'abord un critère dans « Trier par » : la deuxième liste s'activera."
+                : '';
+            bloc.textContent = texte;
+            bloc.style.display = texte ? 'block' : 'none';
+        }
+
         function majAvertissementTri() {
             const bloc = document.getElementById('avertissementTri');
             if (bloc) bloc.style.display = triEnCours() ? 'block' : 'none';
@@ -1272,11 +1358,11 @@
 
             if (searchTerm) {
                 chargesFiltrees = chargesFiltrees.filter(c =>
-                    c.fournisseur.toLowerCase().includes(searchTerm) ||
-                    c.element.toLowerCase().includes(searchTerm) ||
-                    (c.type && c.type.toLowerCase().includes(searchTerm)) ||
-                    (c.centre && c.centre.toLowerCase().includes(searchTerm)) ||
-                    (c.commentaire && c.commentaire.toLowerCase().includes(searchTerm))
+                    texteChamp(c.fournisseur).toLowerCase().includes(searchTerm) ||
+                    texteChamp(c.element).toLowerCase().includes(searchTerm) ||
+                    texteChamp(c.type).toLowerCase().includes(searchTerm) ||
+                    texteChamp(c.centre).toLowerCase().includes(searchTerm) ||
+                    texteChamp(c.commentaire).toLowerCase().includes(searchTerm)
                 );
             }
 
@@ -1284,6 +1370,9 @@
             chargesFiltrees = appliquerTri(chargesFiltrees);
             const triActif = (triEnCours() !== null);
             majAvertissementTri();
+            majAideTri();
+            // Fiches incomplètes : signalées au-dessus du tableau, et affichées.
+            majAvertissementIncomplet(chargesFiltrees.filter(c => champsManquants(c).length));
 
             if (chargesFiltrees.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="12" class="no-data">Aucune charge trouvée</td></tr>';
@@ -1295,10 +1384,12 @@
                 'draggable="true" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)"';
 
             tbody.innerHTML = chargesFiltrees.map((charge, index) => {
-                const montantLisse = calculerMontantLisse(charge);
-                const typeFormatted = charge.type ? charge.type.replace(' ', '-').replace('.', '').toLowerCase() : 'non-defini';
-                const typeBadge = charge.type
-                    ? `<span class="badge badge-type-${typeFormatted}">${charge.type}</span>`
+                const montantLisse = nombreChamp(calculerMontantLisse(charge));
+                const typeCharge = texteChamp(charge.type);
+                const periodicite = texteChamp(charge.periodicite) || 'NON DÉFINIE';
+                const typeFormatted = typeCharge ? typeCharge.replace(' ', '-').replace('.', '').toLowerCase() : 'non-defini';
+                const typeBadge = typeCharge
+                    ? `<span class="badge badge-type-${typeFormatted}">${typeCharge}</span>`
                     : '<span class="badge" style="background:#f8f9fa;color:#6c757d;">Non défini</span>';
 
                 // Badge entrant
@@ -1339,13 +1430,13 @@
                 return `
                     <tr ${attrsDrag} data-id="${charge.id}">
                         <td${triActif ? ' class="poignee-inactive"' : ''}>⋮⋮</td>
-                        <td><strong>${charge.fournisseur}</strong></td>
+                        <td><strong>${texteChamp(charge.fournisseur) || '—'}</strong></td>
                         <td>${badgeCentre(charge.centre)}</td>
                         <td>${typeBadge}</td>
-                        <td>${charge.element}</td>
-                        <td class="montant negatif">${Math.abs(charge.montantHT).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
-                        <td class="montant negatif">${Math.abs(charge.montantTTC).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
-                        <td><span class="badge badge-periodicite-${charge.periodicite.toLowerCase()}">${charge.periodicite}</span></td>
+                        <td>${texteChamp(charge.element) || '—'}</td>
+                        <td class="montant negatif">${Math.abs(nombreChamp(charge.montantHT)).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
+                        <td class="montant negatif">${Math.abs(nombreChamp(charge.montantTTC)).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
+                        <td><span class="badge badge-periodicite-${periodicite.toLowerCase()}">${periodicite}</span></td>
                         <td class="montant negatif">${montantLisse.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
                         <td>${badgeEntrant}</td>
                         <td>${badgeSortant}</td>
@@ -1398,7 +1489,7 @@
                 'ANNUEL': 12
             };
             
-            return Math.round(Math.abs(charge.montantHT) / (facteurs[charge.periodicite] || 1) * 100) / 100;
+            return Math.round(Math.abs(nombreChamp(charge.montantHT)) / (facteurs[charge.periodicite] || 1) * 100) / 100;
         }
 
         function calculerTTC() {
@@ -1452,11 +1543,11 @@
             }
             if (searchTerm) {
                 chargesFiltrees = chargesFiltrees.filter(c =>
-                    c.fournisseur.toLowerCase().includes(searchTerm) ||
-                    c.element.toLowerCase().includes(searchTerm) ||
-                    (c.type && c.type.toLowerCase().includes(searchTerm)) ||
-                    (c.centre && c.centre.toLowerCase().includes(searchTerm)) ||
-                    (c.commentaire && c.commentaire.toLowerCase().includes(searchTerm))
+                    texteChamp(c.fournisseur).toLowerCase().includes(searchTerm) ||
+                    texteChamp(c.element).toLowerCase().includes(searchTerm) ||
+                    texteChamp(c.type).toLowerCase().includes(searchTerm) ||
+                    texteChamp(c.centre).toLowerCase().includes(searchTerm) ||
+                    texteChamp(c.commentaire).toLowerCase().includes(searchTerm)
                 );
             }
 
@@ -1468,7 +1559,7 @@
             const totalSortants = chargesFiltrees.filter(c => c.sortant && c.dateDepart && !estDejaSorti(c)).length;
 
             const totalCharges = chargesFiltrees.length;
-            const totalMontantHT = chargesActives.reduce((sum, c) => sum + Math.abs(c.montantHT), 0);
+            const totalMontantHT = chargesActives.reduce((sum, c) => sum + Math.abs(nombreChamp(c.montantHT)), 0);
             const totalMontantLisse = chargesActives.reduce((sum, c) => sum + calculerMontantLisse(c), 0);
 
             console.log(`Stats charges: ${totalCharges} (${totalEntrants} entrants futurs exclus), HT=${totalMontantHT}€, lissé=${totalMontantLisse}€`);
