@@ -734,13 +734,14 @@
                     </select>
                 </div>
 
-                <!-- AJOUT 16/09/2026 — tri d'affichage à deux niveaux -->
+                <!-- AJOUT 16/09/2026 — tri d'affichage à trois niveaux -->
                 <div class="filter-group">
                     <label>Trier par</label>
                     <select id="triNiveau1" onchange="changerTri()">
                         <option value="manuel">Ordre manuel</option>
                         <option value="type">Type de recette</option>
                         <option value="centre">Centre</option>
+                        <option value="element">Élément</option>
                     </select>
                 </div>
 
@@ -750,6 +751,17 @@
                         <option value="aucun">—</option>
                         <option value="type">Type de recette</option>
                         <option value="centre">Centre</option>
+                        <option value="element">Élément</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>puis par</label>
+                    <select id="triNiveau3" onchange="changerTri()" disabled>
+                        <option value="aucun">—</option>
+                        <option value="type">Type de recette</option>
+                        <option value="centre">Centre</option>
+                        <option value="element">Élément</option>
                     </select>
                 </div>
             </div>
@@ -1215,7 +1227,7 @@
             }
         }
 
-        // ── AJOUT 16/09/2026 — tri d'affichage à deux niveaux ─────────────────
+        // ── AJOUT 16/09/2026 — tri d'affichage à trois niveaux ─────────────────
         // Le tri ne modifie jamais les données : il ne réordonne que la liste
         // affichée. L'ordre manuel — celui du tableau enregistré, que le
         // glisser-déposer modifie — reste le mode par défaut, et le tri choisi
@@ -1239,44 +1251,81 @@
             return i === -1 ? ordre.length : i;
         }
 
+        // Critères retenus, du premier au troisième niveau. Liste vide si
+        // l'ordre manuel est demandé. Un niveau laissé à « — » arrête la chaîne,
+        // et un critère déjà employé plus haut est ignoré.
+        function criteresTri() {
+            const valeur = id => {
+                const e = document.getElementById(id);
+                return e ? e.value : 'aucun';
+            };
+            const premier = valeur('triNiveau1');
+            if (premier === 'manuel') return [];
+            const criteres = [premier];
+            for (const id of ['triNiveau2', 'triNiveau3']) {
+                const c = valeur(id);
+                if (c === 'aucun') break;
+                if (!criteres.includes(c)) criteres.push(c);
+            }
+            return criteres;
+        }
+
         // Critère de premier niveau, ou null si l'ordre manuel est demandé.
         function triEnCours() {
-            const n1 = document.getElementById('triNiveau1');
-            return (n1 && n1.value !== 'manuel') ? n1.value : null;
+            const criteres = criteresTri();
+            return criteres.length ? criteres[0] : null;
         }
 
         function appliquerTri(liste) {
-            const critere1 = triEnCours();
-            if (!critere1) return liste;
-
-            const n2 = document.getElementById('triNiveau2');
-            const v2 = n2 ? n2.value : 'aucun';
-            const critere2 = (v2 !== 'aucun' && v2 !== critere1) ? v2 : null;
+            const criteres = criteresTri();
+            if (criteres.length === 0) return liste;
 
             // Ordre des types : celui du paramétrage (typesRecettesRT), lu une
             // seule fois par tri et non à chaque comparaison.
             const ordreTypes = chargerTypesRecettes()
                 .map(t => (t || '').toString().trim().toLowerCase());
 
-            const rang = (item, critere) => critere === 'type'
-                ? rangDansOrdre(item.type, ordreTypes)
-                : rangDansOrdre(item.centre, ORDRE_CENTRES_TRI);
-
+            // Type et centre se classent par leur rang dans l'ordre de référence.
+            // L'élément est un texte libre : classement alphabétique français,
+            // insensible à la casse et aux accents, les nombres lus comme des
+            // nombres (« Bureau 2 » avant « Bureau 10 »). Un élément vide passe
+            // en dernier.
+            const comparer = (a, b, critere) => {
+                if (critere === 'element') {
+                    const ea = (a.element || '').toString().trim();
+                    const eb = (b.element || '').toString().trim();
+                    if (!ea && !eb) return 0;
+                    if (!ea) return 1;
+                    if (!eb) return -1;
+                    return ea.localeCompare(eb, 'fr', { sensitivity: 'base', numeric: true });
+                }
+                if (critere === 'type') {
+                    return rangDansOrdre(a.type, ordreTypes) - rangDansOrdre(b.type, ordreTypes);
+                }
+                return rangDansOrdre(a.centre, ORDRE_CENTRES_TRI)
+                     - rangDansOrdre(b.centre, ORDRE_CENTRES_TRI);
+            };
 
             return liste.sort((a, b) => {
-                const d1 = rang(a, critere1) - rang(b, critere1);
-                if (d1 !== 0) return d1;
-                return critere2 ? rang(a, critere2) - rang(b, critere2) : 0;
+                for (const critere of criteres) {
+                    const d = comparer(a, b, critere);
+                    if (d !== 0) return d;
+                }
+                return 0;
             });
         }
 
         function changerTri() {
             const n1 = document.getElementById('triNiveau1');
             const n2 = document.getElementById('triNiveau2');
-            if (n1 && n2) {
+            const n3 = document.getElementById('triNiveau3');
+            if (n1 && n2 && n3) {
+                // Pas de niveau sans celui qui le précède, ni deux fois le
+                // même critère dans la chaîne.
                 n2.disabled = (n1.value === 'manuel');
-                // Pas de second niveau sans premier, ni deux fois le même critère.
                 if (n2.disabled || n2.value === n1.value) n2.value = 'aucun';
+                n3.disabled = n2.disabled || n2.value === 'aucun';
+                if (n3.disabled || n3.value === n1.value || n3.value === n2.value) n3.value = 'aucun';
             }
             appliquerFiltres();
         }
