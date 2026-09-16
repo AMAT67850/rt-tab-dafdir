@@ -649,6 +649,24 @@
             color: #24456e;
             font-size: 13.5px;
         }
+
+        /* AJOUT 16/09/2026 — avertissement affiché tant qu'un tri est actif.
+           Corps 13,5 px, aligné sur .note-saisie : dérogation assumée au
+           minimum de 18 px, qui vise les documents et non les repères d'écran. */
+        .note-tri {
+            background: #fff6e5;
+            border-left: 4px solid #d98c00;
+            border-radius: 0 6px 6px 0;
+            padding: 9px 16px 10px;
+            margin: 0 0 18px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #6b4a00;
+        }
+
+        .poignee-inactive {
+            opacity: 0.25;
+        }
     </style>
     <script src="garde-navigateur.js"></script>
 </head>
@@ -715,7 +733,31 @@
                         <option value="ANNUEL">Annuel</option>
                     </select>
                 </div>
+
+                <!-- AJOUT 16/09/2026 — tri d'affichage à deux niveaux -->
+                <div class="filter-group">
+                    <label>Trier par</label>
+                    <select id="triNiveau1" onchange="changerTri()">
+                        <option value="manuel">Ordre manuel</option>
+                        <option value="type">Type de recette</option>
+                        <option value="centre">Centre</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>puis par</label>
+                    <select id="triNiveau2" onchange="changerTri()" disabled>
+                        <option value="aucun">—</option>
+                        <option value="type">Type de recette</option>
+                        <option value="centre">Centre</option>
+                    </select>
+                </div>
             </div>
+        </div>
+
+        <!-- AJOUT 16/09/2026 — le glisser-déposer est suspendu tant qu'un tri est actif -->
+        <div id="avertissementTri" class="note-tri" style="display:none;">
+            🔒 <strong style="font-weight:700;">Tri en cours</strong> — le glisser-déposer est suspendu, pour ne pas écraser l'ordre manuel. Revenez à « Ordre manuel » pour réorganiser les lignes.
         </div>
 
         <!-- Statistiques -->
@@ -1173,6 +1215,77 @@
             }
         }
 
+        // ── AJOUT 16/09/2026 — tri d'affichage à deux niveaux ─────────────────
+        // Le tri ne modifie jamais les données : il ne réordonne que la liste
+        // affichée. L'ordre manuel — celui du tableau enregistré, que le
+        // glisser-déposer modifie — reste le mode par défaut, et le tri choisi
+        // n'est pas mémorisé : chaque ouverture repart de l'ordre manuel.
+        // Les égalités conservent l'ordre manuel, le tri de JavaScript étant
+        // stable (ECMAScript 2019). Le glisser-déposer est suspendu tant qu'un
+        // tri est actif : un dépôt réécrirait sinon l'ordre manuel à partir
+        // d'une vue triée, et le détruirait.
+
+        // Ordre des centres : celui de la liste déroulante de filtre.
+        const ORDRE_CENTRES_TRI = ['gare', 'gare 1', 'gare 2',
+                                   'wissembourg', 'wissembourg 1', 'wissembourg 2'];
+
+
+        // Rang d'une valeur dans un ordre de référence. Une valeur absente de
+        // l'ordre passe après les valeurs connues ; une valeur vide, en dernier.
+        function rangDansOrdre(valeur, ordre) {
+            const v = (valeur || '').toString().trim().toLowerCase();
+            if (!v) return ordre.length + 1;
+            const i = ordre.indexOf(v);
+            return i === -1 ? ordre.length : i;
+        }
+
+        // Critère de premier niveau, ou null si l'ordre manuel est demandé.
+        function triEnCours() {
+            const n1 = document.getElementById('triNiveau1');
+            return (n1 && n1.value !== 'manuel') ? n1.value : null;
+        }
+
+        function appliquerTri(liste) {
+            const critere1 = triEnCours();
+            if (!critere1) return liste;
+
+            const n2 = document.getElementById('triNiveau2');
+            const v2 = n2 ? n2.value : 'aucun';
+            const critere2 = (v2 !== 'aucun' && v2 !== critere1) ? v2 : null;
+
+            // Ordre des types : celui du paramétrage (typesRecettesRT), lu une
+            // seule fois par tri et non à chaque comparaison.
+            const ordreTypes = chargerTypesRecettes()
+                .map(t => (t || '').toString().trim().toLowerCase());
+
+            const rang = (item, critere) => critere === 'type'
+                ? rangDansOrdre(item.type, ordreTypes)
+                : rangDansOrdre(item.centre, ORDRE_CENTRES_TRI);
+
+
+            return liste.sort((a, b) => {
+                const d1 = rang(a, critere1) - rang(b, critere1);
+                if (d1 !== 0) return d1;
+                return critere2 ? rang(a, critere2) - rang(b, critere2) : 0;
+            });
+        }
+
+        function changerTri() {
+            const n1 = document.getElementById('triNiveau1');
+            const n2 = document.getElementById('triNiveau2');
+            if (n1 && n2) {
+                n2.disabled = (n1.value === 'manuel');
+                // Pas de second niveau sans premier, ni deux fois le même critère.
+                if (n2.disabled || n2.value === n1.value) n2.value = 'aucun';
+            }
+            appliquerFiltres();
+        }
+
+        function majAvertissementTri() {
+            const bloc = document.getElementById('avertissementTri');
+            if (bloc) bloc.style.display = triEnCours() ? 'block' : 'none';
+        }
+
         function afficherRecettes() {
             try {
                 const tbody = document.getElementById('recettesTableBody');
@@ -1208,6 +1321,11 @@
                         (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
                     );
                 }
+
+                // Tri d'affichage (ajout 16/09/2026) — n'altère aucune donnée
+                recettesFiltrees = appliquerTri(recettesFiltrees);
+                const triActif = (triEnCours() !== null);
+                majAvertissementTri();
 
                 if (recettesFiltrees.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="11" class="no-data">Aucune recette trouvée</td></tr>';
@@ -1288,8 +1406,8 @@
                     }
                     
                     return `
-                        <tr draggable="true" data-index="${index}">
-                            <td><span class="drag-handle">☰</span><strong>${recette.client}</strong></td>
+                        <tr ${triActif ? '' : 'draggable="true"'} data-index="${index}">
+                            <td><span class="drag-handle${triActif ? ' poignee-inactive' : ''}">☰</span><strong>${recette.client}</strong></td>
                             <td><span class="badge badge-type-${typeCssClass}">${recette.type}</span></td>
                             <td>${recette.element}</td>
                             <td>${badgeCentre}</td>
@@ -1308,7 +1426,8 @@
                 }).join('');
                 
                 // Ajouter les événements drag and drop après avoir créé les lignes
-                initDragAndDrop();
+                // (suspendus tant qu'un tri est actif — ajout 16/09/2026)
+                if (!triActif) initDragAndDrop();
                 
                 console.log(`📊 ${recettesFiltrees.length} recettes affichées`);
             } catch (error) {
@@ -1631,6 +1750,12 @@
             e.stopPropagation();
             e.preventDefault();
             
+            // Garde-fou : jamais de réorganisation sous un tri (ajout 16/09/2026)
+            if (triEnCours()) {
+                this.classList.remove('drag-over');
+                return false;
+            }
+
             try {
                 if (draggedRow !== this) {
                     const targetIndex = parseInt(this.dataset.index);
