@@ -668,6 +668,17 @@
             opacity: 0.25;
         }
 
+        /* AJOUT 16/09/2026 — aide sous les listes de tri. Corps 13 px, aligné
+           sur les aides de saisie déjà en place. */
+        .aide-tri {
+            width: 100%;
+            margin: 12px 2px 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #6c757d;
+            font-style: italic;
+        }
+
         /* AJOUT 16/09/2026 — fiches auxquelles il manque un champ obligatoire */
         .note-incomplet {
             background: #fdecec;
@@ -782,6 +793,9 @@
                         <option value="element">Élément</option>
                     </select>
                 </div>
+
+                <!-- AJOUT 16/09/2026 — dit pourquoi un niveau est encore verrouillé -->
+                <div id="aideTri" class="aide-tri" style="display:none;"></div>
             </div>
         </div>
 
@@ -1404,6 +1418,25 @@
             appliquerFiltres();
         }
 
+        // Aide affichée sous les listes de tri tant qu'un niveau est verrouillé.
+        // Un deuxième niveau sans premier n'a pas de sens : le verrou reste, mais
+        // il dit désormais ce qu'il attend.
+        function majAideTri() {
+            const bloc = document.getElementById('aideTri');
+            const n1 = document.getElementById('triNiveau1');
+            const n2 = document.getElementById('triNiveau2');
+            if (!bloc || !n1 || !n2) return;
+
+            let texte = '';
+            if (n1.value === 'manuel') {
+                texte = "Choisissez d'abord un critère dans « Trier par » : la deuxième liste s'activera, puis la troisième.";
+            } else if (n2.value === 'aucun') {
+                texte = "Renseignez le deuxième niveau pour activer le troisième.";
+            }
+            bloc.textContent = texte;
+            bloc.style.display = texte ? 'block' : 'none';
+        }
+
         function majAvertissementTri() {
             const bloc = document.getElementById('avertissementTri');
             if (bloc) bloc.style.display = triEnCours() ? 'block' : 'none';
@@ -1449,6 +1482,7 @@
                 recettesFiltrees = appliquerTri(recettesFiltrees);
                 const triActif = (triEnCours() !== null);
                 majAvertissementTri();
+                majAideTri();
 
                 if (recettesFiltrees.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="11" class="no-data">Aucune recette trouvée</td></tr>';
