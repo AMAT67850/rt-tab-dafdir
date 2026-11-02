@@ -729,6 +729,37 @@
             color: #24356e;
             cursor: pointer;
         }
+
+        /* AJOUT 02/11/2026 — tableau resserré pour tenir sur la largeur de la
+           fenêtre : marges intérieures des cellules réduites, pastilles et
+           boutons plus étroits, une pastille longue passe sur deux lignes.
+           Les montants ne se coupent jamais. Taille des caractères inchangée. */
+        table {
+            min-width: 900px;
+        }
+        th {
+            padding: 12px 6px;
+        }
+        td {
+            padding: 10px 6px;
+        }
+        td .badge,
+        td .badge-centre {
+            white-space: normal;
+            padding-left: 8px;
+            padding-right: 8px;
+            line-height: 1.3;
+        }
+        td.montant {
+            white-space: nowrap;
+        }
+        .actions {
+            gap: 4px;
+            flex-wrap: wrap;   /* les deux boutons s'empilent si la place manque */
+        }
+        .btn-action {
+            padding: 6px 8px;
+        }
     </style>
     <script src="rt-donnees.js"></script>
     <!-- AJOUT 02/11/2026 — listes communes de centres et de types de charges -->
