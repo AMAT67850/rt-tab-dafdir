@@ -230,9 +230,9 @@
             background-color: #f8f9fa;
         }
 
-        /* Colonne drag handle plus étroite */
+        /* Colonne drag handle plus étroite — élargie le 02/11/2026 pour la case à cocher */
         th:first-child {
-            width: 40px;
+            width: 70px;
             text-align: center;
         }
 
@@ -720,6 +720,39 @@
             color: #7b1d13;
         }
 
+        /* AJOUT 02/11/2026 — sélection de plusieurs lignes à déplacer ensemble */
+        .case-selection {
+            width: 18px;
+            height: 18px;
+            margin: 0 6px 0 0;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+        tbody tr.ligne-selectionnee,
+        tbody tr.ligne-selectionnee:hover {
+            background-color: #e8eefc;
+        }
+        .barre-selection {
+            background: #e8eefc;
+            border-left: 4px solid #4a63c9;
+            border-radius: 0 6px 6px 0;
+            padding: 10px 16px;
+            margin: 0 0 18px;
+            font-size: 18px;
+            line-height: 1.5;
+            color: #24356e;
+        }
+        .barre-selection button {
+            margin-left: 12px;
+            font-size: 16px;
+            padding: 4px 12px;
+            border: 1px solid #4a63c9;
+            border-radius: 6px;
+            background: #fff;
+            color: #24356e;
+            cursor: pointer;
+        }
+
         /* AJOUT 16/09/2026 — aide sous les listes de tri. Corps 13 px, aligné
            sur l'aide de saisie du champ Centre. */
         .aide-tri {
@@ -732,11 +765,13 @@
         }
     </style>
     <script src="rt-donnees.js"></script>
+    <!-- AJOUT 02/11/2026 — listes communes de centres et de types de charges -->
+    <script src="rt-listes.js"></script>
 </head>
 <body>
     <div class="header">
         <h1>💰 Gestion des Charges Récurrentes</h1>
-        <p class="subtitle">Interface CRUD complète avec persistance localStorage et lissage automatique + FILTRES PAR TYPE CHARGES (10 types incluant "Autres")</p>
+        <p class="subtitle">Interface CRUD complète avec persistance localStorage et lissage automatique + FILTRES PAR TYPE CHARGES</p>
     </div>
 
     <div class="container">
@@ -762,16 +797,8 @@
                     <label for="filtreType">Type :</label>
                     <select id="filtreType" onchange="appliquerFiltres()">
                         <option value="tous">Tous les types</option>
-                        <option value="emprunts">Emprunts</option>
-                        <option value="frais bancaires">Frais Bancaires</option>
-                        <option value="loyers">Loyers</option>
-                        <option value="télécomm.">Télécomm.</option>
-                        <option value="assurances">Assurances</option>
-                        <option value="véhicules">Véhicules</option>
-                        <option value="abonnements">Abonnements</option>
-                        <option value="rémunérations">Rémunérations</option>
-                        <option value="ES">ES</option>
-                        <option value="autres">Autres</option>
+                        <!-- MODIFIÉ 02/11/2026 — types tirés de la liste des types de charges
+                             (page Sauvegarde et données), par initialiserListes() -->
                     </select>
                 </div>
                 
@@ -779,11 +806,8 @@
                     <label for="filtreCentre">Centre :</label>
                     <select id="filtreCentre" onchange="appliquerFiltres()">
                         <option value="tous">Tous les centres</option>
-                        <option value="gare">Gare</option>
-                        <option value="wissembourg">Wissembourg</option>
-                        <option value="mixte">Mixte</option>
-                        <option value="general">Frais généraux</option>
-                        <option value="vide">Non précisé</option>
+                        <!-- MODIFIÉ 02/11/2026 — centres de la liste commune, puis Mixte,
+                             Frais généraux et « Non précisé ou hors liste », par initialiserListes() -->
                     </select>
                 </div>
 
@@ -847,6 +871,9 @@
         <div id="avertissementTri" class="note-tri" style="display:none;">
             🔒 <strong style="font-weight:700;">Tri en cours</strong> — le glisser-déposer est suspendu, pour ne pas écraser l'ordre manuel. Revenez à « Ordre manuel » pour réorganiser les lignes.
         </div>
+
+        <!-- AJOUT 02/11/2026 — lignes cochées, déplacées ensemble -->
+        <div id="barreSelection" class="barre-selection" style="display:none;"></div>
 
         <!-- Statistiques -->
         <div class="stats">
@@ -920,16 +947,7 @@
                             <label for="type">Type *</label> <!-- NOUVEAU CHAMP TYPE CHARGES -->
                             <select id="type" required>
                                 <option value="">Choisir un type</option>
-                                <option value="emprunts">Emprunts</option>
-                                <option value="frais bancaires">Frais Bancaires</option>
-                                <option value="loyers">Loyers</option>
-                                <option value="télécomm.">Télécomm.</option>
-                                <option value="assurances">Assurances</option>
-                                <option value="véhicules">Véhicules</option>
-                                <option value="abonnements">Abonnements</option>
-                                <option value="rémunérations">Rémunérations</option>
-                                <option value="ES">ES</option>
-                                <option value="autres">Autres</option>
+                                <!-- MODIFIÉ 02/11/2026 — liste des types de charges -->
                             </select>
                         </div>
                     </div>
@@ -946,14 +964,12 @@
                         <label for="centre">Centre *</label>
                         <select id="centre" required>
                             <option value="">Choisir un centre</option>
-                            <option value="gare">Gare</option>
-                            <option value="wissembourg">Wissembourg</option>
-                            <option value="mixte">Mixte</option>
-                            <option value="général">Frais généraux</option>
+                            <!-- MODIFIÉ 02/11/2026 — centres de la liste commune, puis Mixte et Frais généraux -->
                         </select>
                         <div class="aide-centre">
-                            <strong>Gare</strong> et <strong>Wissembourg</strong> : charge de fonctionnement d'un seul centre.
-                            <strong>Mixte</strong> : charge d'exploitation partagée entre les deux centres, à répartir.
+                            <!-- MODIFIÉ 02/11/2026 — noms des centres tirés de la liste commune -->
+                            <span id="aideCentresListe"><strong>Gare</strong> et <strong>Wissembourg</strong></span> : charge de fonctionnement d'un seul centre.
+                            <strong>Mixte</strong> : charge d'exploitation partagée entre Gare et Wissembourg, à répartir.
                             <strong>Frais généraux</strong> : charge de la société, sans lien avec l'exploitation d'un centre —
                             emprunts, frais bancaires, rémunérations, assurances, abonnements, provisions.
                             Quand le partage est lisible sur la facture (deux compteurs, deux baux), saisissez plutôt deux lignes.
@@ -1059,6 +1075,7 @@
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
+            initialiserListes();   // AJOUT 02/11/2026 — centres et types tirés des listes communes
             chargerCharges();
             afficherCharges();
             mettreAJourStats();
@@ -1208,14 +1225,68 @@
         // tri est actif : un dépôt réécrirait sinon l'ordre manuel à partir
         // d'une vue triée, et le détruirait.
 
-        // Ordre des types : celui de la liste déroulante de filtre.
-        const ORDRE_TYPES_TRI = ['emprunts', 'frais bancaires', 'loyers', 'télécomm.',
-                                 'assurances', 'véhicules', 'abonnements',
-                                 'rémunérations', 'es', 'autres'];
+        // MODIFIÉ 02/11/2026 — ordre des types : celui de la liste des types de
+        // charges ; ordre des centres : la liste commune, puis Mixte, Frais
+        // généraux et enfin « Non précisé ou hors liste ». Voir rangTri().
 
-        // Ordre des centres : celui de la liste déroulante de filtre. Les quatre
-        // valeurs retenues plus « Non précisé », que classeCentre renvoie toujours.
-        const ORDRE_CENTRES_TRI = ['gare', 'wissembourg', 'mixte', 'general', 'vide'];
+        // AJOUT 02/11/2026 — listes déroulantes et aide tirées des listes communes
+        function initialiserListes() {
+            try {
+                const centres = RTListes.centres();
+                const types = RTListes.typesCharges();
+                const esc = RTListes.echapper;
+
+                const fType = document.getElementById('filtreType');
+                if (fType) {
+                    const avant = fType.value || 'tous';
+                    fType.innerHTML = '<option value="tous">Tous les types</option>'
+                        + types.map(t => '<option value="' + esc(t) + '">' + esc(RTListes.libelle(t)) + '</option>').join('');
+                    fType.value = avant;
+                    if (fType.value !== avant) fType.value = 'tous';
+                }
+
+                const fCentre = document.getElementById('filtreCentre');
+                if (fCentre) {
+                    const avant = fCentre.value || 'tous';
+                    fCentre.innerHTML = '<option value="tous">Tous les centres</option>'
+                        + centres.map(c => '<option value="c:' + esc(RTListes.cle(c)) + '">' + esc(c) + '</option>').join('')
+                        + '<option value="mixte">Mixte</option>'
+                        + '<option value="general">Frais généraux</option>'
+                        + '<option value="vide">Non précisé ou hors liste</option>';
+                    fCentre.value = avant;
+                    if (fCentre.value !== avant) fCentre.value = 'tous';
+                }
+
+                const aide = document.getElementById('aideCentresListe');
+                if (aide) {
+                    const noms = centres.map(c => '<strong>' + esc(c) + '</strong>');
+                    aide.innerHTML = noms.length > 1
+                        ? noms.slice(0, -1).join(', ') + ' et ' + noms[noms.length - 1]
+                        : noms.join('');
+                }
+
+                remplirCentreFormulaire('');
+                remplirTypeFormulaire('');
+            } catch (error) {
+                console.error('❌ Erreur initialisation des listes:', error);
+            }
+        }
+
+        function optionsCentresCharges() {
+            return RTListes.centres().map(c => ({ valeur: c, libelle: c }))
+                .concat(RTListes.CENTRES_CHARGES_FIXES);
+        }
+
+        // Une valeur absente de la liste est conservée et marquée « hors liste »,
+        // au lieu d'être effacée en silence à l'enregistrement.
+        function remplirCentreFormulaire(valeur) {
+            RTListes.remplirSelect(document.getElementById('centre'), optionsCentresCharges(), valeur, 'Choisir un centre');
+        }
+
+        function remplirTypeFormulaire(valeur) {
+            RTListes.remplirSelect(document.getElementById('type'),
+                RTListes.typesCharges().map(t => ({ valeur: t, libelle: RTListes.libelle(t) })), valeur, 'Choisir un type');
+        }
 
 
         // AJOUT 16/09/2026 — lecture tolérante des champs d'une fiche. Une charge
@@ -1284,9 +1355,19 @@
             const v2 = n2 ? n2.value : 'aucun';
             const critere2 = (v2 !== 'aucun' && v2 !== critere1) ? v2 : null;
 
-            const rang = (item, critere) => critere === 'type'
-                ? rangDansOrdre(item.type, ORDRE_TYPES_TRI)
-                : ORDRE_CENTRES_TRI.indexOf(classeCentre(item.centre));
+            // MODIFIÉ 02/11/2026 — rangs tirés des listes communes
+            const centres = RTListes.centres();
+            const ordreTypes = RTListes.typesCharges().map(RTListes.cle);
+            const ordreCentres = centres.map(c => 'c:' + RTListes.cle(c)).concat(['mixte', 'general', 'vide']);
+            const rang = (item, critere) => {
+                if (critere === 'type') {
+                    const k = RTListes.cle(item.type);
+                    if (!k) return ordreTypes.length + 1;
+                    const i = ordreTypes.indexOf(k);
+                    return i === -1 ? ordreTypes.length : i;
+                }
+                return ordreCentres.indexOf(classeCentre(item.centre, centres));
+            };
 
 
             return liste.sort((a, b) => {
@@ -1337,7 +1418,8 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
             if (filtreType !== 'tous') {
-                chargesFiltrees = chargesFiltrees.filter(c => c.type === filtreType);
+                // MODIFIÉ 02/11/2026 — casse et accents ignorés
+                chargesFiltrees = chargesFiltrees.filter(c => RTListes.cle(c.type) === RTListes.cle(filtreType));
             }
 
             if (filtreCentre !== 'tous') {
@@ -1373,6 +1455,17 @@
             majAideTri();
             // Fiches incomplètes : signalées au-dessus du tableau, et affichées.
             majAvertissementIncomplet(chargesFiltrees.filter(c => champsManquants(c).length));
+
+            // AJOUT 02/11/2026 — sélection de plusieurs lignes. Proposée tant
+            // qu'aucun tri n'est actif ; sous filtre, seules les lignes affichées
+            // peuvent rester cochées.
+            lignesAffichees = chargesFiltrees;
+            const selectionPossible = !triActif;
+            if (!selectionPossible) selection.clear();
+            for (const f of [...selection]) if (!chargesFiltrees.includes(f)) selection.delete(f);
+            derniereCaseCochee = null;
+            majBarreSelection();
+            const listeCentres = RTListes.centres();
 
             if (chargesFiltrees.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="12" class="no-data">Aucune charge trouvée</td></tr>';
@@ -1427,11 +1520,12 @@
                     badgeSortant = '<span class="badge badge-sortant">🔜 Sortant</span>';
                 }
 
+                const estCochee = selection.has(charge);
                 return `
-                    <tr ${attrsDrag} data-id="${charge.id}">
-                        <td${triActif ? ' class="poignee-inactive"' : ''}>⋮⋮</td>
+                    <tr ${attrsDrag} data-id="${charge.id}" data-pos="${index}"${estCochee ? ' class="ligne-selectionnee"' : ''}>
+                        <td>${selectionPossible ? `<input type="checkbox" class="case-selection" data-pos="${index}"${estCochee ? ' checked' : ''} title="Cocher pour déplacer plusieurs lignes ensemble — Maj + clic pour cocher toute une plage" onclick="cocherLigne(event, this)">` : ''}<span${triActif ? ' class="poignee-inactive"' : ''}>⋮⋮</span></td>
                         <td><strong>${texteChamp(charge.fournisseur) || '—'}</strong></td>
-                        <td>${badgeCentre(charge.centre)}</td>
+                        <td>${badgeCentre(charge.centre, listeCentres)}</td>
                         <td>${typeBadge}</td>
                         <td>${texteChamp(charge.element) || '—'}</td>
                         <td class="montant negatif">${Math.abs(nombreChamp(charge.montantHT)).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}€</td>
@@ -1458,26 +1552,39 @@
         // et accentués ('gare', 'wissembourg', 'général', 'mixte'). Ces trois fonctions
         // ramènent toute graphie à une clé unique, pour que l'affichage, le filtre et le
         // formulaire ne puissent pas diverger.
-        function classeCentre(valeur) {
-            const v = (valeur || '').toString().trim().toLowerCase();
-            if (v === 'gare') return 'gare';
-            if (v === 'wissembourg') return 'wissembourg';
-            if (v === 'général' || v === 'general') return 'general';
-            if (v === 'mixte') return 'mixte';
-            return 'vide';
+        //
+        // MODIFIÉ 02/11/2026 — les centres viennent de la liste commune (page
+        // Sauvegarde et données) ; Mixte et Frais généraux restent fixes. Clés de
+        // classement : 'c:<nom>' pour un centre de la liste, 'mixte', 'general',
+        // et 'vide' pour un centre absent ou hors liste — comme avant, où toute
+        // valeur inconnue tombait dans « Non précisé ».
+        function classeCentre(valeur, liste) {
+            const fixe = RTListes.estCentreFixe(valeur);
+            if (fixe) return fixe.valeur === 'mixte' ? 'mixte' : 'general';
+            const c = RTListes.centreDeFiche(valeur, liste || RTListes.centres());
+            return c === null ? 'vide' : 'c:' + RTListes.cle(c);
         }
 
-        // Valeur à écrire dans les données, à partir de ce qui y figure déjà
-        function normaliserCentre(valeur) {
-            const c = classeCentre(valeur);
-            return c === 'vide' ? '' : (c === 'general' ? 'général' : c);
-        }
+        // Teintes des centres de la liste, dans l'ordre de la liste : les deux
+        // premières sont celles de Gare et Wissembourg avant le 02/11/2026.
+        // L'orangé de Mixte et le violet de Frais généraux n'y figurent pas.
+        const TEINTES_CENTRES = [['#e8f5e9', '#2e7d32'], ['#e3f2fd', '#1565c0'], ['#e0f2f1', '#00695c'],
+                                 ['#fce4ec', '#ad1457'], ['#efebe9', '#5d4037'], ['#e8eaf6', '#283593'],
+                                 ['#f9fbe7', '#827717']];
 
-        function badgeCentre(valeur) {
-            const c = classeCentre(valeur);
-            const libelles = { gare: 'Gare', wissembourg: 'Wissembourg', general: 'Frais généraux',
-                               mixte: 'Mixte', vide: 'Non précisé' };
-            return `<span class="badge-centre ${c}">${libelles[c]}</span>`;
+        function badgeCentre(valeur, liste) {
+            liste = liste || RTListes.centres();
+            const esc = RTListes.echapper;
+            const fixe = RTListes.estCentreFixe(valeur);
+            if (fixe) return `<span class="badge-centre ${fixe.valeur === 'mixte' ? 'mixte' : 'general'}">${fixe.libelle}</span>`;
+            const c = RTListes.centreDeFiche(valeur, liste);
+            if (c !== null) {
+                const t = TEINTES_CENTRES[liste.indexOf(c) % TEINTES_CENTRES.length];
+                const nom = RTListes.entreeExacte(valeur, liste) || texteChamp(valeur);
+                return `<span class="badge-centre" style="background:${t[0]};color:${t[1]};">${esc(nom)}</span>`;
+            }
+            if (texteChamp(valeur)) return `<span class="badge-centre vide" title="Centre absent de la liste des centres">${esc(texteChamp(valeur))} (hors liste)</span>`;
+            return '<span class="badge-centre vide">Non précisé</span>';
         }
 
         function calculerMontantLisse(charge) {
@@ -1525,7 +1632,8 @@
             let chargesFiltrees = [...charges];
 
             if (filtreType !== 'tous') {
-                chargesFiltrees = chargesFiltrees.filter(c => c.type === filtreType);
+                // MODIFIÉ 02/11/2026 — casse et accents ignorés
+                chargesFiltrees = chargesFiltrees.filter(c => RTListes.cle(c.type) === RTListes.cle(filtreType));
             }
 
             if (filtreCentre !== 'tous') {
@@ -1609,6 +1717,8 @@
             chargeEnEdition = null;
             document.getElementById('modalTitle').textContent = 'Nouvelle Charge';
             document.getElementById('chargeForm').reset();
+            remplirCentreFormulaire('');   // AJOUT 02/11/2026 — retire une éventuelle valeur hors liste
+            remplirTypeFormulaire('');
             document.getElementById('montantLisse').textContent = '0.00€';
             document.getElementById('entrant').checked = false;
             document.getElementById('dateEntreeGroup').style.display = 'none';
@@ -1639,8 +1749,8 @@
             document.getElementById('modalTitle').textContent = 'Modifier Charge';
 
             document.getElementById('fournisseur').value = charge.fournisseur;
-            document.getElementById('centre').value = normaliserCentre(charge.centre);
-            document.getElementById('type').value = charge.type || '';
+            remplirCentreFormulaire(charge.centre);   // MODIFIÉ 02/11/2026
+            remplirTypeFormulaire(charge.type);
             document.getElementById('element').value = charge.element;
             document.getElementById('montantHT').value = charge.montantHT;
             document.getElementById('montantTTC').value = charge.montantTTC;
@@ -1691,10 +1801,14 @@
         document.getElementById('chargeForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // AJOUT 02/11/2026 — un centre ou un type inchangé garde son écriture
+            // d'origine (« gare » n'est pas réécrit « Gare »)
+            const origine = chargeEnEdition !== null ? charges.find(c => c.id === chargeEnEdition) : null;
+
             const nouvelleCharge = {
                 fournisseur: document.getElementById('fournisseur').value,
-                centre: document.getElementById('centre').value,
-                type: document.getElementById('type').value,
+                centre: RTListes.valeurAEnregistrer(document.getElementById('centre').value, origine ? origine.centre : null),
+                type: RTListes.valeurAEnregistrer(document.getElementById('type').value, origine ? origine.type : null),
                 element: document.getElementById('element').value,
                 montantHT: parseFloat(document.getElementById('montantHT').value),
                 montantTTC: parseFloat(document.getElementById('montantTTC').value),
@@ -1740,20 +1854,79 @@
         });
 
         // Fonctions de drag & drop
+        // MODIFIÉ 02/11/2026 — déplacement de plusieurs lignes à la fois. On coche
+        // les lignes (Maj + clic pour une plage), puis on glisse l'une d'elles :
+        // tout le groupe suit, dans son ordre. Une ligne non cochée se glisse
+        // seule, comme avant. Comme avant aussi, le déplacement reste permis sous
+        // filtre (il se fait dans la liste complète) et suspendu sous tri.
+        let lignesAffichees = [];        // fiches dans l'ordre de l'écran
+        const selection = new Set();     // fiches cochées
+        let derniereCaseCochee = null;   // rang de la dernière case cliquée
+
+        function cocherLigne(e, caseCochee) {
+            const pos = parseInt(caseCochee.dataset.pos, 10);
+            const etat = caseCochee.checked;
+            let debut = pos, fin = pos;
+            if (e.shiftKey && derniereCaseCochee !== null) {
+                debut = Math.min(pos, derniereCaseCochee);
+                fin = Math.max(pos, derniereCaseCochee);
+            }
+            for (let i = debut; i <= fin; i++) {
+                const fiche = lignesAffichees[i];
+                if (!fiche) continue;
+                if (etat) selection.add(fiche); else selection.delete(fiche);
+                const ligne = document.querySelector('#chargesTableBody tr[data-pos="' + i + '"]');
+                if (ligne) {
+                    ligne.classList.toggle('ligne-selectionnee', etat);
+                    const c = ligne.querySelector('.case-selection');
+                    if (c) c.checked = etat;
+                }
+            }
+            derniereCaseCochee = pos;
+            majBarreSelection();
+        }
+
+        function toutDeselectionner() {
+            selection.clear();
+            derniereCaseCochee = null;
+            document.querySelectorAll('#chargesTableBody .case-selection').forEach(c => { c.checked = false; });
+            document.querySelectorAll('#chargesTableBody tr.ligne-selectionnee').forEach(l => l.classList.remove('ligne-selectionnee'));
+            majBarreSelection();
+        }
+
+        function majBarreSelection() {
+            const barre = document.getElementById('barreSelection');
+            if (!barre) return;
+            const n = selection.size;
+            if (!n) { barre.style.display = 'none'; return; }
+            barre.innerHTML = '☑️ <strong>' + n + (n > 1 ? ' lignes cochées' : ' ligne cochée')
+                + '</strong> — '
+                + (n > 1 ? 'glissez l\'une d\'elles par sa poignée ⋮⋮ : elles se déplacent ensemble, dans leur ordre.'
+                         : 'glissez-la par sa poignée ⋮⋮ pour la déplacer, ou cochez-en d\'autres.')
+                + ' Maj + clic coche toute une plage.'
+                + '<button type="button" onclick="toutDeselectionner()">Tout décocher</button>';
+            barre.style.display = 'block';
+        }
+
         function handleDragStart(e) {
-            draggedElement = e.target;
-            e.target.classList.add('dragging');
+            draggedElement = e.target.closest('tr');
+            if (!draggedElement) return;
+            draggedElement.classList.add('dragging');
+            // Une ligne cochée entraîne tout le groupe coché
+            if (selection.has(lignesAffichees[parseInt(draggedElement.getAttribute('data-pos'), 10)])) {
+                document.querySelectorAll('#chargesTableBody tr.ligne-selectionnee').forEach(l => l.classList.add('dragging'));
+            }
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', e.target.innerHTML);
+            e.dataTransfer.setData('text/plain', draggedElement.getAttribute('data-pos'));
         }
 
         function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
-            
-            // Nettoyer toutes les classes drag-over
-            document.querySelectorAll('.drag-over').forEach(el => {
+            // Nettoyer les classes de glisser-déposer
+            document.querySelectorAll('.drag-over, .dragging').forEach(el => {
                 el.classList.remove('drag-over');
+                el.classList.remove('dragging');
             });
+            draggedElement = null;
         }
 
         function handleDragOver(e) {
@@ -1778,34 +1951,33 @@
             if (e.stopPropagation) {
                 e.stopPropagation();
             }
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
             
             const target = e.target.closest('tr');
             
-            if (draggedElement !== target && target && target.hasAttribute('draggable')) {
-                // Récupérer les IDs
-                const draggedId = parseInt(draggedElement.getAttribute('data-id'));
-                const targetId = parseInt(target.getAttribute('data-id'));
-                
-                // Trouver les indices dans le tableau
-                const draggedIndex = charges.findIndex(c => c.id === draggedId);
-                const targetIndex = charges.findIndex(c => c.id === targetId);
-                
-                // Réorganiser le tableau
-                const [draggedCharge] = charges.splice(draggedIndex, 1);
-                charges.splice(targetIndex, 0, draggedCharge);
-                
-                // Mettre à jour les ordres
-                charges.forEach((charge, index) => {
-                    charge.ordre = index;
-                });
-                
-                // Sauvegarder et rafraîchir
-                sauvegarderCharges();
-                afficherCharges();
-                mettreAJourStats();
+            if (draggedElement && draggedElement !== target && target && target.hasAttribute('draggable')) {
+                const glisse = lignesAffichees[parseInt(draggedElement.getAttribute('data-pos'), 10)];
+                const cible = lignesAffichees[parseInt(target.getAttribute('data-pos'), 10)];
+                const nouvelOrdre = RTListes.deplacerGroupe(charges, selection, glisse, cible);
+
+                if (nouvelOrdre) {
+                    charges = nouvelOrdre;
+
+                    // Mettre à jour les ordres
+                    charges.forEach((charge, index) => {
+                        charge.ordre = index;
+                    });
+
+                    // Sauvegarder et rafraîchir
+                    sauvegarderCharges();
+                    afficherCharges();
+                    mettreAJourStats();
+                }
             }
             
-            target.classList.remove('drag-over');
+            if (target) target.classList.remove('drag-over');
             
             return false;
         }

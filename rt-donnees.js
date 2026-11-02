@@ -50,7 +50,10 @@
         'previsionnel12moisRT': 'rt-previsionnel',
         'typesRecettesRT': 'rt-types-recettes',
         'derniereSauvegardeRT': 'rt-derniere-sauvegarde',
-        'rocket_tower_seuils_personnalises': 'rt-seuils-personnalises'
+        'rocket_tower_seuils_personnalises': 'rt-seuils-personnalises',
+        // AJOUT 02/11/2026 — listes des centres et des types de charges (rt-listes.js)
+        'centresRT': 'rt-centres',
+        'typesChargesRT': 'rt-types-charges'
     };
     var NOUVELLES = Object.keys(CORRESP).map(function (k) { return CORRESP[k]; });
     var ETAT = 'rt-etat';            // { revision, sale, migreLe }
@@ -631,6 +634,9 @@
             data['rt-charges-periodiques'] = JSON.stringify(d.chargesPeriodiques || []);
             if (d.previsionnel) data['rt-previsionnel'] = JSON.stringify(d.previsionnel);
             if (Array.isArray(d.typesRecettes) && d.typesRecettes.length) data['rt-types-recettes'] = JSON.stringify(d.typesRecettes);
+            // Ajout 02/11/2026 — listes des centres et des types de charges
+            if (Array.isArray(d.centres) && d.centres.length) data['rt-centres'] = JSON.stringify(d.centres);
+            if (Array.isArray(d.typesCharges) && d.typesCharges.length) data['rt-types-charges'] = JSON.stringify(d.typesCharges);
             var seuils = lire('rt-seuils-personnalises');
             if (seuils !== null) data['rt-seuils-personnalises'] = seuils;
             return { data: data, date: d.dateExport };
@@ -777,7 +783,8 @@
             version: '2.0', dateExport: new Date().toISOString(), systeme: 'Rocket Tower',
             recettes: g('rt-recettes') || [], chargesRecurrentes: g('rt-charges-recurrentes') || [],
             chargesPeriodiques: g('rt-charges-periodiques') || [], previsionnel: g('rt-previsionnel'),
-            typesRecettes: g('rt-types-recettes')
+            typesRecettes: g('rt-types-recettes'),
+            centres: g('rt-centres'), typesCharges: g('rt-types-charges')   // ajout 02/11/2026
         };
         telecharger('rocket-tower-export-' + jour() + '_' + (S.machine || 'ce-mac') + '.json', JSON.stringify(d, null, 2));
     }
@@ -805,6 +812,8 @@
         if (substancePrev(ici['rt-previsionnel'] || 'null') !== substancePrev(fic['rt-previsionnel'] || 'null'))
             lignes.push('<p style="margin:10px 0 4px;"><b>Prévisionnel</b> : solde initial ou opérations spécifiques différents.</p>');
         if ((ici['rt-types-recettes'] || '') !== (fic['rt-types-recettes'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Types de recettes</b> différents.</p>');
+        if ((ici['rt-centres'] || '') !== (fic['rt-centres'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Liste des centres</b> différente.</p>');
+        if ((ici['rt-types-charges'] || '') !== (fic['rt-types-charges'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Types de charges</b> différents.</p>');
         if ((ici['rt-seuils-personnalises'] || '') !== (fic['rt-seuils-personnalises'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Seuils personnalisés</b> différents.</p>');
         return lignes.length ? lignes.join('') : '<p>Aucune différence de contenu.</p>';
     }

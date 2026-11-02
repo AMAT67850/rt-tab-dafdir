@@ -336,12 +336,21 @@
             margin-top: 1rem;
         }
 
+        /* AJOUT 02/11/2026 — phrase d'aide sous le titre des listes */
+        .aide-liste {
+            font-size: 18px;
+            color: #4b5563;
+            margin-bottom: 18px;
+        }
+
         .default-types-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(253, 203, 110, 0.4);
         }
     </style>
     <script src="rt-donnees.js"></script>
+    <!-- AJOUT 02/11/2026 — listes communes de centres et de types de charges -->
+    <script src="rt-listes.js"></script>
 </head>
 <body>
     <div class="container">
@@ -414,6 +423,40 @@
                         <button class="default-types-btn" onclick="restaurerTypesParDefaut()">
                             🔄 Restaurer les types par défaut
                         </button>
+                    </div>
+
+                    <!-- AJOUT 02/11/2026 — Gestion des centres (liste commune recettes et charges) -->
+                    <div class="types-management">
+                        <h4 class="mb-3">📍 Gestion des Centres</h4>
+                        <p class="aide-liste">Liste commune aux recettes et aux charges récurrentes. « Mixte » et « Frais généraux », réservés aux charges, n'en font pas partie.</p>
+
+                        <div class="add-type-form">
+                            <input type="text" id="newCentreName" placeholder="Nom du nouveau centre (ex : Domaine Mazerand)" maxlength="50">
+                            <button class="btn-add-type" onclick="ajouterEntree('centres')">
+                                ➕ Ajouter
+                            </button>
+                        </div>
+
+                        <div id="centresList">
+                            <!-- Liste des centres générée dynamiquement -->
+                        </div>
+                    </div>
+
+                    <!-- AJOUT 02/11/2026 — Gestion des types de charges -->
+                    <div class="types-management">
+                        <h4 class="mb-3">🧾 Gestion des Types de Charges</h4>
+                        <p class="aide-liste">Types proposés dans le module des charges récurrentes.</p>
+
+                        <div class="add-type-form">
+                            <input type="text" id="newTypeChargeName" placeholder="Nom du nouveau type de charge" maxlength="50">
+                            <button class="btn-add-type" onclick="ajouterEntree('typesCharges')">
+                                ➕ Ajouter
+                            </button>
+                        </div>
+
+                        <div id="typesChargesList">
+                            <!-- Liste des types de charges générée dynamiquement -->
+                        </div>
                     </div>
 
                     <!-- Journal -->
@@ -564,7 +607,11 @@
                     chargesRecurrentes: JSON.parse(localStorage.getItem('chargesRecurrentesRT') || '[]'),
                     chargesPeriodiques: JSON.parse(localStorage.getItem('chargesPeriodiquesRT') || '[]'),
                     previsionnel: JSON.parse(localStorage.getItem('previsionnel12moisRT') || 'null'),
-                    typesRecettes: JSON.parse(localStorage.getItem('typesRecettesRT') || 'null')
+                    typesRecettes: JSON.parse(localStorage.getItem('typesRecettesRT') || 'null'),
+                    // AJOUT 02/11/2026 — listes des centres et des types de charges
+                    // (null tant qu'elles n'ont jamais été modifiées : liste par défaut)
+                    centres: JSON.parse(localStorage.getItem('centresRT') || 'null'),
+                    typesCharges: JSON.parse(localStorage.getItem('typesChargesRT') || 'null')
                 };
 
                 const totalEnregistrements = donnees.recettes.length + donnees.chargesRecurrentes.length + donnees.chargesPeriodiques.length;
@@ -657,6 +704,19 @@
                             addLog('⚠️ Ce fichier ne contient pas les types de recettes : ceux de ce navigateur sont conservés', 'warning');
                         }
 
+                        // AJOUT 02/11/2026 — mêmes règles pour les centres et les types de charges
+                        [['centres', 'centresRT', 'centres'], ['typesCharges', 'typesChargesRT', 'types de charges']].forEach(([champ, etiquette, libelle]) => {
+                            if (Array.isArray(donnees[champ]) && donnees[champ].length) {
+                                localStorage.setItem(etiquette, JSON.stringify(donnees[champ]));
+                                addLog(`✅ ${donnees[champ].length} ${libelle} restaurés`, 'success');
+                            } else {
+                                addLog(`ℹ️ Ce fichier ne contient pas de liste de ${libelle} : celle de ce navigateur est conservée`, 'info');
+                            }
+                        });
+                        afficherListe('centres');
+                        afficherListe('typesCharges');
+                        afficherTypesRecettes();
+
                         const totalImporte = (donnees.recettes?.length || 0) + (donnees.chargesRecurrentes?.length || 0) + (donnees.chargesPeriodiques?.length || 0);
 
                         addLog(`✅ Import réussi ! ${totalImporte} enregistrements importés`, 'success');
@@ -707,6 +767,7 @@
                 '• les charges périodiques\n' +
                 '• le prévisionnel : solde initial, opérations spécifiques, ajustements mensuels\n' +
                 '• les types de recettes personnalisés\n' +
+                '• les listes de centres et de types de charges\n' +
                 '• la date de dernière sauvegarde\n\n' +
                 'Les fichiers de sauvegarde déjà téléchargés sur votre disque ne sont pas concernés.\n\n' +
                 'Continuer ?';
@@ -722,7 +783,8 @@
 
             try {
                 ['recettesRT', 'chargesRecurrentesRT', 'chargesPeriodiquesRT',
-                 'previsionnel12moisRT', 'typesRecettesRT', 'derniereSauvegardeRT']
+                 'previsionnel12moisRT', 'typesRecettesRT', 'derniereSauvegardeRT',
+                 'centresRT', 'typesChargesRT']   // AJOUT 02/11/2026
                     .forEach(cle => localStorage.removeItem(cle));
 
                 addLog('🗑️ Données locales effacées : contrats, prévisionnel, types de recettes', 'warning');
@@ -731,6 +793,8 @@
                 syncState.derniereSauvegarde = null;
 
                 mettreAJourInterface();
+                afficherListe('centres');        // AJOUT 02/11/2026
+                afficherListe('typesCharges');
 
                 addLog('✅ Réinitialisation terminée. Vous pouvez importer un fichier de sauvegarde.', 'info');
 
@@ -869,11 +933,22 @@
                     return;
                 }
 
+                // AJOUT 02/11/2026 — les recettes qui portent ce type sont renommées
+                // avec lui, après confirmation. Jusque-là, elles gardaient l'ancien
+                // nom et décrochaient de la liste.
+                if (nouveauNomTrim === typeActuel) return;
+                const usage = compterUsage(LISTES.typesRecettes, typeActuel);
+                if (usage.total && !confirm(`Renommer le type "${typeActuel}" en "${nouveauNomTrim}" ?\n\n`
+                        + `${phraseUsage(usage)} ${usage.total > 1 ? 'seront renommées' : 'sera renommée'} aussi.`)) {
+                    return;
+                }
+                const nb = renommerDansFiches(LISTES.typesRecettes, typeActuel, nouveauNomTrim);
+
                 types[index] = nouveauNomTrim;
                 sauvegarderTypesRecettes(types);
                 afficherTypesRecettes();
                 
-                addLog(`✅ Type modifié : "${typeActuel}" → "${nouveauNomTrim}"`, 'success');
+                addLog(`✅ Type modifié : "${typeActuel}" → "${nouveauNomTrim}"` + (nb ? ` — ${nb} fiche(s) renommée(s)` : ''), 'success');
                 
             } catch (error) {
                 console.error('Erreur modification type:', error);
@@ -886,7 +961,12 @@
                 const types = chargerTypesRecettes();
                 const type = types[index];
                 
-                if (!confirm(`Êtes-vous sûr de vouloir supprimer le type "${type}" ?\n\n⚠️ Attention : Les recettes existantes avec ce type ne seront pas modifiées, mais ce type ne sera plus disponible dans les nouveaux formulaires.`)) {
+                // MODIFIÉ 02/11/2026 — le message dit combien de recettes portent ce type
+                const usage = compterUsage(LISTES.typesRecettes, type);
+                if (!confirm(`Êtes-vous sûr de vouloir supprimer le type "${type}" ?\n\n`
+                        + (usage.total
+                            ? `${phraseUsage(usage)} ${usage.total > 1 ? 'le garderont' : 'le gardera'} : il y apparaîtra « hors liste » et ne sera plus proposé dans les nouveaux formulaires.`
+                            : 'Aucune recette ne porte ce type.'))) {
                     return;
                 }
 
@@ -919,13 +999,258 @@
             }
         }
 
+        // ========== LISTES COMMUNES : CENTRES ET TYPES DE CHARGES ==========
+        // AJOUT 02/11/2026. Les centres (communs aux recettes et aux charges) et
+        // les types de charges étaient écrits en dur dans les modules 2 et 3.
+        // Ils se gèrent désormais ici, comme les types de recettes. Les règles de
+        // lecture et de correspondance sont dans rt-listes.js.
+        //
+        // Renommer une entrée renomme aussi, après confirmation, les fiches qui
+        // la portent exactement (casse et accents ignorés). Supprimer une entrée
+        // ne touche à aucune fiche : celles qui la portent la gardent, et elle y
+        // apparaît « hors liste ».
+        const LISTES = {
+            centres: {
+                etiquette: 'centresRT',
+                lire: () => RTListes.centres(),
+                conteneur: 'centresList', saisie: 'newCentreName',
+                nom: 'centre', article: 'le centre', minimum: 'au moins un centre',
+                champ: 'centre',
+                collections: [['recettesRT', 'recette', 'recettes'],
+                              ['chargesRecurrentesRT', 'charge récurrente', 'charges récurrentes']]
+            },
+            typesCharges: {
+                etiquette: 'typesChargesRT',
+                lire: () => RTListes.typesCharges(),
+                conteneur: 'typesChargesList', saisie: 'newTypeChargeName',
+                nom: 'type de charge', article: 'le type', minimum: 'au moins un type',
+                champ: 'type',
+                collections: [['chargesRecurrentesRT', 'charge récurrente', 'charges récurrentes']]
+            },
+            // Pour le renommage des types de recettes, gérés plus haut
+            typesRecettes: {
+                champ: 'type',
+                collections: [['recettesRT', 'recette', 'recettes']]
+            }
+        };
+
+        function lireFiches(etiquette) {
+            try {
+                const a = JSON.parse(localStorage.getItem(etiquette) || '[]');
+                return Array.isArray(a) ? a : [];
+            } catch (e) { return []; }
+        }
+
+        // Nombre de fiches portant exactement cette valeur, par collection
+        function compterUsage(cfg, valeur) {
+            const k = RTListes.cle(valeur);
+            const parCollection = cfg.collections.map(([etiquette, sing, plur]) => {
+                const n = lireFiches(etiquette).filter(f => f && RTListes.cle(f[cfg.champ]) === k).length;
+                return { n, sing, plur };
+            });
+            return { parCollection, total: parCollection.reduce((s, c) => s + c.n, 0) };
+        }
+
+        function phraseUsage(usage) {
+            const parts = usage.parCollection.filter(c => c.n)
+                .map(c => c.n + ' ' + (c.n > 1 ? c.plur : c.sing));
+            return parts.length > 1 ? parts.slice(0, -1).join(', ') + ' et ' + parts[parts.length - 1] : parts.join('');
+        }
+
+        // Renomme la valeur dans toutes les fiches qui la portent ; renvoie le
+        // nombre de fiches renommées. Les fiches sont écrites avant la liste : si
+        // l'enregistrement est refusé (bandeau d'état), rien n'est écrit.
+        function renommerDansFiches(cfg, ancien, nouveau) {
+            const k = RTListes.cle(ancien);
+            let total = 0;
+            cfg.collections.forEach(([etiquette]) => {
+                const fiches = lireFiches(etiquette);
+                let n = 0;
+                fiches.forEach(f => {
+                    if (f && RTListes.cle(f[cfg.champ]) === k && f[cfg.champ] !== nouveau) { f[cfg.champ] = nouveau; n++; }
+                });
+                if (n) localStorage.setItem(etiquette, JSON.stringify(fiches));
+                total += n;
+            });
+            return total;
+        }
+
+        function enregistrerListe(cfg, liste) {
+            localStorage.setItem(cfg.etiquette, JSON.stringify(liste));
+        }
+
+        function verifierNom(cfg, nom, liste, indexIgnore) {
+            if (!nom) { alert('⚠️ Veuillez entrer un nom'); return false; }
+            if (cfg === LISTES.centres && RTListes.estNomReserve(nom)) {
+                alert(`⚠️ « ${nom} » est un nom réservé : Mixte et Frais généraux existent déjà pour les charges.`);
+                return false;
+            }
+            const k = RTListes.cle(nom);
+            if (liste.some((x, i) => i !== indexIgnore && RTListes.cle(x) === k)) {
+                alert('⚠️ Ce nom existe déjà dans la liste');
+                return false;
+            }
+            return true;
+        }
+
+        function afficherListe(cle) {
+            const cfg = LISTES[cle];
+            const conteneur = document.getElementById(cfg.conteneur);
+            if (!conteneur) return;
+            const esc = RTListes.echapper;
+            conteneur.innerHTML = cfg.lire().map((entree, index) => `
+                <div class="type-item" draggable="true" data-liste="${cle}" data-index="${index}">
+                    <span class="type-drag-handle">☰</span>
+                    <div class="type-badge">${esc(cle === 'typesCharges' ? RTListes.libelle(entree) : entree)}</div>
+                    <div class="type-actions">
+                        <button class="btn-small btn-edit-type" onclick="renommerEntree('${cle}', ${index})">
+                            ✏️ Modifier
+                        </button>
+                        <button class="btn-small btn-delete-type" onclick="supprimerEntree('${cle}', ${index})">
+                            🗑️ Supprimer
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            conteneur.querySelectorAll('.type-item').forEach(item => {
+                item.addEventListener('dragstart', listeDragStart);
+                item.addEventListener('dragover', listeDragOver);
+                item.addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
+                item.addEventListener('drop', listeDrop);
+                item.addEventListener('dragend', listeDragEnd);
+            });
+        }
+
+        function ajouterEntree(cle) {
+            try {
+                const cfg = LISTES[cle];
+                const input = document.getElementById(cfg.saisie);
+                const nom = input.value.trim().replace(/\s+/g, ' ');
+                const liste = cfg.lire();
+                if (!verifierNom(cfg, nom, liste, -1)) return;
+                liste.push(nom);
+                enregistrerListe(cfg, liste);
+                afficherListe(cle);
+                input.value = '';
+                addLog(`✅ ${RTListes.libelle(cfg.nom)} ajouté : "${nom}"`, 'success');
+            } catch (error) {
+                addLog(`❌ Erreur ajout : ${error.message}`, 'error');
+            }
+        }
+
+        function renommerEntree(cle, index) {
+            try {
+                const cfg = LISTES[cle];
+                const liste = cfg.lire();
+                const ancien = liste[index];
+                const saisi = prompt(`Modifier ${cfg.article} :`, ancien);
+                if (saisi === null) return;
+                const nouveau = saisi.trim().replace(/\s+/g, ' ');
+                if (nouveau === ancien) return;
+                if (!verifierNom(cfg, nouveau, liste, index)) return;
+
+                const usage = compterUsage(cfg, ancien);
+                if (usage.total && !confirm(`Renommer « ${ancien} » en « ${nouveau} » ?\n\n`
+                        + `${phraseUsage(usage)} ${usage.total > 1 ? 'portent' : 'porte'} ce nom : `
+                        + `${usage.total > 1 ? 'elles seront renommées' : 'elle sera renommée'} aussi.`)) {
+                    return;
+                }
+                const nb = renommerDansFiches(cfg, ancien, nouveau);
+                liste[index] = nouveau;
+                enregistrerListe(cfg, liste);
+                afficherListe(cle);
+                addLog(`✅ ${RTListes.libelle(cfg.nom)} renommé : "${ancien}" → "${nouveau}"` + (nb ? ` — ${nb} fiche(s) renommée(s)` : ''), 'success');
+            } catch (error) {
+                addLog(`❌ Erreur modification : ${error.message}`, 'error');
+            }
+        }
+
+        function supprimerEntree(cle, index) {
+            try {
+                const cfg = LISTES[cle];
+                const liste = cfg.lire();
+                if (liste.length <= 1) {
+                    alert(`⚠️ La liste doit garder ${cfg.minimum}.`);
+                    return;
+                }
+                const nom = liste[index];
+                const usage = compterUsage(cfg, nom);
+                const detail = usage.total
+                    ? `${phraseUsage(usage)} ${usage.total > 1 ? 'portent' : 'porte'} ce nom et le ${usage.total > 1 ? 'garderont' : 'gardera'} : `
+                      + `il y apparaîtra « hors liste », et ne sera plus proposé dans les formulaires.`
+                    : 'Aucune fiche ne porte ce nom.';
+                if (!confirm(`Supprimer « ${nom} » de la liste ?\n\n${detail}`)) return;
+                liste.splice(index, 1);
+                enregistrerListe(cfg, liste);
+                afficherListe(cle);
+                addLog(`🗑️ ${RTListes.libelle(cfg.nom)} supprimé de la liste : "${nom}"`, 'warning');
+            } catch (error) {
+                addLog(`❌ Erreur suppression : ${error.message}`, 'error');
+            }
+        }
+
+        // Réorganisation par glisser-déposer, à l'intérieur d'une même liste
+        let listeGlissee = null;
+        let indexGlisse = null;
+
+        function listeDragStart(e) {
+            listeGlissee = this.dataset.liste;
+            indexGlisse = parseInt(this.dataset.index, 10);
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', String(indexGlisse));
+        }
+
+        function listeDragOver(e) {
+            if (this.dataset.liste !== listeGlissee) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (parseInt(this.dataset.index, 10) !== indexGlisse) this.classList.add('drag-over');
+        }
+
+        function listeDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('drag-over');
+            const cle = this.dataset.liste;
+            const cible = parseInt(this.dataset.index, 10);
+            if (cle !== listeGlissee || cible === indexGlisse) return;
+            try {
+                const cfg = LISTES[cle];
+                const liste = cfg.lire();
+                const [entree] = liste.splice(indexGlisse, 1);
+                liste.splice(cible, 0, entree);
+                enregistrerListe(cfg, liste);
+                afficherListe(cle);
+                addLog(`✅ Ordre modifié : "${entree}" déplacé`, 'success');
+            } catch (error) {
+                addLog(`❌ Erreur déplacement : ${error.message}`, 'error');
+            }
+        }
+
+        function listeDragEnd() {
+            document.querySelectorAll('.type-item').forEach(item => item.classList.remove('dragging', 'drag-over'));
+            listeGlissee = null;
+            indexGlisse = null;
+        }
+
+        // Touche Entrée dans les champs d'ajout
+        document.addEventListener('DOMContentLoaded', function() {
+            [['newCentreName', 'centres'], ['newTypeChargeName', 'typesCharges']].forEach(([id, cle]) => {
+                const input = document.getElementById(id);
+                if (input) input.addEventListener('keypress', e => { if (e.key === 'Enter') ajouterEntree(cle); });
+            });
+        });
+
         // ========== DRAG & DROP DES TYPES ==========
         let draggedTypeItem = null;
         let draggedTypeIndex = null;
 
         function initDragAndDropTypes() {
             try {
-                const items = document.querySelectorAll('.type-item[draggable="true"]');
+                // MODIFIÉ 02/11/2026 — limité à la liste des types de recettes : la page
+                // porte désormais deux autres listes, qui ont leurs propres gestionnaires
+                const items = document.querySelectorAll('#typesList .type-item[draggable="true"]');
                 
                 items.forEach(item => {
                     item.addEventListener('dragstart', handleTypeDragStart);
@@ -968,7 +1293,8 @@
             e.preventDefault();
             
             try {
-                if (draggedTypeItem !== this) {
+                // AJOUT 02/11/2026 — rien à faire si l'élément lâché ne vient pas de cette liste
+                if (draggedTypeItem && draggedTypeItem !== this) {
                     const targetIndex = parseInt(this.dataset.index);
                     const types = chargerTypesRecettes();
                     
@@ -1023,6 +1349,8 @@
             chargerDonneesLocales();
             mettreAJourInterface();
             afficherTypesRecettes();
+            afficherListe('centres');        // AJOUT 02/11/2026
+            afficherListe('typesCharges');   // AJOUT 02/11/2026
         });
     </script>
 </body>

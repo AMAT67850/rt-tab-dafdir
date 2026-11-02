@@ -696,8 +696,43 @@
             background: #f1f3f5;
             color: #868e96;
         }
+
+        /* AJOUT 02/11/2026 — sélection de plusieurs lignes à déplacer ensemble */
+        .case-selection {
+            width: 18px;
+            height: 18px;
+            margin: 0 8px 0 0;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+        tbody tr.ligne-selectionnee,
+        tbody tr.ligne-selectionnee:hover {
+            background: #e8eefc;
+        }
+        .barre-selection {
+            background: #e8eefc;
+            border-left: 4px solid #4a63c9;
+            border-radius: 0 6px 6px 0;
+            padding: 10px 16px;
+            margin: 0 0 18px;
+            font-size: 18px;
+            line-height: 1.5;
+            color: #24356e;
+        }
+        .barre-selection button {
+            margin-left: 12px;
+            font-size: 16px;
+            padding: 4px 12px;
+            border: 1px solid #4a63c9;
+            border-radius: 6px;
+            background: #fff;
+            color: #24356e;
+            cursor: pointer;
+        }
     </style>
     <script src="rt-donnees.js"></script>
+    <!-- AJOUT 02/11/2026 — listes communes de centres et de types de charges -->
+    <script src="rt-listes.js"></script>
 </head>
 <body>
     <div class="header">
@@ -742,12 +777,8 @@
                     <label>Centre</label>
                     <select id="filtreCentre" onchange="appliquerFiltres()">
                         <option value="tous">Tous les centres</option>
-                        <option value="GARE">GARE (tous)</option>
-                        <option value="GARE 1">GARE 1</option>
-                        <option value="GARE 2">GARE 2</option>
-                        <option value="WISSEMBOURG">WISSEMBOURG (tous)</option>
-                        <option value="WISSEMBOURG 1">WISSEMBOURG 1</option>
-                        <option value="WISSEMBOURG 2">WISSEMBOURG 2</option>
+                        <!-- MODIFIÉ 02/11/2026 — centres tirés de la liste commune
+                             (page Sauvegarde et données), par initialiserSelectsCentres() -->
                     </select>
                 </div>
 
@@ -806,6 +837,9 @@
         <div id="avertissementTri" class="note-tri" style="display:none;">
             🔒 <strong style="font-weight:700;">Tri en cours</strong> — le glisser-déposer est suspendu, pour ne pas écraser l'ordre manuel. Revenez à « Ordre manuel » pour réorganiser les lignes.
         </div>
+
+        <!-- AJOUT 02/11/2026 — lignes cochées, déplacées ensemble -->
+        <div id="barreSelection" class="barre-selection" style="display:none;"></div>
 
         <!-- Statistiques -->
         <div class="stats">
@@ -917,12 +951,7 @@
                             <label for="centre">Centre</label>
                             <select id="centre">
                                 <option value="">— Non défini —</option>
-                                <option value="GARE">GARE</option>
-                                <option value="GARE 1">GARE 1</option>
-                                <option value="GARE 2">GARE 2</option>
-                                <option value="WISSEMBOURG">WISSEMBOURG</option>
-                                <option value="WISSEMBOURG 1">WISSEMBOURG 1</option>
-                                <option value="WISSEMBOURG 2">WISSEMBOURG 2</option>
+                                <!-- MODIFIÉ 02/11/2026 — centres tirés de la liste commune -->
                             </select>
                         </div>
                     </div>
@@ -1003,6 +1032,7 @@
             console.log('🚀 Initialisation Module 2');
             try {
                 initialiserSelectsTypes(); // Charger les types dynamiquement
+                initialiserSelectsCentres(); // AJOUT 02/11/2026 — liste commune des centres
                 chargerRecettes();
                 afficherRecettes();
                 mettreAJourStats();
@@ -1273,9 +1303,58 @@
         // tri est actif : un dépôt réécrirait sinon l'ordre manuel à partir
         // d'une vue triée, et le détruirait.
 
-        // Ordre des centres : celui de la liste déroulante de filtre.
-        const ORDRE_CENTRES_TRI = ['gare', 'gare 1', 'gare 2',
-                                   'wissembourg', 'wissembourg 1', 'wissembourg 2'];
+        // MODIFIÉ 02/11/2026 — ordre des centres : celui de la liste commune des
+        // centres (page Sauvegarde et données). Un sous-centre numéroté
+        // (« GARE 1 ») prend le rang de son centre ; une valeur hors liste passe
+        // après les centres connus, une valeur vide en dernier.
+        function rangCentre(valeur, liste) {
+            if (!texteChamp(valeur)) return liste.length + 1;
+            const c = RTListes.centreDeFiche(valeur, liste);
+            return c === null ? liste.length : liste.indexOf(c);
+        }
+
+        // AJOUT 02/11/2026 — filtre Centre. 'c:<nom>' : un centre de la liste,
+        // sous-centres numérotés compris, comme l'ancien « GARE (tous) » ;
+        // 'hors' : centre vide ou absent de la liste.
+        function centreAccepte(valeur, filtre) {
+            if (filtre === 'tous') return true;
+            const c = RTListes.centreDeFiche(valeur, RTListes.centres());
+            if (filtre === 'hors') return c === null;
+            return c !== null && ('c:' + RTListes.cle(c)) === filtre;
+        }
+
+        // AJOUT 02/11/2026 — listes de centres tirées de la liste commune
+        function initialiserSelectsCentres() {
+            try {
+                const liste = RTListes.centres();
+                const filtre = document.getElementById('filtreCentre');
+                if (filtre) {
+                    const avant = filtre.value || 'tous';
+                    filtre.innerHTML = '<option value="tous">Tous les centres</option>'
+                        + liste.map(c => '<option value="c:' + RTListes.echapper(RTListes.cle(c)) + '">'
+                            + RTListes.echapper(c) + '</option>').join('')
+                        + '<option value="hors">Non précisé ou hors liste</option>';
+                    filtre.value = avant;
+                    if (filtre.value !== avant) filtre.value = 'tous';
+                }
+                remplirCentreFormulaire('');
+            } catch (error) {
+                console.error('❌ Erreur initialisation centres:', error);
+            }
+        }
+
+        function remplirCentreFormulaire(valeur) {
+            RTListes.remplirSelect(document.getElementById('centre'),
+                RTListes.centres().map(c => ({ valeur: c, libelle: c })), valeur, '— Non défini —');
+        }
+
+        // AJOUT 02/11/2026 — type d'une fiche : une valeur absente de la liste
+        // (type supprimé ou renommé) est conservée et marquée « hors liste »,
+        // au lieu d'être remplacée en silence à l'enregistrement.
+        function remplirTypeFormulaire(valeur) {
+            RTListes.remplirSelect(document.getElementById('type'),
+                chargerTypesRecettes().map(t => ({ valeur: t, libelle: RTListes.libelle(t) })), valeur, null);
+        }
 
         // Ordre des types : celui du paramétrage (typesRecettesRT). Lu une fois
         // par ouverture de page et non à chaque affichage — sans quoi un
@@ -1372,6 +1451,7 @@
             if (criteres.length === 0) return liste;
 
             const ordreTypes = ordreTypesTri();
+            const listeCentres = RTListes.centres();   // AJOUT 02/11/2026
 
             // Type et centre se classent par leur rang dans l'ordre de référence.
             // L'élément est un texte libre : classement alphabétique français,
@@ -1390,8 +1470,7 @@
                 if (critere === 'type') {
                     return rangDansOrdre(a.type, ordreTypes) - rangDansOrdre(b.type, ordreTypes);
                 }
-                return rangDansOrdre(a.centre, ORDRE_CENTRES_TRI)
-                     - rangDansOrdre(b.centre, ORDRE_CENTRES_TRI);
+                return rangCentre(a.centre, listeCentres) - rangCentre(b.centre, listeCentres);
             };
 
             return liste.sort((a, b) => {
@@ -1457,12 +1536,7 @@
                 }
                 
                 if (filtreCentre !== 'tous') {
-                    recettesFiltrees = recettesFiltrees.filter(r => {
-                        const c = (r.centre || '').toUpperCase();
-                        if (filtreCentre === 'GARE') return c === 'GARE' || c === 'GARE 1' || c === 'GARE 2';
-                        if (filtreCentre === 'WISSEMBOURG') return c === 'WISSEMBOURG' || c === 'WISSEMBOURG 1' || c === 'WISSEMBOURG 2';
-                        return c === filtreCentre;
-                    });
+                    recettesFiltrees = recettesFiltrees.filter(r => centreAccepte(r.centre, filtreCentre));
                 }
                 
                 if (filtrePeriodicite !== 'toutes') {
@@ -1484,6 +1558,18 @@
                 majAvertissementTri();
                 majAideTri();
 
+                // AJOUT 02/11/2026 — sélection de plusieurs lignes. Elle n'est
+                // proposée que là où le déplacement est permis ici : ni tri, ni
+                // filtre, ni recherche. Dans les autres cas, la sélection est vidée.
+                lignesAffichees = recettesFiltrees;
+                const selectionPossible = !triActif && recettesFiltrees.length === recettes.length;
+                if (!selectionPossible) selection.clear();
+                // Une fiche modifiée ou supprimée depuis a été remplacée : on l'oublie
+                for (const f of [...selection]) if (!recettes.includes(f)) selection.delete(f);
+                derniereCaseCochee = null;
+                majBarreSelection();
+                const listeCentres = RTListes.centres();
+
                 if (recettesFiltrees.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="11" class="no-data">Aucune recette trouvée</td></tr>';
                     return;
@@ -1503,10 +1589,13 @@
                     else if (typeRecette === "coworking +") typeCssClass = "coworking-plus";
                     else if (typeRecette) typeCssClass = typeRecette.replace(/\s+/g, '-').toLowerCase();
 
-                    // Badge centre
-                    const badgeCentre = recette.centre
-                        ? `<span class="badge badge-centre">${recette.centre}</span>`
+                    // Badge centre — MODIFIÉ 02/11/2026 : libellé de la liste commune
+                    // quand la fiche porte exactement ce centre, valeur brute sinon
+                    // (sous-centre numéroté, centre hors liste)
+                    const badgeCentre = texteChamp(recette.centre)
+                        ? `<span class="badge badge-centre">${RTListes.echapper(RTListes.entreeExacte(recette.centre, listeCentres) || texteChamp(recette.centre))}</span>`
                         : '<span style="color:#aaa;font-size:12px;">—</span>';
+                    const estCochee = selection.has(recette);
 
                     // Badge entrant
                     let badgeEntrant = '';
@@ -1568,8 +1657,8 @@
                     }
                     
                     return `
-                        <tr ${triActif ? '' : 'draggable="true"'} data-index="${index}">
-                            <td><span class="drag-handle${triActif ? ' poignee-inactive' : ''}">☰</span><strong>${texteChamp(recette.client) || '—'}</strong></td>
+                        <tr ${triActif ? '' : 'draggable="true"'} data-pos="${index}"${estCochee ? ' class="ligne-selectionnee"' : ''}>
+                            <td>${selectionPossible ? `<input type="checkbox" class="case-selection" data-pos="${index}"${estCochee ? ' checked' : ''} title="Cocher pour déplacer plusieurs lignes ensemble — Maj + clic pour cocher toute une plage" onclick="cocherLigne(event, this)">` : ''}<span class="drag-handle${triActif ? ' poignee-inactive' : ''}">☰</span><strong>${texteChamp(recette.client) || '—'}</strong></td>
                             <td><span class="badge badge-type-${typeCssClass}">${typeRecette || 'Non défini'}</span></td>
                             <td>${texteChamp(recette.element) || '—'}</td>
                             <td>${badgeCentre}</td>
@@ -1670,12 +1759,7 @@
                 }
                 
                 if (filtreCentre !== 'tous') {
-                    recettesFiltrees = recettesFiltrees.filter(r => {
-                        const c = (r.centre || '').toUpperCase();
-                        if (filtreCentre === 'GARE') return c === 'GARE' || c === 'GARE 1' || c === 'GARE 2';
-                        if (filtreCentre === 'WISSEMBOURG') return c === 'WISSEMBOURG' || c === 'WISSEMBOURG 1' || c === 'WISSEMBOURG 2';
-                        return c === filtreCentre;
-                    });
+                    recettesFiltrees = recettesFiltrees.filter(r => centreAccepte(r.centre, filtreCentre));
                 }
                 
                 if (filtrePeriodicite !== 'toutes') {
@@ -1723,7 +1807,8 @@
                 document.getElementById('modalTitle').textContent = 'Nouvelle Recette';
                 document.getElementById('recetteForm').reset();
                 document.getElementById('montantLisse').textContent = '0.00€';
-                document.getElementById('centre').value = '';
+                remplirCentreFormulaire('');   // MODIFIÉ 02/11/2026 — retire une éventuelle valeur hors liste
+                remplirTypeFormulaire('');
                 document.getElementById('entrant').checked = false;
                 document.getElementById('dateEntreeGroup').style.display = 'none';
                 document.getElementById('dateEntree').required = false;
@@ -1757,12 +1842,12 @@
                 document.getElementById('modalTitle').textContent = 'Modifier Recette';
                 
                 document.getElementById('client').value = recette.client;
-                document.getElementById('type').value = recette.type || 'bureau privatif';
+                remplirTypeFormulaire(recette.type);   // MODIFIÉ 02/11/2026
                 document.getElementById('element').value = recette.element;
                 document.getElementById('montantHT').value = recette.montantHT;
                 document.getElementById('montantTTC').value = recette.montantTTC;
                 document.getElementById('periodicite').value = recette.periodicite;
-                document.getElementById('centre').value = recette.centre || '';
+                remplirCentreFormulaire(recette.centre);   // MODIFIÉ 02/11/2026
                 document.getElementById('commentaire').value = recette.commentaire || '';
                 document.getElementById('entrant').checked = recette.entrant || false;
                 document.getElementById('dateEntree').value = recette.dateEntree || '';
@@ -1827,14 +1912,18 @@
                 const saisiTTC = parseFloat(document.getElementById('montantTTC').value);
                 const ttcRetenu = Number.isFinite(saisiTTC) ? saisiTTC : Math.round(saisiHT * 1.2 * 100) / 100;
 
+                // AJOUT 02/11/2026 — un centre ou un type inchangé garde son écriture
+                // d'origine (« GARE » n'est pas réécrit « Gare »)
+                const origine = recetteEnEdition !== null ? recettes.find(r => r.id === recetteEnEdition) : null;
+
                 const nouvelleRecette = {
                     client: document.getElementById('client').value,
-                    type: document.getElementById('type').value,
+                    type: RTListes.valeurAEnregistrer(document.getElementById('type').value, origine ? origine.type : null),
                     element: document.getElementById('element').value,
                     montantHT: parseFloat(document.getElementById('montantHT').value),
                     montantTTC: ttcRetenu,
                     periodicite: document.getElementById('periodicite').value,
-                    centre: document.getElementById('centre').value,
+                    centre: RTListes.valeurAEnregistrer(document.getElementById('centre').value, origine ? origine.centre : null),
                     statut: 'ACTIF', // conservé pour compatibilité avec les autres modules
                     commentaire: document.getElementById('commentaire').value,
                     entrant: document.getElementById('entrant').checked,
@@ -1865,8 +1954,62 @@
         });
 
         // Drag and Drop
+        // MODIFIÉ 02/11/2026 — déplacement de plusieurs lignes à la fois. On coche
+        // les lignes (Maj + clic pour une plage), puis on glisse l'une d'elles :
+        // tout le groupe suit, dans son ordre. Une ligne non cochée se glisse
+        // seule, comme avant. Le repérage se fait sur les fiches affichées, non
+        // plus sur un rang. Protections inchangées : pas de déplacement sous tri
+        // ni sous filtre.
         let draggedRow = null;
-        let draggedIndex = null;
+        let draggedPos = null;
+        let lignesAffichees = [];        // fiches dans l'ordre de l'écran
+        const selection = new Set();     // fiches cochées
+        let derniereCaseCochee = null;   // rang de la dernière case cliquée
+
+        function cocherLigne(e, caseCochee) {
+            const pos = parseInt(caseCochee.dataset.pos, 10);
+            const etat = caseCochee.checked;
+            let debut = pos, fin = pos;
+            if (e.shiftKey && derniereCaseCochee !== null) {
+                debut = Math.min(pos, derniereCaseCochee);
+                fin = Math.max(pos, derniereCaseCochee);
+            }
+            for (let i = debut; i <= fin; i++) {
+                const fiche = lignesAffichees[i];
+                if (!fiche) continue;
+                if (etat) selection.add(fiche); else selection.delete(fiche);
+                const ligne = document.querySelector('#recettesTableBody tr[data-pos="' + i + '"]');
+                if (ligne) {
+                    ligne.classList.toggle('ligne-selectionnee', etat);
+                    const c = ligne.querySelector('.case-selection');
+                    if (c) c.checked = etat;
+                }
+            }
+            derniereCaseCochee = pos;
+            majBarreSelection();
+        }
+
+        function toutDeselectionner() {
+            selection.clear();
+            derniereCaseCochee = null;
+            document.querySelectorAll('#recettesTableBody .case-selection').forEach(c => { c.checked = false; });
+            document.querySelectorAll('#recettesTableBody tr.ligne-selectionnee').forEach(l => l.classList.remove('ligne-selectionnee'));
+            majBarreSelection();
+        }
+
+        function majBarreSelection() {
+            const barre = document.getElementById('barreSelection');
+            if (!barre) return;
+            const n = selection.size;
+            if (!n) { barre.style.display = 'none'; return; }
+            barre.innerHTML = '☑️ <strong>' + n + (n > 1 ? ' lignes cochées' : ' ligne cochée')
+                + '</strong> — '
+                + (n > 1 ? 'glissez l\'une d\'elles par sa poignée ☰ : elles se déplacent ensemble, dans leur ordre.'
+                         : 'glissez-la par sa poignée ☰ pour la déplacer, ou cochez-en d\'autres.')
+                + ' Maj + clic coche toute une plage.'
+                + '<button type="button" onclick="toutDeselectionner()">Tout décocher</button>';
+            barre.style.display = 'block';
+        }
 
         function initDragAndDrop() {
             try {
@@ -1888,10 +2031,14 @@
 
         function handleDragStart(e) {
             draggedRow = this;
-            draggedIndex = parseInt(this.dataset.index);
+            draggedPos = parseInt(this.dataset.pos, 10);
             this.classList.add('dragging');
+            // Une ligne cochée entraîne tout le groupe coché
+            if (selection.has(lignesAffichees[draggedPos])) {
+                document.querySelectorAll('#recettesTableBody tr.ligne-selectionnee').forEach(l => l.classList.add('dragging'));
+            }
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', this.innerHTML);
+            e.dataTransfer.setData('text/plain', String(draggedPos));
         }
 
         function handleDragOver(e) {
@@ -1919,61 +2066,26 @@
             }
 
             try {
-                if (draggedRow !== this) {
-                    const targetIndex = parseInt(this.dataset.index);
-                    
-                    // Réorganiser le tableau recettes
-                    const filtreType = document.getElementById('filtreType').value;
-                    const filtreCentre = document.getElementById('filtreCentre').value;
-                    const filtrePeriodicite = document.getElementById('filtrePeriodicite').value;
-                    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-                    
-                    // Obtenir les indices réels dans le tableau complet
-                    let recettesFiltrees = [...recettes];
-                    
-                    if (filtreType !== 'tous') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.type === filtreType);
-                    }
-                    
-                    if (filtreCentre !== 'tous') {
-                        recettesFiltrees = recettesFiltrees.filter(r => {
-                            const c = (r.centre || '').toUpperCase();
-                            if (filtreCentre === 'GARE') return c === 'GARE' || c === 'GARE 1' || c === 'GARE 2';
-                            if (filtreCentre === 'WISSEMBOURG') return c === 'WISSEMBOURG' || c === 'WISSEMBOURG 1' || c === 'WISSEMBOURG 2';
-                            return c === filtreCentre;
-                        });
-                    }
-                    
-                    if (filtrePeriodicite !== 'toutes') {
-                        recettesFiltrees = recettesFiltrees.filter(r => r.periodicite === filtrePeriodicite);
-                    }
-                    
-                    if (searchTerm) {
-                        recettesFiltrees = recettesFiltrees.filter(r => 
-                            r.client.toLowerCase().includes(searchTerm) ||
-                            r.element.toLowerCase().includes(searchTerm) ||
-                            r.type.toLowerCase().includes(searchTerm) ||
-                            (r.commentaire && r.commentaire.toLowerCase().includes(searchTerm))
-                        );
-                    }
-                    
-                    // Si des filtres sont actifs, on ne peut pas réorganiser
-                    if (recettesFiltrees.length !== recettes.length) {
+                if (draggedRow && draggedRow !== this) {
+                    // Si des filtres ou une recherche sont actifs, on ne peut pas réorganiser
+                    if (lignesAffichees.length !== recettes.length) {
                         alert('⚠️ Veuillez désactiver les filtres pour réorganiser les recettes');
                         this.classList.remove('drag-over');
-                        return;
+                        return false;
                     }
-                    
-                    // Déplacer l'élément dans le tableau
-                    const draggedItem = recettes[draggedIndex];
-                    recettes.splice(draggedIndex, 1);
-                    recettes.splice(targetIndex, 0, draggedItem);
-                    
-                    // Sauvegarder et rafraîchir
-                    sauvegarderRecettes();
-                    afficherRecettes();
-                    
-                    console.log(`✅ Ligne déplacée de ${draggedIndex} vers ${targetIndex}`);
+
+                    const glisse = lignesAffichees[draggedPos];
+                    const cible = lignesAffichees[parseInt(this.dataset.pos, 10)];
+                    const nouvelOrdre = RTListes.deplacerGroupe(recettes, selection, glisse, cible);
+
+                    if (nouvelOrdre) {
+                        const nb = selection.has(glisse) ? selection.size : 1;
+                        recettes = nouvelOrdre;
+                        // Sauvegarder et rafraîchir
+                        sauvegarderRecettes();
+                        afficherRecettes();
+                        console.log(`✅ ${nb} ligne(s) déplacée(s)`);
+                    }
                 }
             } catch (error) {
                 console.error('❌ Erreur drop:', error);
@@ -1984,15 +2096,14 @@
         }
 
         function handleDragEnd(e) {
-            this.classList.remove('dragging');
-            
-            // Nettoyer toutes les classes drag-over
+            // Nettoyer les classes de glisser-déposer
             document.querySelectorAll('#recettesTableBody tr').forEach(row => {
                 row.classList.remove('drag-over');
+                row.classList.remove('dragging');
             });
             
             draggedRow = null;
-            draggedIndex = null;
+            draggedPos = null;
         }
 
         // Fermeture modal
