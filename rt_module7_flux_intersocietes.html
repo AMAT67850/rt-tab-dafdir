@@ -7,9 +7,13 @@
     <!--
         Module 7 — Flux intersociétés et comptes associés. Créé le 09/11/2026.
         Suit des soldes entre Rocket Tower, Amat Corp et Smoothmania, et le compte
-        associé du gérant dans chaque société. N'entre dans aucun calcul : le
+        associé de l'actionnaire unique dans chaque société. N'entre dans aucun calcul : le
         prévisionnel ne lit pas ces données (le soutien mensuel à Smoothmania y est
         déjà compté, en charge récurrente « flux groupe »).
+        Modifié le 09/11/2026 après déploiement : zone « Synthèse et actions à mener »
+        au-dessus des tableaux (titre et texte modifiables), colonne N° retirée (la
+        poignée de déplacement est passée devant l'élément), sous-titre « actionnaire
+        unique », texte d'explication du haut de page modifiable.
         Étiquette lue et écrite : 'fluxIntersocietesRT', que rt-donnees.js aiguille
         vers 'rt-flux-intersocietes' et range dans le fichier de données iCloud.
     -->
@@ -74,10 +78,11 @@
         tr.ligne.drag-over-bas td { border-bottom: 3px solid #0f766e; }
         tr.ligne.dragging { opacity: 0.45; }
 
-        .col-n { width: 70px; white-space: nowrap; }
-        .poignee { cursor: grab; color: #8a9a97; padding: 2px 4px; user-select: none; }
-        .num { font-weight: 600; color: #495057; margin-left: 4px; }
-        .col-el { width: 210px; }
+        .cel-el { display: flex; align-items: flex-start; gap: 4px; }
+        .cel-el .txt { flex: 1; }
+        .poignee { cursor: grab; color: #6c8f8a; font-size: 20px; line-height: 1.3; padding: 0 4px; border-radius: 4px; user-select: none; }
+        .poignee:hover { background: #e6f4f1; color: #0f5e57; }
+        .col-el { width: 250px; }
         .col-solde { width: 280px; }
         .col-act { width: 56px; text-align: center; }
 
@@ -118,6 +123,8 @@
         .hist th { background: none; border-bottom: 1px solid #cfe3df; font-size: 14px; color: #6c757d; font-weight: 600; padding: 4px 8px; }
         .hist td { border-bottom: 1px solid #e3ecea; padding: 6px 8px; }
 
+        .titre-synthese { font-size: 22px; font-weight: 700; color: #0f5e57; margin-bottom: 12px; }
+        .zone-synthese { min-height: 7.5em; padding: 10px 12px; border: 1px solid #cfe3df; background: #fafdfc; line-height: 1.55; }
         tfoot td { border-top: 2px solid #cfe3df; border-bottom: none; font-weight: 600; background: #f1f5f4; }
         tfoot .txt { font-weight: 400; }
         .aucune td { color: #868e96; font-style: italic; }
@@ -127,13 +134,13 @@
 <body>
     <div class="header">
         <h1>🔁 Flux intersociétés et comptes associés</h1>
-        <p class="subtitle">Rocket Tower, Amat Corp et Smoothmania : qui doit quoi à qui, et le compte associé du gérant</p>
+        <p class="subtitle">Rocket Tower, Amat Corp et Smoothmania : qui doit quoi à qui, et le compte associé de l'actionnaire unique</p>
     </div>
 
     <div class="container">
         <div class="controls">
             <a href="index.html" class="btn btn-secondary">🏠 Dashboard</a>
-            <p class="aide">Cliquez dans une case pour la modifier. « Nouveau solde » garde l'ancien montant dans l'historique de la ligne ; modifier le montant directement le corrige, sans rien garder. Cette page n'entre pas dans le prévisionnel.</p>
+            <div class="aide" id="aide-zone"></div>
         </div>
 
         <div class="demarrage" id="demarrage" style="display:none">
@@ -141,12 +148,14 @@
             <br><button class="btn btn-primary" id="btnReprise">📥 Reprendre les lignes du 9/11/2026</button>
         </div>
 
+        <!-- AJOUT 09/11/2026, après le déploiement de 9 h 47 — zone libre de synthèse, au-dessus des tableaux -->
+        <section class="bloc" id="bloc-synthese"></section>
+
         <section class="bloc">
             <h2>1. Flux intersociétés, dettes et convention de trésorerie</h2>
             <table>
                 <thead>
                     <tr>
-                        <th class="col-n">N°</th>
                         <th class="col-el">Élément</th>
                         <th class="col-solde">Montant, date, source</th>
                         <th>Situation</th>
@@ -164,7 +173,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="col-n">N°</th>
                         <th class="col-el">Entité</th>
                         <th class="col-solde">Solde et date</th>
                         <th>Situation et suite</th>
@@ -182,6 +190,9 @@
         'use strict';
 
         const CLE = 'fluxIntersocietesRT';
+        // Texte d'explication à côté du bouton Dashboard : modifiable par l'utilisatrice
+        // (AJOUT 09/11/2026) ; celui-ci s'affiche tant qu'elle ne l'a pas changé.
+        const AIDE_DEFAUT = 'Cliquez dans une case pour la modifier. « Nouveau solde » garde l\'ancien montant dans l\'historique de la ligne ; modifier le montant directement le corrige, sans rien garder. Pour changer l\'ordre des lignes, faites glisser la poignée ⋮⋮ placée devant chaque élément. Cette page n\'entre pas dans le prévisionnel.';
 
         // Description des deux tableaux : champ du montant, champs gardés dans
         // l'historique, texte du message de suppression.
@@ -229,7 +240,7 @@
 
         // ─── Données ────────────────────────────────────────────────────────
         function structureVide() {
-            return { version: 1, flux: [], comptesAssocies: [], commentaireTotal: '', totalComptesAssocies: 0 };
+            return { version: 1, aide: AIDE_DEFAUT, titreSynthese: 'Synthèse et actions à mener', synthese: '', flux: [], comptesAssocies: [], commentaireTotal: '', totalComptesAssocies: 0 };
         }
         function charger() {
             const t = localStorage.getItem(CLE);
@@ -240,6 +251,9 @@
                 o.flux.forEach(l => { if (!Array.isArray(l.historique)) l.historique = []; });
                 o.comptesAssocies.forEach(l => { if (!Array.isArray(l.historique)) l.historique = []; });
                 if (typeof o.commentaireTotal !== 'string') o.commentaireTotal = '';
+                if (typeof o.aide !== 'string') o.aide = AIDE_DEFAUT;
+                if (typeof o.titreSynthese !== 'string') o.titreSynthese = 'Synthèse et actions à mener';
+                if (typeof o.synthese !== 'string') o.synthese = '';
                 return o;
             } catch (e) {
                 alert('Les données de cette page sont illisibles. Rien n\'est modifié ; prévenez avant toute saisie.');
@@ -332,8 +346,7 @@
 
         function ligneFlux(l, i) {
             return '<tr class="ligne" data-t="flux" data-i="' + i + '">' +
-                '<td class="col-n"><span class="poignee" draggable="true" title="Glisser pour déplacer la ligne">⋮⋮</span><span class="num">' + (i + 1) + '</span></td>' +
-                '<td>' + caseTexte('flux', i, 'element', l.element, 'Élément', true) + '</td>' +
+                '<td><div class="cel-el"><span class="poignee" draggable="true" title="Glisser pour déplacer la ligne">⋮⋮</span>' + caseTexte('flux', i, 'element', l.element, 'Élément', true) + '</div></td>' +
                 '<td><span class="cap">Montant</span>' + caseMontant('flux', i, 'montant', l.montant) +
                     '<span class="cap">Date du solde</span>' + caseDate('flux', i, 'dateSolde', l.dateSolde) +
                     '<span class="cap">Précision sur la date</span>' + caseTexte('flux', i, 'precisionDate', l.precisionDate, '—', true) +
@@ -346,8 +359,7 @@
         }
         function ligneCA(l, i) {
             return '<tr class="ligne" data-t="ca" data-i="' + i + '">' +
-                '<td class="col-n"><span class="poignee" draggable="true" title="Glisser pour déplacer la ligne">⋮⋮</span><span class="num">' + (i + 1) + '</span></td>' +
-                '<td>' + caseTexte('ca', i, 'entite', l.entite, 'Entité', true) + '</td>' +
+                '<td><div class="cel-el"><span class="poignee" draggable="true" title="Glisser pour déplacer la ligne">⋮⋮</span>' + caseTexte('ca', i, 'entite', l.entite, 'Entité', true) + '</div></td>' +
                 '<td><span class="cap">Solde</span>' + caseMontant('ca', i, 'solde', l.solde) +
                     '<span class="cap">Date du solde</span>' + caseDate('ca', i, 'dateSolde', l.dateSolde) +
                     liensSolde('ca', i, l) + '</td>' +
@@ -361,7 +373,7 @@
             const cfg = TABLES[t];
             let html = '';
             if (formNS === l.id) {
-                html += '<tr class="sous"><td></td><td colspan="' + colspan + '"><div class="cadre-sous">' +
+                html += '<tr class="sous"><td colspan="' + colspan + '"><div class="cadre-sous">' +
                     '<h3>Nouveau solde — le montant actuel passera dans l\'historique</h3><div class="form-ns">' +
                     '<div><label>Nouveau ' + (t === 'ca' ? 'solde' : 'montant') + '</label><input class="saisie" id="ns-montant" placeholder="' + (t === 'ca' ? '-1 250,00' : '25 000,00') + '"></div>' +
                     '<div><label>Date du solde</label><input class="saisie" type="date" id="ns-date"></div>' +
@@ -374,7 +386,7 @@
                     '</div><span class="erreur" id="ns-erreur"></span></div></td></tr>';
             }
             if (histoOuvert.has(l.id) && l.historique.length) {
-                html += '<tr class="sous"><td></td><td colspan="' + colspan + '"><div class="cadre-sous">' +
+                html += '<tr class="sous"><td colspan="' + colspan + '"><div class="cadre-sous">' +
                     '<h3>Soldes antérieurs, du plus récent au plus ancien</h3><table class="hist"><thead><tr>' +
                     '<th>' + (t === 'ca' ? 'Solde' : 'Montant') + '</th><th>Date du solde</th>' +
                     (t === 'flux' ? '<th>Précision sur la date</th><th>Source</th>' : '') + '<th></th></tr></thead><tbody>' +
@@ -396,23 +408,30 @@
             const fl = D.flux, ca = D.comptesAssocies;
             document.getElementById('corps-flux').innerHTML = fl.length
                 ? fl.map(ligneFlux).join('')
-                : '<tr class="aucune"><td colspan="6">Aucune ligne.</td></tr>';
+                : '<tr class="aucune"><td colspan="5">Aucune ligne.</td></tr>';
             document.getElementById('corps-ca').innerHTML = ca.length
                 ? ca.map(ligneCA).join('')
-                : '<tr class="aucune"><td colspan="5">Aucune ligne.</td></tr>';
+                : '<tr class="aucune"><td colspan="4">Aucune ligne.</td></tr>';
             document.getElementById('pied-ca').innerHTML =
-                '<tr><td></td><td>Total</td><td><span class="cap">Calculé</span><span class="montant" id="total-ca">' + texteMontant(totalCA(), true) + '</span></td>' +
+                '<tr><td>Total</td><td><span class="cap">Calculé</span><span class="montant" id="total-ca">' + texteMontant(totalCA(), true) + '</span></td>' +
                 '<td><div class="txt" contenteditable="plaintext-only" data-t="ca" data-champ="commentaireTotal" data-vide="—">' + esc(D.commentaireTotal) + '</div></td><td></td></tr>';
+            document.getElementById('aide-zone').innerHTML =
+                '<div class="txt" contenteditable="plaintext-only" spellcheck="true" data-champ="aide" data-vide="Vos explications…">' + esc(D.aide) + '</div>';
+            document.getElementById('bloc-synthese').innerHTML =
+                '<div class="txt simple titre-synthese" contenteditable="plaintext-only" data-champ="titreSynthese" data-vide="Titre de la zone">' + esc(D.titreSynthese) + '</div>' +
+                '<div class="txt zone-synthese" contenteditable="plaintext-only" spellcheck="true" data-champ="synthese" data-vide="Notes, actions à entreprendre, commentaires…">' + esc(D.synthese) + '</div>';
             document.getElementById('demarrage').style.display = (!fl.length && !ca.length) ? '' : 'none';
             if (formNS) { const m = document.getElementById('ns-montant'); if (m) m.focus(); }
         }
 
         // ─── Accès aux valeurs ──────────────────────────────────────────────
         // Une case désigne soit une ligne (data-i), soit une entrée de son
-        // historique (data-i + data-h), soit le commentaire du total.
+        // historique (data-i + data-h), soit un champ de la page entière : le
+        // commentaire du total, le titre et le texte de la zone de synthèse,
+        // le texte d'explication du haut de page.
         function cible(el) {
             const t = el.dataset.t, champ = el.dataset.champ;
-            if (champ === 'commentaireTotal') return { obj: D, champ, t };
+            if (champ === 'commentaireTotal' || champ === 'titreSynthese' || champ === 'synthese' || champ === 'aide') return { obj: D, champ, t };
             const ligne = D[TABLES[t].liste][parseInt(el.dataset.i, 10)];
             if (!ligne) return null;
             const obj = el.dataset.h !== undefined ? ligne.historique[parseInt(el.dataset.h, 10)] : ligne;
@@ -628,7 +647,8 @@
         // ─── Démarrage ──────────────────────────────────────────────────────
         document.getElementById('btnReprise').addEventListener('click', () => {
             if (D.flux.length || D.comptesAssocies.length) return;
-            D = lignesDu9novembre();
+            const garde = { aide: D.aide, titreSynthese: D.titreSynthese, synthese: D.synthese };
+            D = Object.assign(lignesDu9novembre(), garde);
             enregistrer();
             afficher();
         });
