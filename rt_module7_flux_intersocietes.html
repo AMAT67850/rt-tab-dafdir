@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔁 Rocket Tower - Flux intersociétés</title>
+    <!--
+        Module 7 — Flux intersociétés et comptes associés. Créé le 09/11/2026.
+        Suit des soldes entre Rocket Tower, Amat Corp et Smoothmania, et le compte
+        associé du gérant dans chaque société. N'entre dans aucun calcul : le
+        prévisionnel ne lit pas ces données (le soutien mensuel à Smoothmania y est
+        déjà compté, en charge récurrente « flux groupe »).
+        Étiquette lue et écrite : 'fluxIntersocietesRT', que rt-donnees.js aiguille
+        vers 'rt-flux-intersocietes' et range dans le fichier de données iCloud.
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+            min-height: 100vh;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header .subtitle { font-size: 1.1em; opacity: 0.9; }
+
+        .container { max-width: 1500px; margin: 0 auto; padding: 30px 20px; }
+
+        .controls {
+            background: white; padding: 20px 25px; border-radius: 12px; margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center;
+        }
+        .aide { flex: 1 1 500px; font-size: 18px; line-height: 1.5; color: #495057; }
+
+        .btn {
+            padding: 11px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;
+            text-decoration: none; font-size: 18px; display: inline-flex; align-items: center; gap: 8px;
+            font-family: inherit;
+        }
+        .btn-secondary { background: linear-gradient(135deg, #6c757d, #5a6268); color: white; }
+        .btn-primary { background: linear-gradient(135deg, #0f766e, #115e59); color: white; }
+        .btn-ajout { background: #e6f4f1; color: #0f5e57; border: 1px dashed #0f766e; margin-top: 14px; }
+
+        .demarrage {
+            background: #fff8e1; border: 1px solid #f0c36d; border-radius: 12px; padding: 20px 25px;
+            margin-bottom: 25px; font-size: 18px; line-height: 1.5;
+        }
+        .demarrage .btn { margin-top: 12px; }
+
+        .bloc {
+            background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow-x: auto;
+        }
+        .bloc h2 { font-size: 22px; color: #0f5e57; margin-bottom: 16px; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        th {
+            background: #f1f5f4; color: #0f5e57; text-align: left; font-size: 18px; font-weight: 600;
+            padding: 10px 8px; border-bottom: 2px solid #cfe3df;
+        }
+        td { padding: 10px 8px; vertical-align: top; border-bottom: 1px solid #e9ecef; font-size: 18px; line-height: 1.45; }
+        tr.ligne.drag-over-haut td { border-top: 3px solid #0f766e; }
+        tr.ligne.drag-over-bas td { border-bottom: 3px solid #0f766e; }
+        tr.ligne.dragging { opacity: 0.45; }
+
+        .col-n { width: 70px; white-space: nowrap; }
+        .poignee { cursor: grab; color: #8a9a97; padding: 2px 4px; user-select: none; }
+        .num { font-weight: 600; color: #495057; margin-left: 4px; }
+        .col-el { width: 210px; }
+        .col-solde { width: 280px; }
+        .col-act { width: 56px; text-align: center; }
+
+        .cap { display: block; font-size: 14px; color: #6c757d; margin-top: 6px; }
+        .cap:first-child { margin-top: 0; }
+
+        .txt {
+            min-height: 1.45em; padding: 2px 4px; border-radius: 4px; outline: none;
+            white-space: pre-wrap; word-break: break-word; border: 1px solid transparent;
+        }
+        .txt:hover { border-color: #cfe3df; background: #fafdfc; }
+        .txt:focus { border-color: #0f766e; background: #fff; box-shadow: 0 0 0 2px rgba(15,118,110,0.15); }
+        .txt:empty::before { content: attr(data-vide); color: #adb5bd; }
+        .el { font-weight: 600; }
+
+        .edit { display: inline-block; min-width: 60px; padding: 2px 4px; border-radius: 4px; cursor: text; border: 1px solid transparent; }
+        .edit:hover { border-color: #cfe3df; background: #fafdfc; }
+        .montant { font-weight: 600; white-space: nowrap; }
+        .negatif { color: #b02a37; }
+        .vide { color: #adb5bd; font-weight: 400; }
+        input.saisie { font: inherit; font-size: 18px; padding: 4px 6px; border: 1px solid #0f766e; border-radius: 4px; width: 100%; max-width: 240px; }
+        .erreur { display: block; color: #b02a37; font-size: 16px; margin-top: 4px; }
+
+        .lien {
+            background: none; border: none; color: #0f766e; cursor: pointer; font: inherit; font-size: 16px;
+            padding: 2px 0; text-decoration: underline; margin-top: 8px; margin-right: 14px;
+        }
+        .btn-suppr { background: none; border: none; cursor: pointer; font-size: 20px; padding: 4px; opacity: 0.7; }
+        .btn-suppr:hover { opacity: 1; }
+
+        tr.sous td { background: #f6faf9; border-bottom: 1px solid #e9ecef; }
+        .cadre-sous { padding: 4px 4px 8px; }
+        .cadre-sous h3 { font-size: 18px; color: #0f5e57; margin-bottom: 8px; }
+        .form-ns { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: flex-end; }
+        .form-ns label { font-size: 14px; color: #6c757d; display: block; }
+        .form-ns .btn { padding: 8px 14px; }
+        .hist { width: 100%; min-width: 0; border-collapse: collapse; }
+        .hist th { background: none; border-bottom: 1px solid #cfe3df; font-size: 14px; color: #6c757d; font-weight: 600; padding: 4px 8px; }
+        .hist td { border-bottom: 1px solid #e3ecea; padding: 6px 8px; }
+
+        tfoot td { border-top: 2px solid #cfe3df; border-bottom: none; font-weight: 600; background: #f1f5f4; }
+        tfoot .txt { font-weight: 400; }
+        .aucune td { color: #868e96; font-style: italic; }
+    </style>
+    <script src="rt-donnees.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>🔁 Flux intersociétés et comptes associés</h1>
+        <p class="subtitle">Rocket Tower, Amat Corp et Smoothmania : qui doit quoi à qui, et le compte associé du gérant</p>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <a href="index.html" class="btn btn-secondary">🏠 Dashboard</a>
+            <p class="aide">Cliquez dans une case pour la modifier. « Nouveau solde » garde l'ancien montant dans l'historique de la ligne ; modifier le montant directement le corrige, sans rien garder. Cette page n'entre pas dans le prévisionnel.</p>
+        </div>
+
+        <div class="demarrage" id="demarrage" style="display:none">
+            Les deux tableaux sont vides. Vous pouvez y reprendre les lignes du doc de travail « Flux intersociétés et comptes associés » du 9/11/2026 (sept lignes au tableau 1, trois au tableau 2), ou les saisir vous-même avec « Ajouter une ligne ».
+            <br><button class="btn btn-primary" id="btnReprise">📥 Reprendre les lignes du 9/11/2026</button>
+        </div>
+
+        <section class="bloc">
+            <h2>1. Flux intersociétés, dettes et convention de trésorerie</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-n">N°</th>
+                        <th class="col-el">Élément</th>
+                        <th class="col-solde">Montant, date, source</th>
+                        <th>Situation</th>
+                        <th>Suite à donner</th>
+                        <th class="col-act"></th>
+                    </tr>
+                </thead>
+                <tbody id="corps-flux"></tbody>
+            </table>
+            <button class="btn btn-ajout" data-ajout="flux">➕ Ajouter une ligne</button>
+        </section>
+
+        <section class="bloc">
+            <h2>2. Compte associé de Nicolas Amat dans chaque entité</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-n">N°</th>
+                        <th class="col-el">Entité</th>
+                        <th class="col-solde">Solde et date</th>
+                        <th>Situation et suite</th>
+                        <th class="col-act"></th>
+                    </tr>
+                </thead>
+                <tbody id="corps-ca"></tbody>
+                <tfoot id="pied-ca"></tfoot>
+            </table>
+            <button class="btn btn-ajout" data-ajout="ca">➕ Ajouter une ligne</button>
+        </section>
+    </div>
+
+    <script>
+        'use strict';
+
+        const CLE = 'fluxIntersocietesRT';
+
+        // Description des deux tableaux : champ du montant, champs gardés dans
+        // l'historique, texte du message de suppression.
+        const TABLES = {
+            flux: { liste: 'flux', corps: 'corps-flux', montant: 'montant', signe: false,
+                    champsHisto: ['montant', 'dateSolde', 'precisionDate', 'source'], nom: 'element' },
+            ca:   { liste: 'comptesAssocies', corps: 'corps-ca', montant: 'solde', signe: true,
+                    champsHisto: ['solde', 'dateSolde'], nom: 'entite' }
+        };
+
+        let D = null;                  // données en mémoire
+        const histoOuvert = new Set(); // identifiants des lignes dont l'historique est affiché
+        let formNS = null;             // identifiant de la ligne dont le formulaire « Nouveau solde » est ouvert
+
+        // ─── Outils ─────────────────────────────────────────────────────────
+        const fmt = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        }
+        function nouvelId(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+        function arrondi(v) { return Math.round(v * 100) / 100; }
+
+        // Montant affiché : deux décimales, espaces insécables, euro.
+        function texteMontant(v, signe) {
+            if (v === null || v === undefined || v === '') return '<span class="vide">—</span>';
+            const abs = fmt.format(Math.abs(v)) + ' €';
+            if (!signe) return esc((v < 0 ? '−' : '') + abs);
+            if (v < 0) return '<span class="negatif">' + esc('−' + abs) + ' (débiteur)</span>';
+            if (v > 0) return esc('+' + abs);
+            return esc(abs);
+        }
+        function texteDate(iso) {
+            if (!iso) return '<span class="vide">non précisée</span>';
+            const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+            return m ? m[3] + '/' + m[2] + '/' + m[1] : esc(iso);
+        }
+        // Lecture d'un montant saisi : « 25 509,43 », « -3440.09 », « −3 440,09 ».
+        // Renvoie null pour une case vide, undefined pour une saisie invalide.
+        function lireMontant(t) {
+            const s = String(t).replace(/[\s  €]/g, '').replace(/−/g, '-').replace(',', '.');
+            if (s === '') return null;
+            if (!/^-?\d+(\.\d{1,2})?$/.test(s)) return undefined;
+            return arrondi(parseFloat(s));
+        }
+
+        // ─── Données ────────────────────────────────────────────────────────
+        function structureVide() {
+            return { version: 1, flux: [], comptesAssocies: [], commentaireTotal: '', totalComptesAssocies: 0 };
+        }
+        function charger() {
+            const t = localStorage.getItem(CLE);
+            if (!t) return structureVide();
+            try {
+                const o = JSON.parse(t);
+                if (!o || !Array.isArray(o.flux) || !Array.isArray(o.comptesAssocies)) throw new Error('structure');
+                o.flux.forEach(l => { if (!Array.isArray(l.historique)) l.historique = []; });
+                o.comptesAssocies.forEach(l => { if (!Array.isArray(l.historique)) l.historique = []; });
+                if (typeof o.commentaireTotal !== 'string') o.commentaireTotal = '';
+                return o;
+            } catch (e) {
+                alert('Les données de cette page sont illisibles. Rien n\'est modifié ; prévenez avant toute saisie.');
+                return null;
+            }
+        }
+        function totalCA() {
+            return arrondi(D.comptesAssocies.reduce((s, l) => s + (typeof l.solde === 'number' ? l.solde : 0), 0));
+        }
+        // Enregistre tout l'objet. L'ordre des lignes est porté par le champ « ordre »
+        // et le total est recalculé, pour que l'export se lise sans cette page.
+        function enregistrer() {
+            D.flux.forEach((l, i) => { l.ordre = i + 1; });
+            D.comptesAssocies.forEach((l, i) => { l.ordre = i + 1; });
+            D.totalComptesAssocies = totalCA();
+            D.misAJourLe = new Date().toISOString();
+            localStorage.setItem(CLE, JSON.stringify(D));
+        }
+
+        // Lignes du doc de travail « Flux intersociétés et comptes associés » du
+        // 9/11/2026, textes repris tels quels, sauf le montant et la date en tête
+        // de la situation des lignes 1, 2 et 4 (décision du 9/11/2026 : ils ont
+        // leurs propres cases). Le solde de 36 000 € au 31/12/2025 de la ligne 3
+        // est posé dans son historique (relevé Pennylane cité dans le courriel du
+        // 6/11/2026 à l'expert-comptable).
+        function lignesDu9novembre() {
+            const ec = 'Expert-comptable, courriel du 6/11/2026';
+            const f = (element, montant, dateSolde, precisionDate, source, situation, suite, historique) =>
+                ({ id: nouvelId('f'), element, montant, dateSolde, precisionDate, source, situation, suite, historique: historique || [] });
+            const c = (entite, solde, situation) => ({ id: nouvelId('c'), entite, solde, dateSolde: null, situation, historique: [] });
+            return {
+                version: 1,
+                flux: [
+                    f('Amat Corp doit à Rocket Tower', 25509.43, '2026-10-06', '', ec,
+                      'Le montant dépasse les avances versées depuis juin (17 400 € à fin septembre, 21 750 € à fin octobre) : un solde antérieur d\'environ 3 760 € ou 8 110 € est à identifier. La créance augmente d\'environ 52 000 € par an.',
+                      'Rapprocher ce solde de Pennylane Rocket Tower à la même date. Son remboursement dépend de Smoothmania, en veille et sans revenus : point de vigilance.'),
+                    f('Smoothmania doit à Amat Corp', 21601.65, '2026-10-12', '', ec,
+                      'Pour 21 000 € versés de juin à octobre : écart d\'environ 600 €.',
+                      'Demander l\'origine de l\'écart à l\'expert-comptable.'),
+                    f('Rocket Tower doit à Smoothmania (premier plateau de coworking et factures)', 20000, null, 'balance provisoire 2026',
+                      'Pennylane Rocket Tower, compte 401 Smoothmania',
+                      '36 000 € au 31/12/2025, ramenés à 20 000 € : les virements directs de janvier à mai 2026 ont été comptés en remboursement.',
+                      'Solder en une seule fois : aller-retour de 20 000 € proposé par l\'expert-comptable (« Règlement facture SMOOTHMANIA » puis « Règlement facture ROCKET TOWER », le même jour, BP1 approvisionnée), ou compensation écrite des deux dettes, à lui proposer.',
+                      [{ montant: 36000, dateSolde: '2025-12-31', precisionDate: '', source: 'Pennylane Rocket Tower, compte 401 Smoothmania' }]),
+                    f('Smoothmania doit à Rocket Tower (refacturations de prestations de 2022)', 38400, null, 'depuis le 15/11/2023', ec,
+                      'Après l\'aller-retour, il resterait 18 400 €.',
+                      'Vérifier que ce montant figure au compte client Smoothmania de Rocket Tower. Créance ancienne : la faire reconnaître par Smoothmania ou la déprécier (question à l\'expert-comptable).'),
+                    f('Soutien à Smoothmania (convention de trésorerie du 8/4/2025)', null, null, 'depuis juin 2026', 'RDE',
+                      'Depuis juin 2026, Rocket Tower vire 4 350 € par mois à Amat Corp, qui reverse 4 200 € à Smoothmania. Ces sommes sont des avances en compte courant : elles ne remboursent aucune dette.',
+                      'Dans le rapport mensuel, ne plus qualifier de « résultat » le solde calculé après ce flux.'),
+                    f('Intérêts de la convention', null, null, '', ec,
+                      'Facultatifs selon l\'expert-comptable ; s\'ils sont appliqués, taux à fixer sans dépasser le taux maximum déductible, attendu vers 4,45 % pour les clôtures au 31/12/2026.',
+                      'Vérifier la clause d\'intérêts de la convention. Poser la question fiscale d\'une avance consentie sans intérêts.'),
+                    f('Soldes au 31/12/2025 entre les trois sociétés', null, null, '', '',
+                      'Non communiqués : la réponse donne des soldes d\'octobre 2026.',
+                      'À redemander.')
+                ],
+                comptesAssocies: [
+                    c('Rocket Tower', 7.10, 'Rien à faire.'),
+                    c('Smoothmania', -3440.09, 'Interdit pour un gérant d\'EURL (art. L223-21 du Code de commerce) : à régulariser sans attendre le 31/12. Arrêter dès maintenant le remboursement de 1 700 € par mois, qui a dépassé le solde.'),
+                    c('Amat Corp', 6250, 'Proposition de l\'expert-comptable : Amat Corp verse 3 440,09 € au gérant, qui les reverse à Smoothmania. Il reste 2 809,91 € dus au gérant par Amat Corp.')
+                ],
+                commentaireTotal: 'Inchangé après la régularisation, qui déplace les sommes sans modifier la position du gérant.'
+            };
+        }
+
+        // ─── Affichage ──────────────────────────────────────────────────────
+        function caseTexte(t, i, champ, valeur, vide, simple, h) {
+            return '<div class="txt' + (simple ? ' simple' : '') + (champ === 'element' || champ === 'entite' ? ' el' : '') +
+                   '" contenteditable="plaintext-only" spellcheck="true" data-t="' + t + '" data-i="' + i + '"' +
+                   (h !== undefined ? ' data-h="' + h + '"' : '') +
+                   ' data-champ="' + champ + '" data-vide="' + esc(vide) + '">' + esc(valeur || '') + '</div>';
+        }
+        function caseMontant(t, i, champ, valeur, h) {
+            return '<span class="edit montant" data-t="' + t + '" data-i="' + i + '"' + (h !== undefined ? ' data-h="' + h + '"' : '') +
+                   ' data-champ="' + champ + '" data-type="montant" title="Cliquer pour corriger">' + texteMontant(valeur, TABLES[t].signe) + '</span>';
+        }
+        function caseDate(t, i, champ, valeur, h) {
+            return '<span class="edit" data-t="' + t + '" data-i="' + i + '"' + (h !== undefined ? ' data-h="' + h + '"' : '') +
+                   ' data-champ="' + champ + '" data-type="date" title="Cliquer pour modifier">' + texteDate(valeur) + '</span>';
+        }
+
+        function liensSolde(t, i, l) {
+            const n = l.historique.length;
+            let h = '<button class="lien" data-action="ns" data-t="' + t + '" data-i="' + i + '">Nouveau solde</button>';
+            if (n) h += '<button class="lien" data-action="histo" data-t="' + t + '" data-i="' + i + '">' +
+                        n + (n > 1 ? ' soldes antérieurs ' : ' solde antérieur ') + (histoOuvert.has(l.id) ? '▾' : '▸') + '</button>';
+            return h;
+        }
+
+        function ligneFlux(l, i) {
+            return '<tr class="ligne" data-t="flux" data-i="' + i + '">' +
+                '<td class="col-n"><span class="poignee" draggable="true" title="Glisser pour déplacer la ligne">⋮⋮</span><span class="num">' + (i + 1) + '</span></td>' +
+                '<td>' + caseTexte('flux', i, 'element', l.element, 'Élément', true) + '</td>' +
+                '<td><span class="cap">Montant</span>' + caseMontant('flux', i, 'montant', l.montant) +
+                    '<span class="cap">Date du solde</span>' + caseDate('flux', i, 'dateSolde', l.dateSolde) +
+                    '<span class="cap">Précision sur la date</span>' + caseTexte('flux', i, 'precisionDate', l.precisionDate, '—', true) +
+                    '<span class="cap">Source</span>' + caseTexte('flux', i, 'source', l.source, '—', true) +
+                    liensSolde('flux', i, l) + '</td>' +
+                '<td>' + caseTexte('flux', i, 'situation', l.situation, '—', false) + '</td>' +
+                '<td>' + caseTexte('flux', i, 'suite', l.suite, '—', false) + '</td>' +
+                '<td class="col-act"><button class="btn-suppr" data-action="suppr" data-t="flux" data-i="' + i + '" title="Supprimer la ligne">🗑️</button></td>' +
+                '</tr>' + lignesSous('flux', i, l, 5);
+        }
+        function ligneCA(l, i) {
+            return '<tr class="ligne" data-t="ca" data-i="' + i + '">' +
+                '<td class="col-n"><span class="poignee" draggable="true" title="Glisser pour déplacer la ligne">⋮⋮</span><span class="num">' + (i + 1) + '</span></td>' +
+                '<td>' + caseTexte('ca', i, 'entite', l.entite, 'Entité', true) + '</td>' +
+                '<td><span class="cap">Solde</span>' + caseMontant('ca', i, 'solde', l.solde) +
+                    '<span class="cap">Date du solde</span>' + caseDate('ca', i, 'dateSolde', l.dateSolde) +
+                    liensSolde('ca', i, l) + '</td>' +
+                '<td>' + caseTexte('ca', i, 'situation', l.situation, '—', false) + '</td>' +
+                '<td class="col-act"><button class="btn-suppr" data-action="suppr" data-t="ca" data-i="' + i + '" title="Supprimer la ligne">🗑️</button></td>' +
+                '</tr>' + lignesSous('ca', i, l, 4);
+        }
+
+        // Formulaire « Nouveau solde » et historique, sous la ligne.
+        function lignesSous(t, i, l, colspan) {
+            const cfg = TABLES[t];
+            let html = '';
+            if (formNS === l.id) {
+                html += '<tr class="sous"><td></td><td colspan="' + colspan + '"><div class="cadre-sous">' +
+                    '<h3>Nouveau solde — le montant actuel passera dans l\'historique</h3><div class="form-ns">' +
+                    '<div><label>Nouveau ' + (t === 'ca' ? 'solde' : 'montant') + '</label><input class="saisie" id="ns-montant" placeholder="' + (t === 'ca' ? '-1 250,00' : '25 000,00') + '"></div>' +
+                    '<div><label>Date du solde</label><input class="saisie" type="date" id="ns-date"></div>' +
+                    (t === 'flux'
+                        ? '<div><label>Précision sur la date</label><input class="saisie" id="ns-precision" value="' + esc(l.montant == null ? (l.precisionDate || '') : '') + '"></div>' +
+                          '<div><label>Source</label><input class="saisie" id="ns-source" style="max-width:360px" value="' + esc(l.source || '') + '"></div>'
+                        : '') +
+                    '<div><button class="btn btn-primary" data-action="ns-valider" data-t="' + t + '" data-i="' + i + '">Valider</button> ' +
+                    '<button class="btn btn-secondary" data-action="ns-annuler">Annuler</button></div>' +
+                    '</div><span class="erreur" id="ns-erreur"></span></div></td></tr>';
+            }
+            if (histoOuvert.has(l.id) && l.historique.length) {
+                html += '<tr class="sous"><td></td><td colspan="' + colspan + '"><div class="cadre-sous">' +
+                    '<h3>Soldes antérieurs, du plus récent au plus ancien</h3><table class="hist"><thead><tr>' +
+                    '<th>' + (t === 'ca' ? 'Solde' : 'Montant') + '</th><th>Date du solde</th>' +
+                    (t === 'flux' ? '<th>Précision sur la date</th><th>Source</th>' : '') + '<th></th></tr></thead><tbody>' +
+                    l.historique.map((h, k) =>
+                        '<tr><td>' + caseMontant(t, i, cfg.montant, h[cfg.montant], k) + '</td>' +
+                        '<td>' + caseDate(t, i, 'dateSolde', h.dateSolde, k) + '</td>' +
+                        (t === 'flux'
+                            ? '<td>' + caseTexte(t, i, 'precisionDate', h.precisionDate, '—', true, k) + '</td>' +
+                              '<td>' + caseTexte(t, i, 'source', h.source, '—', true, k) + '</td>'
+                            : '') +
+                        '<td style="width:50px;text-align:center"><button class="btn-suppr" data-action="suppr-h" data-t="' + t + '" data-i="' + i + '" data-h="' + k + '" title="Retirer ce solde de l\'historique">✕</button></td></tr>'
+                    ).join('') +
+                    '</tbody></table></div></td></tr>';
+            }
+            return html;
+        }
+
+        function afficher() {
+            const fl = D.flux, ca = D.comptesAssocies;
+            document.getElementById('corps-flux').innerHTML = fl.length
+                ? fl.map(ligneFlux).join('')
+                : '<tr class="aucune"><td colspan="6">Aucune ligne.</td></tr>';
+            document.getElementById('corps-ca').innerHTML = ca.length
+                ? ca.map(ligneCA).join('')
+                : '<tr class="aucune"><td colspan="5">Aucune ligne.</td></tr>';
+            document.getElementById('pied-ca').innerHTML =
+                '<tr><td></td><td>Total</td><td><span class="cap">Calculé</span><span class="montant" id="total-ca">' + texteMontant(totalCA(), true) + '</span></td>' +
+                '<td><div class="txt" contenteditable="plaintext-only" data-t="ca" data-champ="commentaireTotal" data-vide="—">' + esc(D.commentaireTotal) + '</div></td><td></td></tr>';
+            document.getElementById('demarrage').style.display = (!fl.length && !ca.length) ? '' : 'none';
+            if (formNS) { const m = document.getElementById('ns-montant'); if (m) m.focus(); }
+        }
+
+        // ─── Accès aux valeurs ──────────────────────────────────────────────
+        // Une case désigne soit une ligne (data-i), soit une entrée de son
+        // historique (data-i + data-h), soit le commentaire du total.
+        function cible(el) {
+            const t = el.dataset.t, champ = el.dataset.champ;
+            if (champ === 'commentaireTotal') return { obj: D, champ, t };
+            const ligne = D[TABLES[t].liste][parseInt(el.dataset.i, 10)];
+            if (!ligne) return null;
+            const obj = el.dataset.h !== undefined ? ligne.historique[parseInt(el.dataset.h, 10)] : ligne;
+            return obj ? { obj, champ, t } : null;
+        }
+
+        // ─── Textes : modification directe ──────────────────────────────────
+        document.addEventListener('focusout', e => {
+            const el = e.target;
+            if (!el.classList || !el.classList.contains('txt')) return;
+            const c = cible(el);
+            if (!c) return;
+            const v = el.innerText.replace(/ /g, ' ').replace(/\s+$/, '').replace(/^\s+/, '');
+            if (!v) el.textContent = '';   // rétablit l'indication de case vide
+            if ((c.obj[c.champ] || '') === v) return;
+            c.obj[c.champ] = v;
+            enregistrer();
+        });
+        document.addEventListener('keydown', e => {
+            const el = e.target;
+            if (el.classList && el.classList.contains('txt') && el.classList.contains('simple') && e.key === 'Enter') {
+                e.preventDefault(); el.blur();
+            }
+        });
+
+        // ─── Montant et date : correction sur place ─────────────────────────
+        function ouvrirEdition(span) {
+            const c = cible(span);
+            if (!c) return;
+            const type = span.dataset.type;
+            const input = document.createElement('input');
+            input.className = 'saisie';
+            if (type === 'date') { input.type = 'date'; input.value = c.obj[c.champ] || ''; }
+            else { input.value = (c.obj[c.champ] === null || c.obj[c.champ] === undefined) ? '' : String(c.obj[c.champ]).replace('.', ','); }
+            const err = document.createElement('span');
+            err.className = 'erreur';
+            span.replaceWith(input);
+            input.after(err);
+            input.focus();
+            let fini = false;
+            function terminer(valider) {
+                if (fini) return;
+                if (valider) {
+                    let v;
+                    if (type === 'date') v = input.value || null;
+                    else {
+                        v = lireMontant(input.value);
+                        if (v === undefined) {
+                            err.textContent = 'Montant non reconnu : saisissez par exemple 25 509,43 ou laissez vide.';
+                            input.focus();
+                            return;
+                        }
+                    }
+                    fini = true;
+                    if (c.obj[c.champ] !== v && !(c.obj[c.champ] == null && v == null)) { c.obj[c.champ] = v; enregistrer(); }
+                } else fini = true;
+                // La case est remise en place sans redessiner la page, pour qu'un
+                // clic sur une autre case soit pris en compte du premier coup.
+                span.innerHTML = type === 'date' ? texteDate(c.obj[c.champ]) : texteMontant(c.obj[c.champ], TABLES[c.t].signe);
+                err.remove();
+                input.replaceWith(span);
+                const tot = document.getElementById('total-ca');
+                if (tot) tot.innerHTML = texteMontant(totalCA(), true);
+            }
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') { e.preventDefault(); terminer(true); }
+                if (e.key === 'Escape') { e.preventDefault(); terminer(false); }
+            });
+            input.addEventListener('input', () => { err.textContent = ''; });
+            input.addEventListener('blur', () => terminer(true));
+        }
+
+        // ─── Boutons ────────────────────────────────────────────────────────
+        document.addEventListener('click', e => {
+            const span = e.target.closest('.edit');
+            if (span) { ouvrirEdition(span); return; }
+
+            const ajout = e.target.closest('[data-ajout]');
+            if (ajout) {
+                const t = ajout.dataset.ajout;
+                const l = t === 'flux'
+                    ? { id: nouvelId('f'), element: '', montant: null, dateSolde: null, precisionDate: '', source: '', situation: '', suite: '', historique: [] }
+                    : { id: nouvelId('c'), entite: '', solde: null, dateSolde: null, situation: '', historique: [] };
+                D[TABLES[t].liste].push(l);
+                enregistrer();
+                afficher();
+                const champ = t === 'flux' ? 'element' : 'entite';
+                const el = document.querySelector('.txt[data-t="' + t + '"][data-i="' + (D[TABLES[t].liste].length - 1) + '"][data-champ="' + champ + '"]');
+                if (el) el.focus();
+                return;
+            }
+
+            const b = e.target.closest('[data-action]');
+            if (!b) return;
+            const t = b.dataset.t, i = parseInt(b.dataset.i, 10);
+            const liste = t ? D[TABLES[t].liste] : null;
+            const l = liste ? liste[i] : null;
+
+            switch (b.dataset.action) {
+                case 'suppr': {
+                    const nom = l[TABLES[t].nom] || 'sans nom';
+                    const h = l.historique.length;
+                    if (!confirm('Supprimer la ligne « ' + nom + ' » ?' + (h ? '\n\nSon historique (' + h + (h > 1 ? ' soldes antérieurs' : ' solde antérieur') + ') sera supprimé aussi.' : ''))) return;
+                    liste.splice(i, 1);
+                    histoOuvert.delete(l.id);
+                    if (formNS === l.id) formNS = null;
+                    enregistrer();
+                    afficher();
+                    break;
+                }
+                case 'histo':
+                    if (histoOuvert.has(l.id)) histoOuvert.delete(l.id); else histoOuvert.add(l.id);
+                    afficher();
+                    break;
+                case 'ns':
+                    formNS = formNS === l.id ? null : l.id;
+                    afficher();
+                    break;
+                case 'ns-annuler':
+                    formNS = null;
+                    afficher();
+                    break;
+                case 'ns-valider': {
+                    const cfg = TABLES[t];
+                    const v = lireMontant(document.getElementById('ns-montant').value);
+                    const err = document.getElementById('ns-erreur');
+                    if (v === undefined || v === null) {
+                        err.textContent = v === null ? 'Saisissez le nouveau montant.' : 'Montant non reconnu : saisissez par exemple 25 509,43.';
+                        document.getElementById('ns-montant').focus();
+                        return;
+                    }
+                    // L'ancien solde n'est gardé que s'il y en avait un.
+                    if (l[cfg.montant] !== null && l[cfg.montant] !== undefined) {
+                        const ancien = {};
+                        cfg.champsHisto.forEach(k => { ancien[k] = l[k] === undefined ? null : l[k]; });
+                        l.historique.unshift(ancien);
+                    }
+                    l[cfg.montant] = v;
+                    l.dateSolde = document.getElementById('ns-date').value || null;
+                    if (t === 'flux') {
+                        l.precisionDate = document.getElementById('ns-precision').value.trim();
+                        l.source = document.getElementById('ns-source').value.trim();
+                    }
+                    formNS = null;
+                    enregistrer();
+                    afficher();
+                    break;
+                }
+                case 'suppr-h': {
+                    const k = parseInt(b.dataset.h, 10);
+                    const h = l.historique[k];
+                    const quoi = texteMontant(h[TABLES[t].montant], TABLES[t].signe).replace(/<[^>]+>/g, '');
+                    if (!confirm('Retirer de l\'historique le solde de ' + quoi + (h.dateSolde ? ' au ' + texteDate(h.dateSolde) : '') + ' ?')) return;
+                    l.historique.splice(k, 1);
+                    if (!l.historique.length) histoOuvert.delete(l.id);
+                    enregistrer();
+                    afficher();
+                    break;
+                }
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if (!formNS || !e.target.closest || !e.target.closest('.form-ns')) return;
+            if (e.key === 'Enter') { e.preventDefault(); const v = document.querySelector('[data-action="ns-valider"]'); if (v) v.click(); }
+            if (e.key === 'Escape') { e.preventDefault(); formNS = null; afficher(); }
+        });
+
+        // ─── Déplacement d'une ligne par glisser-déposer ────────────────────
+        // Une ligne se place après la ligne visée quand on descend, avant quand on
+        // monte, comme aux modules 2 et 3. On ne déplace qu'à l'intérieur d'un tableau.
+        let glisse = null;   // { t, i }
+        function nettoyerGlisse() {
+            document.querySelectorAll('.drag-over-haut, .drag-over-bas, .dragging').forEach(x => x.classList.remove('drag-over-haut', 'drag-over-bas', 'dragging'));
+        }
+        document.addEventListener('dragstart', e => {
+            const p = e.target.closest && e.target.closest('.poignee');
+            if (!p) return;
+            const tr = p.closest('tr.ligne');
+            glisse = { t: tr.dataset.t, i: parseInt(tr.dataset.i, 10) };
+            tr.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            // Type de donnée propre à la page : une case de texte ne peut pas
+            // recevoir la ligne comme du texte si on la lâche dessus.
+            e.dataTransfer.setData('application/x-rt-ligne', String(glisse.i));
+        });
+        document.addEventListener('dragend', () => { glisse = null; nettoyerGlisse(); });
+        document.addEventListener('dragover', e => {
+            if (!glisse) return;
+            const tr = e.target.closest && e.target.closest('tr.ligne');
+            e.preventDefault();
+            if (!tr || tr.dataset.t !== glisse.t) { e.dataTransfer.dropEffect = 'none'; return; }
+            e.dataTransfer.dropEffect = 'move';
+            const vers = parseInt(tr.dataset.i, 10);
+            document.querySelectorAll('.drag-over-haut, .drag-over-bas').forEach(x => x.classList.remove('drag-over-haut', 'drag-over-bas'));
+            if (vers !== glisse.i) tr.classList.add(vers > glisse.i ? 'drag-over-bas' : 'drag-over-haut');
+        });
+        document.addEventListener('drop', e => {
+            if (!glisse) return;
+            e.preventDefault();
+            const tr = e.target.closest && e.target.closest('tr.ligne');
+            if (!tr || tr.dataset.t !== glisse.t) { glisse = null; nettoyerGlisse(); return; }
+            const de = glisse.i, vers = parseInt(tr.dataset.i, 10);
+            const liste = D[TABLES[glisse.t].liste];
+            glisse = null;
+            nettoyerGlisse();
+            if (de === vers) return;
+            const l = liste.splice(de, 1)[0];
+            liste.splice(vers, 0, l);
+            enregistrer();
+            afficher();
+        });
+
+        // ─── Démarrage ──────────────────────────────────────────────────────
+        document.getElementById('btnReprise').addEventListener('click', () => {
+            if (D.flux.length || D.comptesAssocies.length) return;
+            D = lignesDu9novembre();
+            enregistrer();
+            afficher();
+        });
+
+        D = charger();
+        if (D) afficher();
+        else document.querySelectorAll('.bloc, .btn-ajout').forEach(x => { x.style.pointerEvents = 'none'; x.style.opacity = '0.5'; });
+    </script>
+</body>
+</html>

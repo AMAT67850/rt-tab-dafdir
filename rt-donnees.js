@@ -1,6 +1,6 @@
 /* rt-donnees.js — Rocket Tower — reprise d'octobre 2026
  *
- * Fichier commun aux neuf pages, appelé par une seule ligne placée avant tout code
+ * Fichier commun aux dix pages, appelé par une seule ligne placée avant tout code
  * qui lit ou écrit des données :
  *     <script src="rt-donnees.js"></script>
  * Il remplace garde-navigateur.js.
@@ -53,7 +53,9 @@
         'rocket_tower_seuils_personnalises': 'rt-seuils-personnalises',
         // AJOUT 02/11/2026 — listes des centres et des types de charges (rt-listes.js)
         'centresRT': 'rt-centres',
-        'typesChargesRT': 'rt-types-charges'
+        'typesChargesRT': 'rt-types-charges',
+        // AJOUT 09/11/2026 — flux intersociétés et comptes associés (module 7)
+        'fluxIntersocietesRT': 'rt-flux-intersocietes'
     };
     var NOUVELLES = Object.keys(CORRESP).map(function (k) { return CORRESP[k]; });
     var ETAT = 'rt-etat';            // { revision, sale, migreLe }
@@ -637,6 +639,8 @@
             // Ajout 02/11/2026 — listes des centres et des types de charges
             if (Array.isArray(d.centres) && d.centres.length) data['rt-centres'] = JSON.stringify(d.centres);
             if (Array.isArray(d.typesCharges) && d.typesCharges.length) data['rt-types-charges'] = JSON.stringify(d.typesCharges);
+            // Ajout 09/11/2026 — flux intersociétés et comptes associés
+            if (d.fluxIntersocietes && typeof d.fluxIntersocietes === 'object') data['rt-flux-intersocietes'] = JSON.stringify(d.fluxIntersocietes);
             var seuils = lire('rt-seuils-personnalises');
             if (seuils !== null) data['rt-seuils-personnalises'] = seuils;
             return { data: data, date: d.dateExport };
@@ -784,7 +788,8 @@
             recettes: g('rt-recettes') || [], chargesRecurrentes: g('rt-charges-recurrentes') || [],
             chargesPeriodiques: g('rt-charges-periodiques') || [], previsionnel: g('rt-previsionnel'),
             typesRecettes: g('rt-types-recettes'),
-            centres: g('rt-centres'), typesCharges: g('rt-types-charges')   // ajout 02/11/2026
+            centres: g('rt-centres'), typesCharges: g('rt-types-charges'),   // ajout 02/11/2026
+            fluxIntersocietes: g('rt-flux-intersocietes')                     // ajout 09/11/2026
         };
         telecharger('rocket-tower-export-' + jour() + '_' + (S.machine || 'ce-mac') + '.json', JSON.stringify(d, null, 2));
     }
@@ -814,6 +819,7 @@
         if ((ici['rt-types-recettes'] || '') !== (fic['rt-types-recettes'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Types de recettes</b> différents.</p>');
         if ((ici['rt-centres'] || '') !== (fic['rt-centres'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Liste des centres</b> différente.</p>');
         if ((ici['rt-types-charges'] || '') !== (fic['rt-types-charges'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Types de charges</b> différents.</p>');
+        if ((ici['rt-flux-intersocietes'] || '') !== (fic['rt-flux-intersocietes'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Flux intersociétés et comptes associés</b> différents.</p>');   // ajout 09/11/2026
         if ((ici['rt-seuils-personnalises'] || '') !== (fic['rt-seuils-personnalises'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Seuils personnalisés</b> différents.</p>');
         return lignes.length ? lignes.join('') : '<p>Aucune différence de contenu.</p>';
     }

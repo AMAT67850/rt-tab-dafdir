@@ -611,7 +611,10 @@
                     // AJOUT 02/11/2026 — listes des centres et des types de charges
                     // (null tant qu'elles n'ont jamais été modifiées : liste par défaut)
                     centres: JSON.parse(localStorage.getItem('centresRT') || 'null'),
-                    typesCharges: JSON.parse(localStorage.getItem('typesChargesRT') || 'null')
+                    typesCharges: JSON.parse(localStorage.getItem('typesChargesRT') || 'null'),
+                    // AJOUT 09/11/2026 — flux intersociétés et comptes associés (module 7)
+                    // (null tant que la page n'a jamais été remplie)
+                    fluxIntersocietes: JSON.parse(localStorage.getItem('fluxIntersocietesRT') || 'null')
                 };
 
                 const totalEnregistrements = donnees.recettes.length + donnees.chargesRecurrentes.length + donnees.chargesPeriodiques.length;
@@ -713,6 +716,13 @@
                                 addLog(`ℹ️ Ce fichier ne contient pas de liste de ${libelle} : celle de ce navigateur est conservée`, 'info');
                             }
                         });
+                        // AJOUT 09/11/2026 — flux intersociétés : même règle, conservés si absents du fichier
+                        if (donnees.fluxIntersocietes && typeof donnees.fluxIntersocietes === 'object') {
+                            localStorage.setItem('fluxIntersocietesRT', JSON.stringify(donnees.fluxIntersocietes));
+                            addLog('✅ Flux intersociétés et comptes associés restaurés', 'success');
+                        } else {
+                            addLog('ℹ️ Ce fichier ne contient pas les flux intersociétés : ceux de ce navigateur sont conservés', 'info');
+                        }
                         afficherListe('centres');
                         afficherListe('typesCharges');
                         afficherTypesRecettes();
@@ -768,6 +778,7 @@
                 '• le prévisionnel : solde initial, opérations spécifiques, ajustements mensuels\n' +
                 '• les types de recettes personnalisés\n' +
                 '• les listes de centres et de types de charges\n' +
+                '• les flux intersociétés et comptes associés\n' +
                 '• la date de dernière sauvegarde\n\n' +
                 'Les fichiers de sauvegarde déjà téléchargés sur votre disque ne sont pas concernés.\n\n' +
                 'Continuer ?';
@@ -784,7 +795,8 @@
             try {
                 ['recettesRT', 'chargesRecurrentesRT', 'chargesPeriodiquesRT',
                  'previsionnel12moisRT', 'typesRecettesRT', 'derniereSauvegardeRT',
-                 'centresRT', 'typesChargesRT']   // AJOUT 02/11/2026
+                 'centresRT', 'typesChargesRT',   // AJOUT 02/11/2026
+                 'fluxIntersocietesRT']           // AJOUT 09/11/2026
                     .forEach(cle => localStorage.removeItem(cle));
 
                 addLog('🗑️ Données locales effacées : contrats, prévisionnel, types de recettes', 'warning');
