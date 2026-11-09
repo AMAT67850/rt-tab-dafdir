@@ -203,7 +203,8 @@
 
     // Le prévisionnel est réécrit par le module 6 à chaque ouverture : seuls ces
     // champs constituent une vraie modification.
-    var CHAMPS_PREV = ['soldeInitial', 'operationsSpecifiques', 'overridesTemporaires', 'suppressionsTemporaires'];
+    // notesEncadres : textes des encadrés « Note », modifiables depuis le 09/11/2026
+    var CHAMPS_PREV = ['soldeInitial', 'operationsSpecifiques', 'overridesTemporaires', 'suppressionsTemporaires', 'notesEncadres'];
     function substancePrev(txt) {
         try {
             var o = JSON.parse(txt);
@@ -815,7 +816,7 @@
             if (h) lignes.push('<p style="margin:10px 0 4px;"><b>' + c[1] + '</b></p><ul style="margin:0;padding-left:22px;">' + h + '</ul>');
         });
         if (substancePrev(ici['rt-previsionnel'] || 'null') !== substancePrev(fic['rt-previsionnel'] || 'null'))
-            lignes.push('<p style="margin:10px 0 4px;"><b>Prévisionnel</b> : solde initial ou opérations spécifiques différents.</p>');
+            lignes.push('<p style="margin:10px 0 4px;"><b>Prévisionnel</b> : solde initial, opérations spécifiques ou notes différents.</p>');
         if ((ici['rt-types-recettes'] || '') !== (fic['rt-types-recettes'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Types de recettes</b> différents.</p>');
         if ((ici['rt-centres'] || '') !== (fic['rt-centres'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Liste des centres</b> différente.</p>');
         if ((ici['rt-types-charges'] || '') !== (fic['rt-types-charges'] || '')) lignes.push('<p style="margin:10px 0 4px;"><b>Types de charges</b> différents.</p>');

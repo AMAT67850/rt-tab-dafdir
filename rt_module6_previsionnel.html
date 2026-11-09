@@ -85,6 +85,16 @@
         .note-solde p:last-child {
             margin-bottom: 0;
         }
+
+        /* AJOUT 09/11/2026 — texte des encadrés « Note » modifiable par l'utilisatrice */
+        .note-texte { outline: none; border-radius: 4px; padding: 2px 4px; margin: -2px -4px; border: 1px solid transparent; }
+        .note-texte:hover { border-color: #c9dcea; background: #fff; cursor: text; }
+        .note-texte:focus { border-color: #3498db; background: #fff; box-shadow: 0 0 0 2px rgba(52,152,219,0.15); }
+        .note-texte > strong { color: #2c3e50; display: block; margin-bottom: 10px; }
+        .note-texte p { margin: 0 0 8px 0; }
+        .note-texte p:last-child { margin-bottom: 0; }
+        .note-texte:empty::before { content: 'Note vide : cliquez pour écrire.'; color: #adb5bd; }
+        .note-aide { font-size: 0.85em; color: #888; margin-top: 8px; }
         
         .config-section h2 {
             color: #2c3e50;
@@ -627,20 +637,25 @@
                 </div>
             </div>
 
-            <!-- Note solde initial -->
+            <!-- Note solde initial — texte modifiable depuis le 09/11/2026 -->
             <div class="note-solde">
+                <div class="note-texte" contenteditable="true" spellcheck="true" data-note="soldeInitial" title="Cliquer pour modifier ce texte">
                 <strong>ℹ️ Note sur le Solde Initial</strong>
                 <p>Le solde cumulé est calculé à partir du solde initial renseigné ci-dessus, qui est celui du compte <strong>CMDP (épargne/BFR)</strong>.</p>
                 <p>⚠️ Il n'inclut pas les soldes des comptes BP, qui sont trop fluctuants et peuvent déjà inclure des recettes du mois en cours (paiements anticipés, prélèvements automatiques avancés avant WE/férié) — recettes par ailleurs déjà comptées dans le prévisionnel. Les inclure entraînerait un double comptage.</p>
                 <p>En ne comptant que le solde de la CMDP, le solde cumulé reflète le <strong>cash-flow structurel sur 12 mois glissants</strong> : la richesse générée si le portefeuille clients reste stable et sans compter d'éventuelles dépenses ponctuelles non prévues.</p>
+                </div>
             </div>
 
-            <!-- Note données projetées -->
+            <!-- Note données projetées — texte modifiable depuis le 09/11/2026 -->
             <div class="note-solde">
+                <div class="note-texte" contenteditable="true" spellcheck="true" data-note="donneesProjetees" title="Cliquer pour modifier ce texte">
                 <strong>ℹ️ Note sur les données projetées</strong>
                 <p>Ce prévisionnel est construit mois par mois à partir des recettes et charges récurrentes saisies dans les onglets dédiés.</p>
                 <p><strong>Entrées différées</strong> : une recette ou charge avec une date d'entrée future n'est comptée qu'à partir du mois de son démarrage effectif.</p>
                 <p><strong>Sorties prévues</strong> : une recette ou charge avec une date de départ est exclue à partir du mois suivant son départ.</p>
+                </div>
+                <div class="note-aide">Ces deux encadrés se modifient en cliquant dans le texte ; ⌘ B met en gras. Le texte est enregistré quand vous cliquez ailleurs.</div>
             </div>
 
             <!-- Stats Résumé -->
@@ -789,6 +804,7 @@
                 chargesData = chargesStorage ? JSON.parse(chargesStorage).filter(c => !c.statut || c.statut === 'ACTIF') : [];
                 
                 console.log(`📥 Données chargées: ${recettesData.length} recettes, ${chargesData.length} charges`);
+                window.notesEncadres = {};   // AJOUT 09/11/2026 — remplacé ci-dessous si le prévisionnel en contient
                 
                 // Charger les données spécifiques du prévisionnel
                 if (prevStorage) {
@@ -797,6 +813,7 @@
                     operationsSpecifiques = prevData.operationsSpecifiques || {};
                     window.overridesTemporaires = prevData.overridesTemporaires || {};
                     window.suppressionsTemporaires = prevData.suppressionsTemporaires || {};
+                    window.notesEncadres = (prevData.notesEncadres && typeof prevData.notesEncadres === 'object') ? prevData.notesEncadres : {};   // AJOUT 09/11/2026
                     console.log('💾 Configuration prévisionnel restaurée');
                 }
 
@@ -804,7 +821,57 @@
                 console.error('❌ Erreur chargement:', error);
                 alert('Erreur lors du chargement des données: ' + error.message);
             }
+            afficherNotesEncadres();   // AJOUT 09/11/2026
         }
+
+        // ─── AJOUT 09/11/2026 — encadrés « Note » modifiables ─────────────────
+        // Le texte d'origine, écrit dans la page, s'affiche tant que l'utilisatrice
+        // ne l'a pas modifié. Un texte modifié est gardé dans le prévisionnel
+        // (notesEncadres.soldeInitial, notesEncadres.donneesProjetees), donc dans le
+        // fichier de données iCloud. Seules quelques balises de mise en forme sont
+        // conservées (paragraphe, retour à la ligne, gras, italique, liste).
+        const NOTES_BALISES = ['P', 'BR', 'STRONG', 'B', 'EM', 'I', 'DIV', 'UL', 'OL', 'LI'];
+        function nettoyerNote(html) {
+            const doc = new DOMParser().parseFromString('<div>' + html + '</div>', 'text/html');
+            (function propre(n) {
+                Array.from(n.childNodes).forEach(c => {
+                    if (c.nodeType === 3) return;
+                    if (c.nodeType !== 1 || /^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|LINK|META)$/.test(c.tagName)) { c.remove(); return; }
+                    propre(c);
+                    if (NOTES_BALISES.indexOf(c.tagName) < 0) { c.replaceWith(...c.childNodes); return; }
+                    Array.from(c.attributes).forEach(a => c.removeAttribute(a.name));
+                });
+            })(doc.body.firstChild);
+            const h = doc.body.firstChild.innerHTML.trim();
+            return doc.body.firstChild.textContent.trim() ? h : '';
+        }
+        function afficherNotesEncadres() {
+            document.querySelectorAll('.note-texte[data-note]').forEach(el => {
+                const v = window.notesEncadres && window.notesEncadres[el.dataset.note];
+                if (typeof v === 'string') el.innerHTML = nettoyerNote(v);
+            });
+        }
+        document.addEventListener('focusin', e => {
+            const el = e.target.closest && e.target.closest('.note-texte[data-note]');
+            if (el) el.dataset.avant = nettoyerNote(el.innerHTML);
+        });
+        document.addEventListener('focusout', e => {
+            const el = e.target.closest && e.target.closest('.note-texte[data-note]');
+            if (!el) return;
+            const v = nettoyerNote(el.innerHTML);
+            if (!v) el.innerHTML = '';
+            if (v === el.dataset.avant) return;
+            window.notesEncadres = window.notesEncadres || {};
+            window.notesEncadres[el.dataset.note] = v;
+            el.dataset.avant = v;
+            sauvegarderPrevisionnel();
+        });
+        // Un texte collé arrive sans sa mise en forme d'origine.
+        document.addEventListener('paste', e => {
+            if (!(e.target.closest && e.target.closest('.note-texte[data-note]'))) return;
+            e.preventDefault();
+            document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain'));
+        });
 
         function sauvegarderPrevisionnel() {
             try {
@@ -816,6 +883,8 @@
                     overridesTemporaires: window.overridesTemporaires || {},
                     suppressionsTemporaires: window.suppressionsTemporaires || {}
                 };
+                // AJOUT 09/11/2026 — textes des encadrés « Note », seulement s'il y en a
+                if (window.notesEncadres && Object.keys(window.notesEncadres).length) data.notesEncadres = window.notesEncadres;
                 localStorage.setItem('previsionnel12moisRT', JSON.stringify(data));
                 console.log('💾 Prévisionnel sauvegardé');
             } catch (error) {

@@ -13,7 +13,9 @@
         Modifié le 09/11/2026 après déploiement : zone « Synthèse et actions à mener »
         au-dessus des tableaux (titre et texte modifiables), colonne N° retirée (la
         poignée de déplacement est passée devant l'élément), sous-titre « actionnaire
-        unique », texte d'explication du haut de page modifiable.
+        unique », texte d'explication du haut de page modifiable ; barre de mise en
+        forme (gras, italique, souligné, surligné, listes) pour la synthèse et les
+        colonnes « Suite à donner » et « Situation et suite ».
         Étiquette lue et écrite : 'fluxIntersocietesRT', que rt-donnees.js aiguille
         vers 'rt-flux-intersocietes' et range dans le fichier de données iCloud.
     -->
@@ -123,6 +125,23 @@
         .hist th { background: none; border-bottom: 1px solid #cfe3df; font-size: 14px; color: #6c757d; font-weight: 600; padding: 4px 8px; }
         .hist td { border-bottom: 1px solid #e3ecea; padding: 6px 8px; }
 
+        /* AJOUT 09/11/2026 — textes avec mise en forme (synthèse, suite à donner, situation et suite) */
+        .txt.riche { white-space: normal; }
+        .riche p { margin: 0 0 6px; }
+        .riche ul, .riche ol { margin: 4px 0 4px 1.4em; padding: 0; }
+        .riche li { margin: 2px 0; }
+        .riche mark { background: #fff3a3; color: inherit; padding: 0 2px; border-radius: 2px; }
+        .barre-riche {
+            position: absolute; z-index: 1000; display: flex; flex-wrap: wrap; gap: 4px; padding: 4px;
+            background: #fff; border: 1px solid #cfe3df; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .barre-riche[hidden] { display: none; }
+        .barre-riche button {
+            font-family: inherit; font-size: 18px; height: 36px; min-width: 38px; padding: 0 10px; cursor: pointer;
+            border: 1px solid transparent; border-radius: 6px; background: none; color: #0f5e57;
+        }
+        .barre-riche button:hover { background: #e6f4f1; }
+        .barre-riche button.actif { background: #cfe3df; border-color: #0f766e; }
         .titre-synthese { font-size: 22px; font-weight: 700; color: #0f5e57; margin-bottom: 12px; }
         .zone-synthese { min-height: 7.5em; padding: 10px 12px; border: 1px solid #cfe3df; background: #fafdfc; line-height: 1.55; }
         tfoot td { border-top: 2px solid #cfe3df; border-bottom: none; font-weight: 600; background: #f1f5f4; }
@@ -184,6 +203,17 @@
             </table>
             <button class="btn btn-ajout" data-ajout="ca">➕ Ajouter une ligne</button>
         </section>
+    </div>
+
+    <!-- AJOUT 09/11/2026 — barre de mise en forme, affichée au-dessus du texte en cours de modification -->
+    <div id="barre-riche" class="barre-riche" hidden>
+        <button type="button" data-cmd="bold" title="Gras (⌘ B)"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="Italique (⌘ I)"><i>I</i></button>
+        <button type="button" data-cmd="underline" title="Souligné (⌘ U)"><u>U</u></button>
+        <button type="button" data-cmd="surligner" title="Surligner ; un second clic retire le surlignage"><mark style="background:#fff3a3">Surligner</mark></button>
+        <button type="button" data-cmd="insertUnorderedList" title="Liste à puces">• Liste</button>
+        <button type="button" data-cmd="insertOrderedList" title="Liste numérotée">1. Liste</button>
+        <button type="button" data-cmd="effacer" title="Retirer la mise en forme du texte sélectionné">Effacer la mise en forme</button>
     </div>
 
     <script>
@@ -353,7 +383,7 @@
                     '<span class="cap">Source</span>' + caseTexte('flux', i, 'source', l.source, '—', true) +
                     liensSolde('flux', i, l) + '</td>' +
                 '<td>' + caseTexte('flux', i, 'situation', l.situation, '—', false) + '</td>' +
-                '<td>' + caseTexte('flux', i, 'suite', l.suite, '—', false) + '</td>' +
+                '<td>' + caseRiche('flux', i, 'suite', l, '—') + '</td>' +
                 '<td class="col-act"><button class="btn-suppr" data-action="suppr" data-t="flux" data-i="' + i + '" title="Supprimer la ligne">🗑️</button></td>' +
                 '</tr>' + lignesSous('flux', i, l, 5);
         }
@@ -363,7 +393,7 @@
                 '<td><span class="cap">Solde</span>' + caseMontant('ca', i, 'solde', l.solde) +
                     '<span class="cap">Date du solde</span>' + caseDate('ca', i, 'dateSolde', l.dateSolde) +
                     liensSolde('ca', i, l) + '</td>' +
-                '<td>' + caseTexte('ca', i, 'situation', l.situation, '—', false) + '</td>' +
+                '<td>' + caseRiche('ca', i, 'situation', l, '—') + '</td>' +
                 '<td class="col-act"><button class="btn-suppr" data-action="suppr" data-t="ca" data-i="' + i + '" title="Supprimer la ligne">🗑️</button></td>' +
                 '</tr>' + lignesSous('ca', i, l, 4);
         }
@@ -419,7 +449,7 @@
                 '<div class="txt" contenteditable="plaintext-only" spellcheck="true" data-champ="aide" data-vide="Vos explications…">' + esc(D.aide) + '</div>';
             document.getElementById('bloc-synthese').innerHTML =
                 '<div class="txt simple titre-synthese" contenteditable="plaintext-only" data-champ="titreSynthese" data-vide="Titre de la zone">' + esc(D.titreSynthese) + '</div>' +
-                '<div class="txt zone-synthese" contenteditable="plaintext-only" spellcheck="true" data-champ="synthese" data-vide="Notes, actions à entreprendre, commentaires…">' + esc(D.synthese) + '</div>';
+                '<div class="txt riche zone-synthese" contenteditable="true" spellcheck="true" data-champ="synthese" data-vide="Notes, actions à entreprendre, commentaires…">' + htmlRiche(D, 'synthese') + '</div>';
             document.getElementById('demarrage').style.display = (!fl.length && !ca.length) ? '' : 'none';
             if (formNS) { const m = document.getElementById('ns-montant'); if (m) m.focus(); }
         }
@@ -441,7 +471,7 @@
         // ─── Textes : modification directe ──────────────────────────────────
         document.addEventListener('focusout', e => {
             const el = e.target;
-            if (!el.classList || !el.classList.contains('txt')) return;
+            if (!el.classList || !el.classList.contains('txt') || el.classList.contains('riche')) return;
             const c = cible(el);
             if (!c) return;
             const v = el.innerText.replace(/ /g, ' ').replace(/\s+$/, '').replace(/^\s+/, '');
@@ -455,6 +485,140 @@
             if (el.classList && el.classList.contains('txt') && el.classList.contains('simple') && e.key === 'Enter') {
                 e.preventDefault(); el.blur();
             }
+        });
+
+        // ─── Textes avec mise en forme (AJOUT 09/11/2026) ────────────────────
+        // Zone de synthèse, « Suite à donner » (tableau 1), « Situation et suite »
+        // (tableau 2). Chaque champ garde deux formes : le texte mis en forme
+        // (champ + « Html », par exemple suiteHtml) et le texte brut (champ
+        // d'origine), que le rapport mensuel peut lire tel quel. Tant qu'un texte
+        // n'a pas été mis en forme, seul le texte brut existe et il s'affiche.
+        const RICHE_BALISES = ['P', 'BR', 'DIV', 'B', 'STRONG', 'I', 'EM', 'U', 'MARK', 'UL', 'OL', 'LI'];
+        function aFond(el) {
+            const bg = el.style && el.style.backgroundColor;
+            return !!bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'initial' && bg !== 'inherit';
+        }
+        function nettoyerRiche(html) {
+            const doc = new DOMParser().parseFromString('<div>' + html + '</div>', 'text/html');
+            const racine = doc.body.firstChild;
+            (function propre(n) {
+                Array.from(n.childNodes).forEach(c => {
+                    if (c.nodeType === 3) return;
+                    if (c.nodeType !== 1 || /^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|LINK|META|TEMPLATE)$/.test(c.tagName)) { c.remove(); return; }
+                    propre(c);
+                    if ((c.tagName === 'SPAN' || c.tagName === 'FONT') && aFond(c)) {
+                        const m = doc.createElement('mark');
+                        while (c.firstChild) m.appendChild(c.firstChild);
+                        c.replaceWith(m);
+                        return;
+                    }
+                    if (RICHE_BALISES.indexOf(c.tagName) < 0) { c.replaceWith(...c.childNodes); return; }
+                    Array.from(c.attributes).forEach(a => c.removeAttribute(a.name));
+                });
+            })(racine);
+            return racine.innerHTML.trim();
+        }
+        function htmlRiche(obj, champ) {
+            const h = obj[champ + 'Html'];
+            if (typeof h === 'string' && h) return nettoyerRiche(h);
+            return esc(obj[champ] || '').replace(/\n/g, '<br>');
+        }
+        function caseRiche(t, i, champ, obj, vide) {
+            return '<div class="txt riche" contenteditable="true" spellcheck="true" data-t="' + t + '" data-i="' + i +
+                   '" data-champ="' + champ + '" data-vide="' + esc(vide) + '">' + htmlRiche(obj, champ) + '</div>';
+        }
+        function texteBrut(el) {
+            return el.innerText.replace(/\u00a0/g, ' ').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+        }
+
+        const barre = document.getElementById('barre-riche');
+        let champRiche = null;
+        function placerBarre() {
+            if (!champRiche) return;
+            const r = champRiche.getBoundingClientRect();
+            let gauche = r.left + window.scrollX;
+            const maxi = window.scrollX + document.documentElement.clientWidth - barre.offsetWidth - 8;
+            if (gauche > maxi) gauche = maxi;
+            barre.style.left = Math.max(8, gauche) + 'px';
+            barre.style.top = Math.max(0, r.top + window.scrollY - barre.offsetHeight - 6) + 'px';
+        }
+        function majBarre() {
+            ['bold', 'italic', 'underline', 'insertUnorderedList', 'insertOrderedList'].forEach(c => {
+                const b = barre.querySelector('[data-cmd="' + c + '"]');
+                let actif = false;
+                try { actif = document.queryCommandState(c); } catch (e) { }
+                b.classList.toggle('actif', actif);
+            });
+            const sel = getSelection();
+            const n = sel.rangeCount ? sel.getRangeAt(0).startContainer : null;
+            const el = n && (n.nodeType === 1 ? n : n.parentElement);
+            let surligne = false;
+            for (let x = el; x && x !== champRiche; x = x.parentElement) if (x.tagName === 'MARK' || aFond(x)) { surligne = true; break; }
+            barre.querySelector('[data-cmd="surligner"]').classList.toggle('actif', surligne);
+        }
+        // Éléments surlignés touchés par la sélection (balise mark, ou fond posé par le navigateur)
+        function surlignagesSelection() {
+            const sel = getSelection();
+            if (!sel.rangeCount || !champRiche) return [];
+            const r = sel.getRangeAt(0);
+            return Array.from(champRiche.querySelectorAll('mark, span, font')).filter(m => (m.tagName === 'MARK' || aFond(m)) && r.intersectsNode(m));
+        }
+        function deballer(n) { n.replaceWith(...n.childNodes); }
+        function surligner() {
+            const sel = getSelection();
+            if (!sel.rangeCount || !champRiche.contains(sel.getRangeAt(0).commonAncestorContainer)) return;
+            const deja = surlignagesSelection();
+            if (deja.length) { deja.forEach(deballer); return; }
+            if (sel.isCollapsed) return;
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('hiliteColor', false, '#fff3a3');
+            document.execCommand('styleWithCSS', false, false);
+        }
+        barre.addEventListener('mousedown', e => e.preventDefault());   // garde le texte sélectionné
+        barre.addEventListener('click', e => {
+            const b = e.target.closest('button');
+            if (!b || !champRiche) return;
+            const cmd = b.dataset.cmd;
+            document.execCommand('styleWithCSS', false, false);
+            if (cmd === 'surligner') surligner();
+            else if (cmd === 'effacer') { document.execCommand('removeFormat'); surlignagesSelection().forEach(deballer); }
+            else document.execCommand(cmd);
+            majBarre();
+            placerBarre();
+        });
+        document.addEventListener('focusin', e => {
+            const el = e.target.closest && e.target.closest('.riche');
+            if (!el) return;
+            el.dataset.avant = nettoyerRiche(el.innerHTML);
+            champRiche = el;
+            barre.hidden = false;
+            placerBarre();
+            majBarre();
+        });
+        document.addEventListener('focusout', e => {
+            const el = e.target.closest && e.target.closest('.riche');
+            if (!el) return;
+            barre.hidden = true;
+            champRiche = null;
+            const c = cible(el);
+            if (!c) return;
+            const texte = texteBrut(el);
+            if (!texte) el.innerHTML = '';   // rétablit l'indication de case vide
+            const html = texte ? nettoyerRiche(el.innerHTML) : '';
+            if (html === el.dataset.avant) return;
+            c.obj[c.champ + 'Html'] = html;
+            c.obj[c.champ] = texte;
+            el.dataset.avant = html;
+            enregistrer();
+        });
+        document.addEventListener('selectionchange', () => { if (champRiche) majBarre(); });
+        document.addEventListener('input', e => { if (champRiche && e.target === champRiche) placerBarre(); });
+        window.addEventListener('resize', placerBarre);
+        // Un texte collé arrive sans sa mise en forme d'origine.
+        document.addEventListener('paste', e => {
+            if (!(e.target.closest && e.target.closest('.riche'))) return;
+            e.preventDefault();
+            document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain'));
         });
 
         // ─── Montant et date : correction sur place ─────────────────────────
@@ -647,7 +811,7 @@
         // ─── Démarrage ──────────────────────────────────────────────────────
         document.getElementById('btnReprise').addEventListener('click', () => {
             if (D.flux.length || D.comptesAssocies.length) return;
-            const garde = { aide: D.aide, titreSynthese: D.titreSynthese, synthese: D.synthese };
+            const garde = { aide: D.aide, titreSynthese: D.titreSynthese, synthese: D.synthese, syntheseHtml: D.syntheseHtml };
             D = Object.assign(lignesDu9novembre(), garde);
             enregistrer();
             afficher();
