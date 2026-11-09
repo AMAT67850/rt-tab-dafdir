@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📚 Documentation ROCKET TOWER • Guide Utilisateur Complet</title>
+    <title>📚 Guide ROCKET TOWER</title>
     <style>
         * {
             margin: 0;
@@ -131,10 +131,16 @@
             transform: translateY(-2px);
         }
         
-        /* Contenu principal */
+        /* Contenu principal — texte de lecture en 18 px (09/11/2026) */
         .main-content {
             padding: 30px;
+            font-size: 18px;
+            line-height: 1.55;
         }
+        .main-content ul { margin: 6px 0 12px 1.3em; }
+        .main-content li { margin: 4px 0; }
+        .main-content p { margin: 4px 0 12px; }
+        .main-content code { font-size: 0.9em; background: #f1f3f5; padding: 1px 5px; border-radius: 4px; }
         
         .section {
             display: none;
@@ -515,7 +521,7 @@
         <!-- Header -->
         <div class="header">
             <h1>📚 Documentation ROCKET TOWER</h1>
-            <p class="subtitle">Guide Utilisateur Complet • Architecture Modulaire & Synchronisation Hybride</p>
+            <p class="subtitle">Guide pratique du tableau de bord financier — mis à jour le 9 novembre 2026</p>
         </div>
 
         <!-- Navigation -->
@@ -523,403 +529,197 @@
             <div class="nav-menu">
                 <div class="nav-item active" onclick="showSection('demarrage', this)">🚀 Démarrage</div>
                 <div class="nav-item" onclick="showSection('modules', this)">🔧 Modules</div>
-                <div class="nav-item" onclick="showSection('synchronisation', this)">🔄 Synchronisation</div>
+                <div class="nav-item" onclick="showSection('donnees', this)">🔄 Données et deux Mac</div>
                 <div class="nav-item" onclick="showSection('analytics', this)">📈 Analytics</div>
                 <div class="nav-item" onclick="showSection('depannage', this)">⚙️ Dépannage</div>
             </div>
             <div class="search-box">
-                <input type="text" class="search-input" placeholder="Rechercher dans la documentation..." onkeyup="rechercherContenu(this.value)">
+                <input type="text" class="search-input" placeholder="Rechercher dans le guide..." onkeyup="rechercherContenu(this.value)">
                 <a href="index.html" class="btn btn-primary">🏠 Dashboard</a>
             </div>
         </div>
 
         <!-- Contenu principal -->
         <div class="main-content">
-            <!-- SECTION DÉMARRAGE -->
+            <!-- SECTION DÉMARRAGE — réécrite le 09/11/2026 -->
             <div id="demarrage" class="section active">
                 <div class="card">
-                    <h2>🚀 Guide de Démarrage Rapide</h2>
+                    <h2>🚀 Démarrage</h2>
 
-                    <h3>📋 Première Utilisation (5 minutes)</h3>
-                    <ol class="step-list">
-                        <li><strong>Accédez au Dashboard :</strong> Ouvrez <code>index.html</code> - c'est votre point d'entrée unique</li>
-                        <li><strong>Explorez les modules :</strong> Cliquez sur chaque module pour découvrir les fonctionnalités</li>
-                        <li><strong>Vérifiez vos données :</strong> Consultez les données intégrées dans chaque module</li>
-                        <li><strong>Testez la navigation :</strong> Utilisez les boutons "🏠 Dashboard" pour revenir au menu principal</li>
-                        <li><strong>Consultez les analytics :</strong> Module 5 pour voir vos ratios performance en temps réel</li>
-                    </ol>
-
-                    <h3>🔧 Architecture de Navigation</h3>
-                    <div class="code-block">
-index.html (Dashboard) ← Point d'entrée central
-├── rt_module2_recettes_crud_final.html     (Recettes)
-├── rt_module3_charges_crud.html             (Charges Récurrentes)  
-├── rt_Module4_charges-periodiques_crud.html (Charges Périodiques)
-├── rt_module5_analytics.html                (Analytics)
-├── rt_Module7_Previsionnel.html             (Prévisionnel)
-└── rocket_tower_sync_system.html            (Administration)
-                    </div>
-
-                    <h3>🎯 Navigation Optimale</h3>
-                    <div class="feature-grid">
-                        <div class="feature-box">
-                            <div class="feature-title">📱 Mobile-First</div>
-                            Interface responsive optimisée pour tous écrans
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">⚡ Performance</div>
-                            Chargement instantané grâce au localStorage
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">🔄 Sync Auto</div>
-                            Indicateur visuel de synchronisation en temps réel
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">🎨 Cohérence</div>
-                            Design uniforme sur tous les modules
-                        </div>
-                    </div>
-
-                    <div class="alert alert-warning">
-                        <strong>💡 Astuce :</strong> Gardez toujours le Dashboard (<code>index.html</code>) ouvert dans un onglet pour navigation rapide entre modules.
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION MODULES -->
-            <div id="modules" class="section">
-                <div class="card">
-                    <h2>🔧 Manuel Détaillé des Modules</h2>
-
-                    <h3>📊 Module 1 - Dashboard Principal</h3>
-                    <div class="alert alert-info">
-                        <strong>Fonction :</strong> Point d'entrée central avec navigation vers tous les modules
-                    </div>
-                    <h4>Fonctionnalités :</h4>
+                    <h3>Ouvrir le tableau de bord</h3>
                     <ul>
-                        <li>Navigation vers les 6 modules opérationnels</li>
-                        <li>Indicateur d'ancienneté de la dernière sauvegarde</li>
-                        <li>Accès direct Google Drive et SeaTable</li>
+                        <li>Favori Chrome : <code>https://amat67850.github.io/rt-tab-dafdir/</code>, sans rien derrière. Il ouvre l'accueil ; chaque page s'ouvre depuis sa carte.</li>
+                        <li><strong>Chrome uniquement.</strong> Dans un autre navigateur, la page refuse de s'ouvrir et affiche l'adresse à copier dans Chrome.</li>
+                        <li>Sur l'iMac ou le MacBook. Pas sur iPhone ni iPad.</li>
                     </ul>
 
-                    <h3>💰 Module 2 - Recettes Récurrentes</h3>
-                    <div class="alert alert-success">
-                        <strong>Données :</strong> Contrats clients avec lissage automatique et synchronisation
-                    </div>
-                    <h4>Fonctionnalités CRUD :</h4>
-                    <ul>
-                        <li><span class="highlight">Ajouter :</span> Nouveau contrat avec périodicité (mensuel, trimestriel, semestriel, annuel)</li>
-                        <li><span class="highlight">Modifier :</span> Clic sur ligne du tableau pour édition</li>
-                        <li><span class="highlight">Supprimer :</span> Bouton suppression avec confirmation</li>
-                        <li><span class="highlight">Filtrer :</span> Par catégorie, centre, périodicité</li>
-                    </ul>
-                    <h4>Calculs Automatiques :</h4>
-                    <ul>
-                        <li><strong>Lissage mensuel :</strong> Conversion automatique toutes périodicités vers mensuel</li>
-                        <li><strong>Totaux HT/TTC :</strong> Calculs temps réel avec TVA</li>
-                        <li><strong>Synchronisation :</strong> Sauvegarde localStorage + cloud</li>
-                    </ul>
-
-                    <h3>💸 Module 3 - Charges Récurrentes</h3>
-                    <div class="alert alert-success">
-                        <strong>Données :</strong> Charges récurrentes avec calculs automatiques
-                    </div>
-                    <h4>Gestion Avancée :</h4>
-                    <ul>
-                        <li><strong>Catégories :</strong> LOYERS, CARBURANT, TÉLÉCOM, URSSAF, etc.</li>
-                        <li><strong>Centres de coût :</strong> GÉNÉRAL, GARE, WISSEMBOURG</li>
-                        <li><strong>Périodicités :</strong> Mensuel, trimestriel, semestriel, annuel</li>
-                        <li><strong>Interventions spécifiques :</strong> Mois choisis (format "1,4,7,10")</li>
-                    </ul>
-
-                    <h3>📅 Module 4 - Charges Périodiques</h3>
-                    <div class="alert alert-success">
-                        <strong>Données :</strong> Charges périodiques (1-2 fois/an) avec provision mensuelle
-                    </div>
-                    <h4>Spécificités :</h4>
-                    <ul>
-                        <li><strong>Charges exceptionnelles :</strong> Assurances, taxes, abonnements annuels</li>
-                        <li><strong>Provision mensuelle :</strong> Calcul automatique (Total TTC ÷ 12)</li>
-                        <li><strong>Prochaine échéance :</strong> Suivi des dates importantes</li>
-                    </ul>
-
-                    <h3>📈 Module 5 - Analytics Dashboard</h3>
-                    <div class="alert alert-info">
-                        <strong>Lecture seule :</strong> Analyse automatique des données des modules 2, 3, 4
-                    </div>
-                    <h4>Indicateurs Temps Réel :</h4>
-                    <ul>
-                        <li><strong>Totaux lissés HT :</strong> Recettes vs Charges mensuelles</li>
-                        <li><strong>Résultat mensuel :</strong> Différence recettes - charges</li>
-                        <li><strong>Ratios performance :</strong> Charges/Recettes, Marge opérationnelle</li>
-                        <li><strong>Équilibre financier :</strong> ATTEINT / NON ATTEINT automatique</li>
-                    </ul>
-                    <h4>Répartitions Détaillées :</h4>
-                    <ul>
-                        <li>Par catégorie (recettes et charges)</li>
-                        <li>Top contributeurs par montant</li>
-                        <li>Pourcentages et montants moyens</li>
-                    </ul>
-
-                    <h3>🔮 Module 7 - Prévisionnel 12 Mois</h3>
-                    <div class="alert alert-info">
-                        <strong>Projection automatique :</strong> Basée sur les données récurrentes + opérations spécifiques
-                    </div>
-                    <h4>Fonctionnalités :</h4>
-                    <ul>
-                        <li><strong>Projection 12 mois :</strong> Calcul automatique basé sur périodicités</li>
-                        <li><strong>Solde initial :</strong> Configurable par l'utilisateur</li>
-                        <li><strong>Opérations spécifiques :</strong> Ajout d'événements ponctuels par mois</li>
-                        <li><strong>Graphique évolution :</strong> Courbe solde cumulé avec Chart.js</li>
-                        <li><strong>Détails mensuels :</strong> Accordéons avec répartition recettes/charges</li>
-                    </ul>
-
-                    <h3>⚙️ Module Administration - Synchronisation</h3>
-                    <div class="alert alert-warning">
-                        <strong>Interface avancée :</strong> Monitoring et diagnostic de la synchronisation hybride
-                    </div>
-                    <h4>Outils de Monitoring :</h4>
-                    <ul>
-                        <li><strong>État temps réel :</strong> Local vs Cloud, différences détectées</li>
-                        <li><strong>Statistiques :</strong> Par module, dernières modifications</li>
-                        <li><strong>Actions manuelles :</strong> Export, import, comparaison, reset</li>
-                        <li><strong>Journal sync :</strong> Logs détaillés avec horodatage</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- NOUVELLE SECTION SYNCHRONISATION -->
-            <div id="synchronisation" class="section">
-                <div class="card">
-                    <h2>🔄 Guide de Synchronisation Collaboratif</h2>
-
-                    <div class="alert alert-success">
-                        <strong>🎯 Objectif :</strong> Partager facilement vos données Rocket Tower avec vos collègues en 30 secondes
-                    </div>
-
-                    <h3>🚀 Principe de Fonctionnement</h3>
-                    <div class="sync-workflow">
-                        <div class="person-card">
-                            <h4>👤 Vous</h4>
-                            <div class="person-role">Responsable des modifications</div>
-                        </div>
-                        <div class="sync-arrow">📄→</div>
-                        <div class="person-card">
-                            <h4>👥 Collègues</h4>
-                            <div class="person-role">Récepteurs des données</div>
-                        </div>
-                    </div>
-
-                    <h3>📤 ÉTAPE 1 : Export de vos données (Vous)</h3>
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <h4>1. Effectuez vos modifications normalement</h4>
-                            <p>Travaillez dans vos modules (Recettes, Charges, etc.) comme d'habitude. Toutes vos modifications sont sauvegardées automatiquement.</p>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>2. Accédez à l'interface de synchronisation</h4>
-                            <div class="step-actions">
-                                <strong>Action :</strong> Allez sur <code>rocket_tower_sync_system.html</code><br>
-                                <strong>Raccourci :</strong> Depuis le Dashboard → Module "Administration Synchronisation"
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>3. Exportez vos données</h4>
-                            <div class="step-actions">
-                                <strong>Action :</strong> Cliquez sur le bouton <span class="highlight">"📤 Exporter Données"</span><br>
-                                <strong>Résultat :</strong> Un fichier JSON se télécharge automatiquement<br>
-                                <strong>Nom du fichier :</strong> <code>rocket-tower-export-2025-08-13.json</code>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h3>📧 ÉTAPE 2 : Envoi du fichier</h3>
-                    <div class="alert alert-info">
-                        <strong>Méthodes recommandées :</strong><br>
-                        • Email en pièce jointe<br>
-                        • Google Drive / OneDrive partagé<br>
-                        • Teams / Slack<br>
-                        • Clé USB (si en présentiel)
-                    </div>
-
-                    <h3>📥 ÉTAPE 3 : Import par vos collègues</h3>
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <h4>1. Réception du fichier</h4>
-                            <p>Vos collègues reçoivent et téléchargent le fichier JSON que vous avez envoyé.</p>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>2. Accès à l'interface de synchronisation</h4>
-                            <div class="step-actions">
-                                <strong>Action :</strong> Ils vont sur <code>rocket_tower_sync_system.html</code><br>
-                                <strong>URL :</strong> <code>https://amat67850.github.io/rt-tab-dafdir/rocket_tower_sync_system.html</code>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>3. Import des données</h4>
-                            <div class="step-actions">
-                                <strong>Action :</strong> Clic sur <span class="highlight">"📥 Importer Données"</span><br>
-                                <strong>Sélection :</strong> Choisir votre fichier JSON<br>
-                                <strong>Résultat :</strong> Import automatique + message de confirmation
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>4. Vérification</h4>
-                            <div class="step-actions">
-                                <strong>Contrôle :</strong> Aller dans le module Analytics<br>
-                                <strong>Validation :</strong> Vérifier que les montants correspondent<br>
-                                <strong>Navigation :</strong> Parcourir les autres modules pour confirmer
-                            </div>
-                        </div>
-                    </div>
-
-                    <h3>⚡ Comparaison Avant/Après</h3>
+                    <h3>Le bandeau d'état, en haut de chaque page</h3>
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Aspect</th>
-                                    <th>❌ Ancienne Méthode</th>
-                                    <th>✅ Nouvelle Méthode</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Couleur et message</th><th>Ce que ça veut dire</th><th>Que faire</th></tr></thead>
                             <tbody>
-                                <tr>
-                                    <td><strong>Temps requis</strong></td>
-                                    <td>10-15 minutes</td>
-                                    <td>30 secondes</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Complexité</strong></td>
-                                    <td>Console navigateur + commandes techniques</td>
-                                    <td>2 clics (Export + Import)</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Risque d'erreur</strong></td>
-                                    <td>Élevé (copier-coller JSON)</td>
-                                    <td>Quasi nul (automatique)</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Types de données</strong></td>
-                                    <td>1 par 1 (3 manipulations)</td>
-                                    <td>Toutes en une fois</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Formation requise</strong></td>
-                                    <td>Technique</td>
-                                    <td>Aucune</td>
-                                </tr>
+                                <tr><td>🟢 « Données à jour — enregistrées le … sur … (révision …) »</td><td>Tout va bien.</td><td>Travailler.</td></tr>
+                                <tr><td>🟠 « Mot de passe non saisi — consultation seule »</td><td>Rien ne peut être enregistré.</td><td>« Saisir le mot de passe ».</td></tr>
+                                <tr><td>🟠 « Aucun fichier de données relié à ce Mac »</td><td>Ce Mac ne sait pas où est le fichier.</td><td>« Relier un fichier existant », puis désigner le dossier <code>DONNÉES EN SERVICE</code>.</td></tr>
+                                <tr><td>🔴 « Le fichier a été modifié sur … — rechargez avant de saisir »</td><td>L'autre Mac a enregistré depuis l'ouverture de la page.</td><td>« Recharger », puis travailler.</td></tr>
+                                <tr><td>🔴 « … modifiées dans un autre onglet »</td><td>Deux onglets ouverts sur le tableau de bord.</td><td>« Recharger » ; garder un seul onglet par page.</td></tr>
+                                <tr><td>🔴 « … il faut choisir avant de saisir »</td><td>Ce Mac et le fichier, ou deux copies iCloud, ne portent pas la même version.</td><td>« Voir et choisir » : la fenêtre montre les différences ; garder la bonne version.</td></tr>
+                                <tr><td>🔴 « Fichier injoignable » ou « enregistrement… a échoué »</td><td>iCloud ne répond pas, ou le dossier a bougé.</td><td>« Réessayer » ; sinon « Désigner à nouveau le dossier ».</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <h3>💡 Bonnes Pratiques</h3>
-                    <div class="feature-grid">
-                        <div class="feature-box">
-                            <div class="feature-title">📅 Fréquence Recommandée</div>
-                            Export après modifications importantes ou en fin de journée/semaine
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">📝 Nommage Fichiers</div>
-                            Le système nomme automatiquement avec la date du jour
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">🔍 Vérification</div>
-                            Toujours vérifier les Analytics après import pour confirmer
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">📧 Communication</div>
-                            Informer l'équipe quand de nouvelles données sont disponibles
-                        </div>
-                    </div>
-
-                    <h3>🚨 Que faire en cas de problème ?</h3>
                     <div class="alert alert-warning">
-                        <strong>Problèmes courants et solutions :</strong><br><br>
-                        <strong>• "Le fichier ne s'importe pas"</strong><br>
-                        → Vérifier que c'est bien un fichier .json<br>
-                        → Essayer de l'ouvrir avec un éditeur de texte pour vérifier qu'il n'est pas corrompu<br><br>
-                        
-                        <strong>• "Les données ne correspondent pas"</strong><br>
-                        → Vérifier que vous avez le bon fichier (date récente)<br>
-                        → Refaire l'export depuis l'origine<br><br>
-                        
-                        <strong>• "L'interface ne répond pas"</strong><br>
-                        → Rafraîchir la page (F5)<br>
-                        → Essayer avec un autre navigateur<br>
-                        → Vider le cache du navigateur
+                        <strong>Trois règles</strong><br>
+                        • <strong>Une page sans bandeau est une ancienne copie</strong> : on n'y saisit rien.<br>
+                        • <strong>Fermer l'onglet avant de passer à l'autre Mac.</strong><br>
+                        • <strong>Le mot de passe n'est enregistré nulle part</strong> et ne se récupère pas.
                     </div>
 
-                    <h3>📞 Support</h3>
-                    <div class="alert alert-info">
-                        <strong>En cas de problème persistant :</strong><br>
-                        Contactez <strong>daf.amatcorp@gmail.com</strong> en précisant :<br>
-                        • Le navigateur utilisé<br>
-                        • Le moment où le problème survient<br>
-                        • Le message d'erreur éventuel<br>
-                        • Une capture d'écran si possible
+                    <h3>Les pages</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <tbody>
+                                <tr><td><strong>💵 Recettes récurrentes</strong></td><td>Contrats clients.</td></tr>
+                                <tr><td><strong>💰 Charges récurrentes</strong></td><td>Charges mensuelles ou régulières, dont la provision vers BP2.</td></tr>
+                                <tr><td><strong>📅 Charges périodiques</strong></td><td>Chiffrage de la provision annuelle. N'entre dans aucun calcul.</td></tr>
+                                <tr><td><strong>📊 Analytics</strong></td><td>Résultat mensuel aujourd'hui, à 3, 6, 12 mois et à long terme.</td></tr>
+                                <tr><td><strong>🔮 Prévisionnel 12 mois</strong></td><td>Trésorerie mois par mois à partir du solde de la CMDP.</td></tr>
+                                <tr><td><strong>🔁 Flux intersociétés</strong></td><td>Qui doit quoi à qui entre les trois sociétés, et compte associé. Hors calculs.</td></tr>
+                                <tr><td><strong>🖨️ Export PDF</strong></td><td>Rapport mensuel et prévisionnel imprimables.</td></tr>
+                                <tr><td><strong>💾 Sauvegarde et données</strong></td><td>Export, import, listes (centres, types).</td></tr>
+                            </tbody>
+                        </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- SECTION MODULES — réécrite le 09/11/2026 -->
+            <div id="modules" class="section">
+                <div class="card">
+                    <h2>🔧 Les pages, une par une</h2>
+
+                    <h3>🏠 Accueil</h3>
+                    <ul>
+                        <li>Une carte par page.</li>
+                        <li>En haut, le voyant « Sauvegarde il y a … jours » compte les jours depuis le dernier enregistrement dans le fichier iCloud : orange au-delà de 7 jours, rouge au-delà de 30.</li>
+                        <li>Liens vers Google Drive et SeaTable.</li>
+                    </ul>
+
+                    <h3>💵 Recettes récurrentes</h3>
+                    <ul>
+                        <li><strong>Dates d'entrée et de sortie</strong> : toujours un premier ou un dernier jour de mois. Elles marquent le début et la fin du plein tarif. Le prorata d'un mois incomplet se saisit en opération ponctuelle au prévisionnel ; la date réelle se note dans le commentaire.</li>
+                        <li><strong>Centres et types</strong> : tirés des listes de la page Sauvegarde. Une valeur qui n'y figure plus reste affichée, avec le filtre « Non précisé ou hors liste ».</li>
+                        <li><strong>Déplacer des lignes</strong> : cocher les lignes, Maj + clic pour toute une plage, puis glisser. Impossible quand un tri ou un filtre est actif.</li>
+                    </ul>
+
+                    <h3>💰 Charges récurrentes</h3>
+                    <ul>
+                        <li><strong>Mêmes règles de dates</strong> que les recettes.</li>
+                        <li><strong>Centres</strong> : la liste commune, plus « Mixte » (charge partagée entre Gare et Wissembourg) et « Frais généraux ».</li>
+                        <li><strong>Provision pour charges périodiques</strong> : une ligne saisie à la main, dimensionnée avec la page Charges périodiques. Elle correspond au virement mensuel vers BP2.</li>
+                        <li><strong>Déplacer des lignes</strong> : comme aux recettes ; permis sous filtre, pas sous tri.</li>
+                    </ul>
+
+                    <h3>📅 Charges périodiques</h3>
+                    <ul>
+                        <li>Outil de chiffrage : <strong>n'entre ni dans les analytics ni dans le prévisionnel</strong>.</li>
+                        <li>Une ligne correspond à un décaissement qui revient une fois par an. Quatre acomptes font quatre lignes.</li>
+                        <li>Provision mensuelle = total TTC ÷ 12. C'est, aux arrondis près, le montant de la ligne de provision des charges récurrentes et du virement vers BP2.</li>
+                        <li>Garde ses propres listes de centres et de catégories.</li>
+                    </ul>
+
+                    <h3>📊 Analytics</h3>
+                    <ul>
+                        <li>Lit les recettes et les charges récurrentes, rien d'autre.</li>
+                        <li>Voir l'onglet « Analytics » de ce guide.</li>
+                    </ul>
+
+                    <h3>🔮 Prévisionnel 12 mois</h3>
+                    <ul>
+                        <li><strong>Solde initial = solde de la CMDP seule.</strong> Les comptes BP n'y entrent pas. BP2 contient des provisions déjà comptées en charges, réservées à des factures que le prévisionnel ne montre pas.</li>
+                        <li>« ➕ Ajouter Opérations » : opérations ponctuelles d'un mois donné (prorata, dépense exceptionnelle…).</li>
+                        <li>« 🔄 Calculer Prévisionnel » après un changement de solde initial ou d'opération.</li>
+                        <li>Les deux encadrés « Note » se modifient en cliquant dans le texte ; ⌘ B met en gras.</li>
+                    </ul>
+
+                    <h3>🔁 Flux intersociétés et comptes associés</h3>
+                    <ul>
+                        <li><strong>Hors prévisionnel</strong> : le soutien mensuel à Smoothmania n'est compté qu'une fois, dans les charges récurrentes (« flux groupe »).</li>
+                        <li>Tous les textes se modifient en cliquant dedans. Une barre de mise en forme apparaît dans la zone de synthèse et dans les colonnes « Suite à donner » et « Situation et suite ».</li>
+                        <li><strong>« Nouveau solde »</strong> range l'ancien montant dans l'historique de la ligne. <strong>Modifier le montant directement</strong> le corrige, sans rien garder.</li>
+                        <li>Une date inconnue reste vide (« non précisée ») ; une mention comme « depuis le 15/11/2023 » va dans « Précision sur la date ».</li>
+                        <li>Changer l'ordre : glisser la poignée ⋮⋮ devant chaque élément.</li>
+                        <li>Après un nouveau solde, relire les textes de la ligne : ceux qui citent un montant ne suivent pas.</li>
+                    </ul>
+
+                    <h3>🖨️ Export PDF</h3>
+                    <ul>
+                        <li>Deux rapports : « Rapport mensuel » et « Prévisionnel 12 mois ».</li>
+                        <li>« 🖨️ Imprimer… », puis « Enregistrer en PDF » dans la fenêtre d'impression.</li>
+                    </ul>
+
+                    <h3>💾 Sauvegarde et données</h3>
+                    <ul>
+                        <li><strong>« 📤 Exporter Données »</strong> : télécharge un fichier JSON avec toutes les données. C'est une copie de secours, et la base du rapport mensuel à la direction.</li>
+                        <li><strong>« 📥 Importer Données »</strong> : remplace les données par celles d'un export, dans le fichier iCloud, donc sur les deux Mac.</li>
+                        <li><strong>« 🗑️ Réinitialiser »</strong> : efface toutes les données, après avoir proposé un export. Malgré le libellé « de ce navigateur », l'effacement est écrit dans le fichier iCloud et vaut pour les deux Mac. Les copies des séances précédentes restent dans le dossier <code>historique</code>.</li>
+                        <li><strong>Listes</strong> : types de recettes, centres, types de charges. Renommer renomme les fiches, après confirmation. Supprimer ne touche aucune fiche : elles gardent leur valeur, « hors liste ».</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SECTION DONNÉES ET DEUX MAC — remplace « Synchronisation » le 09/11/2026 -->
+            <div id="donnees" class="section">
+                <div class="card">
+                    <h2>🔄 Données et deux Mac</h2>
+
+                    <h3>Où sont les données</h3>
+                    <ul>
+                        <li>Dans un seul fichier, chiffré, dans iCloud Drive : <code>TABLEAU DE BORD RT_TB_FIN (site internet) / DONNÉES EN SERVICE / donnees_rocket_tower.json</code>.</li>
+                        <li>Le dossier doit être réglé sur « Conserver le téléchargement » sur les deux Mac.</li>
+                        <li>Le sous-dossier <code>historique</code> garde, pour chaque séance de travail, une copie datée du fichier prise après le premier enregistrement de la séance (les vingt dernières).</li>
+                        <li>Les pages du site (GitHub) ne contiennent aucune donnée.</li>
+                    </ul>
+
+                    <h3>Au quotidien</h3>
+                    <ol class="step-list">
+                        <li>Chaque modification est écrite dans le fichier ; le bandeau passe au vert.</li>
+                        <li>Avant de changer de Mac : <strong>fermer l'onglet</strong>.</li>
+                        <li>Sur l'autre Mac : ouvrir le tableau de bord et vérifier que le bandeau est vert avec la dernière révision.</li>
+                    </ol>
+
+                    <h3>Copies de secours</h3>
+                    <ul>
+                        <li>L'export de la page Sauvegarde (fichier JSON, enregistré dans Téléchargements).</li>
+                        <li>Les copies du dossier <code>historique</code>, protégées par le même mot de passe.</li>
+                    </ul>
                 </div>
             </div>
 
             <!-- SECTION ANALYTICS -->
             <div id="analytics" class="section">
                 <div class="card">
-                    <h2>📈 Interprétation des Analytics</h2>
+                    <h2>📈 Lire les analytics</h2>
 
-                    <h3>🎯 Indicateurs Clés de Performance</h3>
+                    <div class="alert alert-info">
+                        La page lit les recettes et les charges récurrentes. Pour chaque situation, elle donne les recettes, les charges et le <strong>résultat mensuel HT</strong>, tous lissés au mois.
+                    </div>
+
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Indicateur</th>
-                                    <th>Calcul</th>
-                                    <th>Interprétation</th>
-                                    <th>Objectif</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Situation</th><th>Ce qu'elle compte</th></tr></thead>
                             <tbody>
-                                <tr>
-                                    <td><strong>Résultat Mensuel HT</strong></td>
-                                    <td>Recettes Lissées - Charges Lissées</td>
-                                    <td>Bénéfice/Perte mensuel moyen</td>
-                                    <td>Positif</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Ratio Charges/Recettes</strong></td>
-                                    <td>(Charges / Recettes) × 100</td>
-                                    <td>% des recettes consommé par charges</td>
-                                    <td>À optimiser selon contexte</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Marge Opérationnelle</strong></td>
-                                    <td>(Résultat / Recettes) × 100</td>
-                                    <td>% de rentabilité opérationnelle</td>
-                                    <td>À définir selon activité</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Équilibre Financier</strong></td>
-                                    <td>ATTEINT si Résultat ≥ 0</td>
-                                    <td>Viabilité financière</td>
-                                    <td>ATTEINT</td>
-                                </tr>
+                                <tr><td><strong>📸 Actuelle</strong></td><td>Les contrats effectifs aujourd'hui.</td></tr>
+                                <tr><td><strong>⏰ À 3 mois, 📆 à 6 mois, 📅 à 12 mois</strong></td><td>La situation précédente, plus les entrées et sorties datées de la période (« Variations connues »).</td></tr>
+                                <tr><td><strong>🔮 Long terme</strong></td><td>Après les variations connues au-delà de 12 mois : les contrats pérennes.</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <h3>📊 Analyse des Répartitions</h3>
-                    <h4>Recettes par Catégorie :</h4>
                     <ul>
-                        <li><strong>Diversification :</strong> Aucune catégorie > 50% du total (risque de concentration)</li>
-                        <li><strong>Croissance :</strong> Identifier les catégories en progression</li>
-                        <li><strong>Rentabilité :</strong> Montant moyen par contrat</li>
-                    </ul>
-
-                    <h4>Charges par Catégorie :</h4>
-                    <ul>
-                        <li><strong>Optimisation :</strong> Identifier les postes de charges les plus lourds</li>
-                        <li><strong>Maîtrise :</strong> Évolution des charges fixes vs variables</li>
-                        <li><strong>Négociation :</strong> Principales charges = priorités de renégociation</li>
+                        <li><strong>Répartitions</strong> : recettes et charges par type, sur la base actuelle (nombre, montant lissé, part en %).</li>
+                        <li>« 🔄 Actualiser » relit les données ; « 📄 Imprimer » imprime la page.</li>
                     </ul>
 
                     <h3>🎯 Personnalisation des Seuils</h3>
@@ -956,112 +756,45 @@ Ajoutez vos propres critères selon votre activité..."
                             <button onclick="chargerSeuils()" style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
                                 📥 Charger
                             </button>
-                            <small style="color: #6c757d; align-self: center;">Sauvegarde locale dans votre navigateur</small>
+                            <small style="color: #6c757d; align-self: center;">Enregistré dans le fichier de données, comme le reste du tableau de bord</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION DÉPANNAGE -->
+            <!-- SECTION DÉPANNAGE — réécrite le 09/11/2026 -->
             <div id="depannage" class="section">
                 <div class="card">
-                    <h2>⚙️ Dépannage et Solutions</h2>
+                    <h2>⚙️ Dépannage</h2>
 
-                    <div class="alert alert-warning">
-                        <strong>📞 Support Technique :</strong><br>
-                        En cas de problème persistant et sans réponse dans les indications ci-dessous, contacter <strong>daf.amatcorp@gmail.com</strong>
-                    </div>
+                    <h4>Le bandeau est orange ou rouge</h4>
+                    <p>Voir le tableau de l'onglet « Démarrage » : chaque message a son bouton.</p>
 
-                    <h3>🔧 Problèmes Courants et Solutions</h3>
+                    <h4>« Rien n'a été enregistré : … »</h4>
+                    <p>La saisie a été refusée parce que le fichier n'était pas prêt (mot de passe, fichier modifié sur l'autre Mac…). La page se recharge seule ; régler la cause indiquée, puis refaire la saisie.</p>
 
-                    <h4>📊 "Les analytics ne se mettent pas à jour"</h4>
-                    <div class="code-block">
-Solution :
-1. Cliquer sur "🔄 Actualiser" dans le module Analytics
-2. Vérifier que les données sont bien saisies dans modules 2, 3, 4
-3. Recharger la page (F5) si nécessaire
-                    </div>
-
-                    <h4>🔄 "Problème de synchronisation"</h4>
-                    <div class="code-block">
-Solution :
-1. Aller dans Module Administration Synchronisation
-2. Vérifier l'état de connexion (point coloré en haut à droite)
-3. Cliquer "⚡ Synchroniser" pour forcer la sync
-4. Si persistent : bouton "🔄 Reset Local" puis ressaisir
-                    </div>
-
-                    <h4>📱 "Interface déformée sur mobile"</h4>
-                    <div class="code-block">
-Solution :
-1. Rotation écran (paysage recommandé pour tableaux)
-2. Zoom navigateur ajusté (100% recommandé)
-3. Utiliser navigation par onglets plutôt que multiples fenêtres
-                    </div>
-
-                    <h4>🔮 "Prévisionnel incorrect"</h4>
-                    <div class="code-block">
-Solution :
-1. Vérifier le solde initial (doit être correct)
-2. Contrôler les périodicités des charges/recettes
-3. Recalculer avec bouton "🔄 Calculer Prévisionnel"
-4. Supprimer opérations spécifiques erronées si nécessaire
-                    </div>
-
-                    <h3>🛡️ Sauvegarde et Récupération</h3>
-
-                    <h4>💾 Sauvegarder vos données :</h4>
+                    <h4>Une page n'a pas l'air d'avoir changé après un dépôt sur GitHub</h4>
                     <ol class="step-list">
-                        <li><strong>Module Administration :</strong> Aller dans Administration Synchronisation</li>
-                        <li><strong>Export :</strong> Utiliser "📤 Exporter Données"</li>
-                        <li><strong>Manuel :</strong> Copier les données localStorage (outils développeur)</li>
-                        <li><strong>PDF :</strong> Exporter Analytics + Prévisionnel en PDF pour archivage</li>
+                        <li>Ouvrir la page en ajoutant <code>?v=</code> suivi d'un nouveau chiffre à l'adresse, par exemple <code>…/index.html?v=17</code>.</li>
+                        <li>Si un fichier <code>.js</code> a été déposé : attendre une dizaine de minutes, puis l'ouvrir sur chaque Mac (<code>…/rt-donnees.js</code>) et y chercher un mot de la nouvelle version (Cmd + F) avant toute saisie.</li>
+                        <li>Revenir ensuite au favori habituel, sans <code>?v=</code>.</li>
                     </ol>
 
-                    <h4>🔄 Récupérer après problème :</h4>
-                    <ol class="step-list">
-                        <li><strong>Import automatique :</strong> Utiliser "📥 Importer Données" avec fichier de sauvegarde</li>
-                        <li><strong>Reset :</strong> Module Administration → "🔄 Reset Local" puis ressaisir</li>
-                        <li><strong>Navigation :</strong> Toujours revenir au Dashboard en cas de problème</li>
-                    </ol>
-
-                    <h3>⚡ Optimisation Performance</h3>
-
-                    <div class="feature-grid">
-                        <div class="feature-box">
-                            <div class="feature-title">🚀 Navigation Rapide</div>
-                            Garder Dashboard ouvert, naviguer par onglets
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">💾 LocalStorage</div>
-                            Données instantanées, pas de délai réseau
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">📱 Mobile Optimisé</div>
-                            Interface responsive, fonctionne partout
-                        </div>
-                        <div class="feature-box">
-                            <div class="feature-title">🔄 Sync Intelligente</div>
-                            Fonctionne hors ligne, sync quand connexion
-                        </div>
-                    </div>
-
-                    <h3>📞 Support et Évolutions</h3>
-                    <div class="alert alert-info">
-                        <strong>Architecture Évolutive :</strong><br>
-                        • Modules indépendants : ajout facile de nouvelles fonctionnalités<br>
-                        • Standards web : compatible tous navigateurs<br>
-                        • Code documenté : modifications/améliorations facilitées<br>
-                        • Synchronisation hybride : base solide pour intégrations futures
-                    </div>
-
-                    <h3>🎯 Maintenance Préventive</h3>
+                    <h4>Le prévisionnel semble faux</h4>
                     <ul>
-                        <li><strong>Hebdomadaire :</strong> Vérifier synchronisation Module Administration</li>
-                        <li><strong>Mensuel :</strong> Export PDF Analytics + Prévisionnel</li>
-                        <li><strong>Trimestriel :</strong> Nettoyage données obsolètes</li>
-                        <li><strong>Annuel :</strong> Mise à jour périodicités et contrats</li>
+                        <li>Solde initial : celui de la CMDP, à jour.</li>
+                        <li>Dates d'entrée et de sortie, et périodicités, aux recettes et aux charges.</li>
+                        <li>Opérations ponctuelles du mois concerné.</li>
+                        <li>Puis « 🔄 Calculer Prévisionnel ».</li>
                     </ul>
+
+                    <h4>Déposer une nouvelle version des pages</h4>
+                    <ol class="step-list">
+                        <li>Fermer le tableau de bord sur les deux Mac.</li>
+                        <li>Si les fichiers arrivent dans un <code>.zip</code>, le double-cliquer dans Téléchargements ; déposer les fichiers du dossier obtenu, pas le dossier.</li>
+                        <li>Sur <code>https://github.com/AMAT67850/rt-tab-dafdir/upload/main</code>, connectée avec le compte AMAT67850 : glisser les fichiers, laisser « Commit directly to the main branch », cliquer sur « Commit changes ».</li>
+                        <li>Vérifier qu'aucun nom ne finit par « (1) » ou « 2 », puis contrôler comme ci-dessus.</li>
+                    </ol>
                 </div>
             </div>
         </div>
