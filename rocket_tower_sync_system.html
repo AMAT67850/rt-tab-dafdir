@@ -360,7 +360,7 @@
                     <!-- Header -->
                     <div class="sync-header">
                         <h1>🚀 Rocket Tower</h1>
-                        <p>Sauvegarde et gestion des données locales</p>
+                        <p>Sauvegarde et gestion des données</p>
                     </div>
 
                     <!-- Status -->
@@ -398,9 +398,10 @@
                         <div class="row">
                             <div class="col-md-12 text-center">
                                 <button class="action-btn btn-reset" onclick="resetLocal()">
-                                    🗑️ Réinitialiser les données locales
+                                    🗑️ Réinitialiser toutes les données
                                 </button>
-                                <br><small class="text-muted">Efface recettes, charges récurrentes et charges périodiques de ce navigateur</small>
+                                <!-- CORRECTION 09/11/2026 : l'effacement s'écrit dans le fichier iCloud et vaut pour les deux Mac -->
+                                <br><small class="text-muted">Efface toutes les données du tableau de bord dans le fichier iCloud, donc sur les deux Mac</small>
                             </div>
                         </div>
                     </div>
@@ -547,10 +548,10 @@
 
             if (total === 0) {
                 statusElement.className = 'status-indicator status-pending';
-                statusElement.innerHTML = '📭 Aucune donnée dans ce navigateur';
+                statusElement.innerHTML = '📭 Aucune donnée dans le tableau de bord';   // libellé corrigé le 09/11/2026
             } else if (!syncState.derniereSauvegarde) {
                 statusElement.className = 'status-indicator status-error';
-                statusElement.innerHTML = '⚠️ Jamais sauvegardé — les données ne sont que dans ce navigateur';
+                statusElement.innerHTML = '⚠️ Aucune date d\'enregistrement connue — voir le bandeau d\'état en haut de la page';   // libellé corrigé le 09/11/2026
             } else {
                 const jours = Math.floor((Date.now() - syncState.derniereSauvegarde.getTime()) / 86400000);
                 const quand = formaterAnciennete(syncState.derniereSauvegarde)
@@ -697,14 +698,14 @@
                             localStorage.setItem('previsionnel12moisRT', JSON.stringify(donnees.previsionnel));
                             addLog('✅ Prévisionnel restauré (solde initial, opérations spécifiques, ajustements)', 'success');
                         } else {
-                            addLog('⚠️ Ce fichier ne contient pas le prévisionnel : celui de ce navigateur est conservé tel quel, et se rapporte donc aux données précédentes', 'warning');
+                            addLog('⚠️ Ce fichier ne contient pas le prévisionnel : celui en place est conservé tel quel, et se rapporte donc aux données précédentes', 'warning');
                         }
 
                         if (Array.isArray(donnees.typesRecettes) && donnees.typesRecettes.length) {
                             localStorage.setItem('typesRecettesRT', JSON.stringify(donnees.typesRecettes));
                             addLog(`✅ ${donnees.typesRecettes.length} types de recettes restaurés`, 'success');
                         } else {
-                            addLog('⚠️ Ce fichier ne contient pas les types de recettes : ceux de ce navigateur sont conservés', 'warning');
+                            addLog('⚠️ Ce fichier ne contient pas les types de recettes : ceux en place sont conservés', 'warning');
                         }
 
                         // AJOUT 02/11/2026 — mêmes règles pour les centres et les types de charges
@@ -713,7 +714,7 @@
                                 localStorage.setItem(etiquette, JSON.stringify(donnees[champ]));
                                 addLog(`✅ ${donnees[champ].length} ${libelle} restaurés`, 'success');
                             } else {
-                                addLog(`ℹ️ Ce fichier ne contient pas de liste de ${libelle} : celle de ce navigateur est conservée`, 'info');
+                                addLog(`ℹ️ Ce fichier ne contient pas de liste de ${libelle} : celle en place est conservée`, 'info');
                             }
                         });
                         // AJOUT 09/11/2026 — flux intersociétés : même règle, conservés si absents du fichier
@@ -721,7 +722,7 @@
                             localStorage.setItem('fluxIntersocietesRT', JSON.stringify(donnees.fluxIntersocietes));
                             addLog('✅ Flux intersociétés et comptes associés restaurés', 'success');
                         } else {
-                            addLog('ℹ️ Ce fichier ne contient pas les flux intersociétés : ceux de ce navigateur sont conservés', 'info');
+                            addLog('ℹ️ Ce fichier ne contient pas les flux intersociétés : ceux en place sont conservés', 'info');
                         }
                         afficherListe('centres');
                         afficherListe('typesCharges');
@@ -771,16 +772,16 @@
         async function resetLocal() {
             const avertissement =
                 '⚠️ RÉINITIALISATION\n\n' +
-                'Cette action va effacer, dans ce navigateur :\n\n' +
+                'Cette action va effacer, dans le fichier de données iCloud, donc sur les deux Mac :\n\n' +
                 '• les recettes récurrentes\n' +
                 '• les charges récurrentes\n' +
                 '• les charges périodiques\n' +
-                '• le prévisionnel : solde initial, opérations spécifiques, ajustements mensuels\n' +
+                '• le prévisionnel : solde initial, opérations spécifiques, ajustements mensuels, textes des encadrés « Note »\n' +
                 '• les types de recettes personnalisés\n' +
                 '• les listes de centres et de types de charges\n' +
                 '• les flux intersociétés et comptes associés\n' +
                 '• la date de dernière sauvegarde\n\n' +
-                'Les fichiers de sauvegarde déjà téléchargés sur votre disque ne sont pas concernés.\n\n' +
+                'Ne sont pas concernés : les fichiers de sauvegarde déjà téléchargés sur votre disque, ni les copies des séances précédentes dans le dossier « historique ».\n\n' +
                 'Continuer ?';
 
             if (!confirm(avertissement)) {
@@ -799,7 +800,7 @@
                  'fluxIntersocietesRT']           // AJOUT 09/11/2026
                     .forEach(cle => localStorage.removeItem(cle));
 
-                addLog('🗑️ Données locales effacées : contrats, prévisionnel, types de recettes', 'warning');
+                addLog('🗑️ Données effacées dans le fichier iCloud (les deux Mac) : contrats, prévisionnel, listes, flux intersociétés', 'warning');
 
                 syncState.local = { recettes: 0, chargesRecurrentes: 0, chargesPeriodiques: 0 };
                 syncState.derniereSauvegarde = null;
@@ -1357,7 +1358,7 @@
         // ========== INITIALISATION ==========
         document.addEventListener('DOMContentLoaded', function() {
             addLog('🚀 Interface de sauvegarde initialisée', 'success');
-            addLog('💡 Les données ne quittent ce navigateur que par un export manuel', 'info');
+            addLog('💡 Les données sont enregistrées dans le fichier iCloud, commun aux deux Mac ; l\'export en fait une copie de secours', 'info');   // libellé corrigé le 09/11/2026
             chargerDonneesLocales();
             mettreAJourInterface();
             afficherTypesRecettes();
