@@ -313,7 +313,7 @@
             <!-- RECETTES RÉCURRENTES -->
             <div class="section-card">
                 <h2 class="section-title">💵 Interface Gestion des Recettes récurrentes</h2>
-                <p class="section-description">Système complet avec contrats clients réels intégrés, lissage automatique des périodicités et persistance localStorage.</p>
+                <p class="section-description">Contrats clients : montants, périodicités lissées au mois, dates d'entrée et de sortie, centres et types.</p>
                 <a href="rt_module2_recettes_crud_final.html" class="btn btn-success">💵 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
             </div>
@@ -321,7 +321,7 @@
             <!-- CHARGES RÉCURRENTES -->
             <div class="section-card">
                 <h2 class="section-title">💰 Interface Gestion des Charges récurrentes</h2>
-                <p class="section-description">Système complet avec charges réelles intégrées, lissage automatique des périodicités et persistance localStorage.</p>
+                <p class="section-description">Charges régulières lissées au mois, dont la provision pour charges périodiques (virement vers BP2).</p>
                 <a href="rt_module3_charges_crud.html" class="btn btn-danger">💰 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
             </div>
@@ -329,7 +329,7 @@
             <!-- CHARGES PÉRIODIQUES -->
             <div class="section-card">
                 <h2 class="section-title">📅 Interface Charges Périodiques</h2>
-                <p class="section-description">Gestion complète des charges 1-2 fois par an avec CRUD localStorage, calculs automatiques et persistance.</p>
+                <p class="section-description">Charges réglées une ou deux fois par an : chiffrage de la provision mensuelle. N'entre dans aucun calcul.</p>
                 <a href="rt_Module4_charges-periodiques_crud.html" class="btn btn-warning">📅 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
             </div>
@@ -337,7 +337,7 @@
             <!-- ANALYTICS DASHBOARD -->
             <div class="section-card">
                 <h2 class="section-title">📊 Interface Analytics Dashboard</h2>
-                <p class="section-description">Analyse financière temps réel avec indicateurs clés, ratios de performance et équilibre financier.</p>
+                <p class="section-description">Résultat mensuel lissé aujourd'hui, à 3, 6 et 12 mois et à long terme ; répartition des recettes et des charges par type.</p>
                 <a href="rt_module5_analytics.html" class="btn btn-primary">📊 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
             </div>
@@ -369,7 +369,7 @@
             <!-- SAUVEGARDE ET DONNÉES -->
             <div class="section-card">
                 <h2 class="section-title">💾 Sauvegarde et Données</h2>
-                <p class="section-description">Export et import du fichier de sauvegarde JSON, gestion des types de recettes, réinitialisation des données locales.</p>
+                <p class="section-description">Export et import du fichier de sauvegarde JSON, listes des types de recettes, des centres et des types de charges, réinitialisation des données.</p>
                 <a href="rocket_tower_sync_system.html" class="btn btn-info">💾 Accéder à l'Interface</a>
                 <span class="status-badge status-operational">✅ Opérationnel</span>
             </div>
@@ -408,7 +408,7 @@
                 derniere = localStorage.getItem('derniereSauvegardeRT');
             } catch (e) {
                 dot.className = 'sync-dot sync-red';
-                text.textContent = 'Stockage local inaccessible';
+                text.textContent = 'Mémoire de Chrome inaccessible';
                 return;
             }
 
@@ -416,7 +416,7 @@
 
             if (!donneesPresentes) {
                 dot.classList.add('sync-orange');
-                text.textContent = 'Aucune donnée dans ce navigateur';
+                text.textContent = 'Aucune donnée dans le tableau de bord';
                 return;
             }
 
@@ -424,7 +424,7 @@
 
             if (jours === null) {
                 dot.classList.add('sync-red');
-                text.textContent = 'Jamais sauvegardé';
+                text.textContent = 'Aucune date d\'enregistrement connue';
                 return;
             }
 

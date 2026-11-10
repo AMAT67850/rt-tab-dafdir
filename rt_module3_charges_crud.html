@@ -808,7 +808,7 @@
 <body>
     <div class="header">
         <h1>💰 Gestion des Charges Récurrentes</h1>
-        <p class="subtitle">Interface CRUD complète avec persistance localStorage et lissage automatique + FILTRES PAR TYPE CHARGES</p>
+        <p class="subtitle">Gestion des charges récurrentes — lissage mensuel, filtres par centre et par type</p>
     </div>
 
     <div class="container">
@@ -1138,7 +1138,7 @@
                 charges = [];
                 chargementEchoue = true;
                 console.error('❌ Données de charges illisibles :', error);
-                alert("Les charges enregistrées dans ce navigateur sont illisibles.\n\n" +
+                alert("Les charges enregistrées sont illisibles.\n\n" +
                       "Rien n'est affiché et l'enregistrement est bloqué, pour ne pas écraser " +
                       "des données peut-être récupérables.\n\n" +
                       "Restaurez un fichier de sauvegarde depuis la page Sauvegarde et données.");
@@ -1147,7 +1147,7 @@
 
         function sauvegarderCharges() {
             if (chargementEchoue) {
-                alert("Enregistrement bloqué : les charges de ce navigateur n'ont pas pu être lues.\n\n" +
+                alert("Enregistrement bloqué : les charges enregistrées n'ont pas pu être lues.\n\n" +
                       "Restaurez une sauvegarde avant toute modification.");
                 return;
             }

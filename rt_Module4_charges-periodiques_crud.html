@@ -657,7 +657,7 @@
         // Sauvegarde et chargement
         function sauvegarderDonnees() {
             if (chargementEchoue) {
-                alert("Enregistrement bloqué : les charges périodiques de ce navigateur n'ont pas pu être lues.\n\n" +
+                alert("Enregistrement bloqué : les charges périodiques enregistrées n'ont pas pu être lues.\n\n" +
                       "Restaurez une sauvegarde avant toute modification.");
                 return false;
             }
@@ -690,7 +690,7 @@
                 chargesPeriodiques = [];
                 chargementEchoue = true;
                 console.error('❌ Données de charges périodiques illisibles :', error);
-                alert("Les charges périodiques enregistrées dans ce navigateur sont illisibles.\n\n" +
+                alert("Les charges périodiques enregistrées sont illisibles.\n\n" +
                       "Rien n'est affiché et l'enregistrement est bloqué, pour ne pas écraser " +
                       "des données peut-être récupérables.\n\n" +
                       "Restaurez un fichier de sauvegarde depuis la page Sauvegarde et données.");
